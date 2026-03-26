@@ -93,7 +93,61 @@ df.groupBy(F.spark_partition_id()).count().orderBy("count", ascending=False).sho
 df.groupBy("join_key").count().orderBy("count", ascending=False).show(10)
 ```
 
+## Spark 4.0 Performance Additions
+
+### TransformWithState (Replaces mapGroupsWithState)
+
+```python
+# Spark 4.0: new stateful streaming operator
+# Supports object-oriented state, composite types, auto TTL, timers
+from pyspark.sql.streaming import TransformWithState
+
+class SessionTracker(TransformWithState):
+    """Track user sessions with automatic TTL-based expiry."""
+
+    def init(self, handle):
+        self.session = handle.getValueState("session", schema)
+
+    def handleInputRows(self, key, rows, timer_values):
+        # Process rows, update state with TTL
+        for row in rows:
+            self.session.update(new_state)
+        # Set timer for session timeout
+        timer_values.register_event_time_timer(expiry_ms)
+
+    def handleExpiredTimer(self, key, timer_values):
+        # Emit session summary when timer fires
+        yield self.session.get()
+        self.session.clear()
+```
+
+### Arrow UDFs (Replacing Pandas UDFs)
+
+```python
+# Spark 4.0: Arrow-optimized UDFs — faster than Pandas UDFs
+# Operates on Arrow data directly, no serialization overhead
+import pyarrow.compute as pc
+
+@F.udf(returnType=StringType(), useArrow=True)
+def normalize_email(email):
+    return pc.utf8_lower(email)
+
+df = df.withColumn("email_clean", normalize_email("email"))
+```
+
+### Spark Connect Mode Toggle
+
+```python
+# Switch between classic and Connect mode
+spark.conf.set("spark.api.mode", "connect")  # thin client mode
+spark.conf.set("spark.api.mode", "classic")   # traditional mode
+
+# Or use the lightweight client package
+# pip install pyspark-client  (1.5 MB vs ~300 MB full pyspark)
+```
+
 ## See Also
 
 - [partitioning](../concepts/partitioning.md)
 - [catalyst-optimizer](../concepts/catalyst-optimizer.md)
+- [spark-connect](../concepts/spark-connect.md)

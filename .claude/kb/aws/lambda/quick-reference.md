@@ -2,6 +2,7 @@
 
 > Fast lookup tables. For code examples, see linked files.
 > **MCP Validated:** 2026-02-17
+> **Last Updated:** 2026-03-26
 
 ## Runtime Limits
 
@@ -14,6 +15,26 @@
 | /tmp storage | 512 MB - 10,240 MB | Ephemeral, configurable |
 | Env variables | 4 KB total | Use SSM for large configs |
 | Concurrent executions | 1,000 default | Request increase via quota |
+
+## Supported Python Runtimes (2026)
+
+| Runtime | Status | EOL |
+|---------|--------|-----|
+| Python 3.14 | GA (Nov 2025) | LTS |
+| Python 3.13 | GA | Active |
+| Python 3.12 | GA | Active |
+| Python 3.11 | GA | Active |
+| Python 3.10 | Deprecated | Migrate to 3.12+ |
+| Python 3.9 | Deprecated | Migrate to 3.12+ |
+
+## New Features (re:Invent 2025+)
+
+| Feature | Description |
+|---------|-------------|
+| **Managed Instances** | Steady-state compute for predictable traffic (no cold starts) |
+| **SnapStart for Python** | Pre-initialized execution environments for faster cold starts |
+| **Python 3.14 runtime** | Template strings (`t-strings`), deferred type annotation eval |
+| **AWS Transform custom** | AI agent for automated runtime upgrades at scale |
 
 ## Handler Signature
 
@@ -57,6 +78,9 @@
 | File > 500 MB processing | Step Functions + EFS mount |
 | Retry failed events | DLQ (SQS) + EventInvokeConfig |
 | Structured logging | Powertools Logger |
+| Steady-state traffic (always-on) | Managed instances (re:Invent 2025) |
+| Fast cold starts (Python) | SnapStart for Python |
+| ETL with Spark | AWS Glue 5.0 (Spark 3.5.4, Python 3.11) |
 
 ## Common Pitfalls
 

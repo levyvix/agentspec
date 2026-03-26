@@ -2,15 +2,42 @@
 
 > **Purpose**: Guide LLMs through explicit step-by-step reasoning to improve accuracy on complex tasks
 > **Confidence**: 0.95
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 ## Overview
 
-Chain-of-Thought (CoT) prompting instructs the model to reason step by step before producing a final answer. LLMs often fail not because they lack knowledge, but because they skip reasoning steps. CoT exposes the model's thought process, making outputs more accurate, auditable, and reliable -- especially for logic, math, and multi-step extraction tasks.
+Chain-of-Thought (CoT) prompting instructs the model to reason step by step before producing a final answer. In 2026, CoT has evolved into several variants: zero-shot CoT ("think step by step"), few-shot CoT (worked examples), self-consistency (sample multiple paths), and ReAct (interleave reasoning with tool actions). Claude 4.x models support "extended thinking" -- a native CoT mode where the model reasons in a dedicated thinking block before responding.
 
 ## The Pattern
 
 ```python
+from anthropic import Anthropic
+
+client = Anthropic()
+
+# Claude extended thinking -- native CoT
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=8000,
+    thinking={
+        "type": "enabled",
+        "budget_tokens": 4000  # tokens allocated for reasoning
+    },
+    messages=[{
+        "role": "user",
+        "content": "Analyze this financial data and determine quarterly growth rate.\n\n{data}"
+    }]
+)
+# Response includes thinking block (reasoning) + text block (answer)
+for block in response.content:
+    if block.type == "thinking":
+        print(f"Reasoning: {block.thinking}")
+    elif block.type == "text":
+        print(f"Answer: {block.text}")
+```
+
+```python
+# Traditional CoT with explicit instructions
 from openai import OpenAI
 
 client = OpenAI()
@@ -34,7 +61,7 @@ Show your reasoning for each step before giving the final answer.
 {data}
 
 ## Output Format
-Return JSON with fields: steps (list of reasoning strings), final_answer (float), confidence (float 0-1)
+Return JSON: {{"steps": ["..."], "final_answer": <float>, "confidence": <float>}}
 """
 
 def analyze_with_cot(data: str) -> dict:
@@ -52,33 +79,30 @@ def analyze_with_cot(data: str) -> dict:
 
 ## Quick Reference
 
-| Variant | When to Use | Notes |
-|---------|-------------|-------|
-| Zero-shot CoT | Simple reasoning, add "think step by step" | Minimal prompt change |
-| Few-shot CoT | Complex logic, provide worked examples | Higher accuracy, more tokens |
-| Self-consistency | High-stakes, sample multiple paths then vote | Best accuracy, highest cost |
+| Variant | When to Use | Accuracy | Cost |
+|---------|-------------|----------|------|
+| Zero-shot CoT | Simple reasoning, add "think step by step" | +20-30% | Low |
+| Few-shot CoT | Complex logic, provide worked examples | +25-40% | Medium |
+| Self-consistency | High-stakes, sample N paths then vote | +10-15% over CoT | High |
+| ReAct | Tool use, multi-step research | +30-50% | High |
+| Extended Thinking (Claude) | Complex reasoning, coding, analysis | +30-50% | Medium |
 
-## Common Mistakes
-
-### Wrong
-
-```python
-# No reasoning requested -- LLM jumps to answer
-prompt = "What is the quarterly growth rate? Data: {data}"
-```
-
-### Correct
+## ReAct Pattern (Reason + Act)
 
 ```python
-# Explicit reasoning steps before answer
-prompt = """Think step by step:
-1. First, identify the relevant numbers
-2. Then, calculate the differences
-3. Finally, compute the percentage
+REACT_PROMPT = """Answer the question using the following format:
 
-Show your work, then provide the final answer.
+Thought: I need to figure out...
+Action: search("query") or calculate("expression")
+Observation: [result of action]
+...repeat Thought/Action/Observation...
+Thought: I now have enough information
+Final Answer: [the answer]
 
-Data: {data}"""
+Question: {question}"""
+
+# ReAct is now built into agent frameworks (LangGraph, Claude Agent SDK)
+# The manual prompt pattern above is for understanding -- use frameworks in production
 ```
 
 ## When NOT to Use CoT
@@ -105,8 +129,6 @@ def cot_with_self_consistency(prompt: str, n_samples: int = 5) -> str:
         )
         result = json.loads(response.choices[0].message.content)
         answers.append(result.get("final_answer"))
-
-    # Majority vote
     most_common = Counter(answers).most_common(1)[0][0]
     return most_common
 ```

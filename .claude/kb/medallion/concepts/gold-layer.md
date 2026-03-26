@@ -2,7 +2,7 @@
 
 > **Purpose**: Business-level aggregation layer -- star schemas, KPIs, materialized views for consumption
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
@@ -138,7 +138,28 @@ gold_agg = silver_df.groupBy("region").agg(_sum("amount").alias("total_revenue")
 | One massive Gold table | Slow queries, hard to maintain | Purpose-specific aggregates |
 | No `_computed_at` column | Cannot tell when data was refreshed | Always add computation timestamp |
 | Raw IDs without dimensions | Users must join manually | Pre-join dimensions into facts |
-| No Z-ORDER optimization | Full scans on filtered queries | Z-ORDER on common filter columns |
+| No Z-ORDER / liquid clustering | Full scans on filtered queries | Use liquid clustering (Delta 4.x) or Z-ORDER |
+| Gold tables business users can't use | Poorly named, no documentation | Business-friendly names + semantic layer |
+| No certification/trust markers | Users unsure which tables are reliable | Tag certified Gold tables, add data contracts |
+| Ignoring AI/ML consumption | ML models get inconsistent data | Serve certified Gold to feature stores and vector DBs |
+
+## Gold for AI/ML (2025+ Pattern)
+
+```python
+# Gold -> Feature Store: serve certified data for ML training
+def publish_to_feature_store(gold_table: str, feature_group: str, entity_key: str):
+    """Publish Gold layer data as ML features with point-in-time correctness."""
+    gold_df = spark.table(gold_table)
+
+    # Feature store expects: entity_key + timestamp + feature columns
+    features = (
+        gold_df
+        .withColumn("event_timestamp", col("_computed_at"))
+        .select(entity_key, "event_timestamp", *feature_columns)
+    )
+    # Write to feature store (Feast, Databricks Feature Store, etc.)
+    fs.write_table(name=feature_group, df=features, mode="merge")
+```
 
 ## Related
 

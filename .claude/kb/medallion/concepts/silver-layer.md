@@ -2,7 +2,7 @@
 
 > **Purpose**: Cleansed, conformed, deduplicated data with schema enforcement and business key alignment
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
@@ -134,6 +134,16 @@ bronze_df.write.format("delta").mode("append").saveAsTable("silver.orders")
 deduped = deduplicate(bronze_df, keys=["order_id"])
 merge_into_silver(deduped, target="silver.cleansed_orders", keys=["order_id"])
 ```
+
+## Silver Anti-Patterns (Field Lessons)
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| Silver = Bronze + renamed columns | No real cleansing, duplicates persist | Enforce dedup, type casting, and validation |
+| No data contracts on Silver | Downstream consumers break on schema changes | Define contracts with schema, SLAs, ownership |
+| Mixing domain data in one Silver DB | Ownership confusion, coupling | Organize by domain: `silver_sales`, `silver_inventory` |
+| No incremental processing | Full reloads waste compute | Use watermarks or CDF for incremental MERGE |
+| SCD Type 2 everywhere | Excessive storage, complex queries | Use Type 2 only where business requires history |
 
 ## Related
 

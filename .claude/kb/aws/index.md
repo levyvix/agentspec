@@ -1,7 +1,8 @@
 # AWS Knowledge Base
 
-> **Purpose**: AWS serverless services for data processing and deployment
+> **Purpose**: AWS serverless and data services for processing, analytics, and deployment
 > **Sub-Domains**: Lambda, Deployment
+> **Last Updated**: 2026-03-26
 
 ## Sub-Domains
 
@@ -9,6 +10,16 @@
 |--------|------|---------|--------|
 | [Lambda](lambda/index.md) | `aws/lambda/` | Serverless functions, SAM templates, S3 triggers, IAM policies | lambda-builder, aws-lambda-architect |
 | [Deployment](deployment/index.md) | `aws/deployment/` | SAM CLI, AWS CLI, deploy workflows, local testing | aws-deployer |
+
+## AWS Data Services Overview (2025-2026)
+
+| Service | Latest Version | Key Update |
+|---------|---------------|------------|
+| **AWS Lambda** | Python 3.14 runtime | Managed instances for steady-state traffic, SnapStart for Python |
+| **AWS Glue** | 5.0 GA | Spark 3.5.4, Python 3.11, Iceberg 1.7.1, Delta 3.3.0, Lake Formation FGAC |
+| **Redshift Serverless** | Up to 1024 RPUs | MDDL (10x perf), queue-based QMR, Iceberg read/write, Serverless reservations |
+| **MWAA** | Airflow 3.0 GA | Redesigned UI, event-driven scheduling, Task SDK, Python 3.12 |
+| **SAM CLI** | Finch support | `sam sync --watch`, `sam build --watch` (proposed), package performance flags |
 
 ## Quick Navigation
 

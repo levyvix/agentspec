@@ -202,20 +202,19 @@ During `/build`, agents are automatically matched to tasks: dbt models go to `db
 
 ```text
 .claude/
-├── agents/              # 41 specialized agents
+├── agents/              # 58 specialized agents
 │   ├── workflow/        # 6 SDD phase agents
-│   ├── code-quality/    # 5 code excellence agents (DE-aware)
-│   ├── data-engineering/ # 15 DE specialists
-│   ├── cloud/           # 5 cloud agents (AWS, Fabric, GCP)
-│   ├── ai-ml/           # 2 AI/ML agents
-│   ├── dev/             # 2 dev agents (AgentLoop)
-│   ├── communication/   # 4 communication agents
-│   └── exploration/     # 2 codebase agents
+│   ├── architect/       # 8 system-level design agents
+│   ├── cloud/           # 10 AWS, GCP, CI/CD agents
+│   ├── platform/        # 6 Microsoft Fabric agents
+│   ├── python/          # 6 code quality + prompt agents
+│   ├── test/            # 3 testing + data quality agents
+│   ├── data-engineering/ # 15 DE implementation agents
+│   └── dev/             # 4 developer productivity agents
 │
-├── commands/            # 22 slash commands
+├── commands/            # 21 slash commands
 │   ├── workflow/        # SDD phases (7)
 │   ├── data-engineering/ # DE commands (8)
-│   ├── dev/             # AgentLoop (1)
 │   ├── core/            # Utilities (4)
 │   ├── knowledge/       # KB management (1)
 │   └── review/          # Code review (1)

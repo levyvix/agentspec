@@ -6,7 +6,7 @@
 
 ## Project Context
 
-**What is AgentSpec?** A Claude Code plugin that provides structured AI-assisted development through a 5-phase SDD workflow, specialized for data engineering with 41 agents, 22 commands, and 22 KB domains.
+**What is AgentSpec?** A Claude Code plugin that provides structured AI-assisted development through a 5-phase SDD workflow, specialized for data engineering with 58 agents, 21 commands, and 22 KB domains.
 
 **Current Status:** v2.0.0 — Data engineering pivot complete. Linear is the project tracker (source of truth).
 
@@ -17,17 +17,17 @@
 ```text
 agentspec/
 ├── .claude/                 # Claude Code integration
-│   ├── agents/              # 41 specialized agents
-│   │   ├── workflow/        # 6 SDD phase agents
-│   │   ├── code-quality/    # 5 code excellence agents (DE-aware)
-│   │   ├── data-engineering/ # 15 DE specialist agents
-│   │   ├── cloud/           # 5 cloud platform agents (AWS, Fabric, GCP)
-│   │   ├── ai-ml/           # 2 AI/ML agents
-│   │   ├── dev/             # 2 dev agents (AgentLoop)
-│   │   ├── communication/   # 4 communication agents
-│   │   └── exploration/     # 2 codebase agents
+│   ├── agents/              # 58 specialized agents
+│   │   ├── architect/       # 8 system-level design agents
+│   │   ├── cloud/           # 10 AWS, GCP, cloud services, CI/CD
+│   │   ├── platform/        # 6 Microsoft Fabric specialists
+│   │   ├── python/          # 6 Python dev, code quality, prompts
+│   │   ├── test/            # 3 testing, data quality, contracts
+│   │   ├── data-engineering/ # 15 DE implementation specialists
+│   │   ├── dev/             # 4 developer tools & productivity
+│   │   └── workflow/        # 6 SDD phase agents
 │   │
-│   ├── commands/            # 22 slash commands
+│   ├── commands/            # 21 slash commands
 │   │   ├── workflow/        # SDD commands (7)
 │   │   ├── data-engineering/ # DE commands (8)
 │   │   ├── dev/             # Dev commands (1)
@@ -211,10 +211,13 @@ Data engineering example:
 | `.claude/sdd/templates/*.md` | Document templates (DE-aware) |
 | `.claude/kb/_templates/*.template` | KB domain templates |
 | `.claude/kb/_index.yaml` | KB domain registry (11 domains) |
-| `.claude/agents/data-engineering/README.md` | DE agent routing + escalation map |
-| `.claude/agents/cloud/` | AWS, Fabric, GCP cloud platform agents |
-| `.claude/agents/ai-ml/` | GenAI architect, prompt specialist |
-| `.claude/agents/dev/` | Overnight builder, prompt crafter (AgentLoop) |
+| `.claude/agents/README.md` | Agent routing + escalation map |
+| `.claude/agents/architect/` | System-level design agents (schema, pipeline, lakehouse) |
+| `.claude/agents/cloud/` | AWS, GCP, CI/CD, deployment agents |
+| `.claude/agents/platform/` | Microsoft Fabric specialists |
+| `.claude/agents/python/` | Python dev, code quality, prompt engineering |
+| `.claude/agents/test/` | Testing, data quality, data contracts |
+| `.claude/agents/dev/` | Overnight builder, prompt crafter, codebase explorer |
 
 ---
 

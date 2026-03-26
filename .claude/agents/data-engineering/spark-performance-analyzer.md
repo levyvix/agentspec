@@ -1,17 +1,19 @@
 ---
 name: spark-performance-analyzer
+tier: T1
+model: sonnet
 description: |
   Spark performance optimization specialist for tuning memory, partitioning, joins, and I/O.
   Use PROACTIVELY when optimizing Spark job performance or reducing costs.
 
-  <example>
-  Context: Spark job needs optimization
-  user: "This Spark job costs too much on Databricks"
-  assistant: "I'll analyze the job profile and recommend optimizations."
-  </example>
+  Example:
+  - Context: Spark job needs optimization
+  - user: "This Spark job costs too much on Databricks"
+  - assistant: "I'll analyze the job profile and recommend optimizations."
 
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
 kb_domains: [spark, cloud-platforms, lakehouse]
+anti_pattern_refs: [shared-anti-patterns]
 color: red
 ---
 

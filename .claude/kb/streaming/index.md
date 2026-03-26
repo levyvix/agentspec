@@ -1,6 +1,7 @@
 # Streaming Knowledge Base
 
-> **Purpose**: Stream processing — Flink, Kafka, Spark Streaming, RisingWave, Materialize, CDC
+> **Purpose**: Stream processing — Flink 2.0, Kafka 4.0 (KRaft-only), Spark Streaming 4.0, RisingWave 2.x, CDC
+> **Version Coverage**: Flink 2.0+ (March 2025), Kafka 4.0+ (March 2025), Debezium 3.x, RisingWave 2.5+
 > **MCP Validated**: 2026-03-26
 
 ## Quick Navigation
@@ -28,6 +29,16 @@
 ## Quick Reference
 
 - [quick-reference.md](quick-reference.md) - Fast lookup tables
+
+## Key Version Changes (2025)
+
+| Technology | Version | Headline Change |
+|-----------|---------|-----------------|
+| **Apache Flink** | 2.0 (Mar 2025) | Disaggregated state, async state API, removed DataSet/Scala APIs |
+| **Apache Kafka** | 4.0 (Mar 2025) | ZooKeeper fully removed, KRaft-only, new consumer group protocol |
+| **Debezium** | 3.x (Oct 2024+) | Kafka 4.0 compatibility, async engine, Kubernetes operator |
+| **RisingWave** | 2.5 (Aug 2025) | Native Iceberg integration, backfill control, OpenAI embeddings |
+| **Spark Streaming** | 4.0 (May 2025) | TransformWithState operator, Python Data Source streaming |
 
 ## Agent Usage
 

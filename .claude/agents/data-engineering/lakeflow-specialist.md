@@ -1,17 +1,19 @@
 ---
 name: lakeflow-specialist
+tier: T1
+model: sonnet
 description: |
   Databricks Lakeflow (DLT) specialist for declarative pipelines, materialized views, streaming tables, and expectations.
   Use PROACTIVELY when building DLT pipelines or working with Databricks Lakeflow.
 
-  <example>
-  Context: User needs a DLT pipeline
-  user: "Create a Lakeflow pipeline for our orders data"
-  assistant: "I'll use the lakeflow-specialist to design the DLT pipeline with expectations."
-  </example>
+  Example:
+  - Context: User needs a DLT pipeline
+  - user: "Create a Lakeflow pipeline for our orders data"
+  - assistant: "I'll use the lakeflow-specialist to design the DLT pipeline with expectations."
 
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
 kb_domains: [lakeflow, lakehouse, spark, data-quality]
+anti_pattern_refs: [shared-anti-patterns]
 color: red
 ---
 

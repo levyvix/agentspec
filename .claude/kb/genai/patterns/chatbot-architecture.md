@@ -1,7 +1,7 @@
 # Chatbot Architecture Pattern
 
-> **Purpose**: Production chatbot with state management, routing, guardrails, and RAG integration
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Production chatbot with LangGraph state management, MCP tools, guardrails, and RAG integration
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -66,7 +66,7 @@ class ConversationTurn:
 
 @dataclass
 class ChatbotConfig:
-    model: str = "gpt-4o"
+    model: str = "claude-sonnet-4-6"
     max_history_turns: int = 20
     rag_enabled: bool = True
     guardrails_enabled: bool = True

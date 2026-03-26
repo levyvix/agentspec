@@ -1,7 +1,7 @@
 # Semantic Layer
 
 > **Purpose**: Centralized metric definitions via MetricFlow — semantic models, measures, dimensions
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with AI-readiness and governance patterns
 
 ## When to Use
 
@@ -9,6 +9,8 @@
 - Business users define metrics differently across teams ("revenue" = gross vs net)
 - You want a single source of truth for KPIs across dashboards, reports, and APIs
 - Integrating with the dbt Semantic Layer Gateway for low-latency queries
+- **AI agents and LLMs** need consistent, trusted metric definitions (semantic inconsistency causes hallucinated answers)
+- Production governance: the semantic layer acts as a contract between data domains
 
 ## Implementation
 
@@ -93,6 +95,17 @@ metrics:
 | `type_params.time_granularity` | `day` | Finest grain for time dimension |
 | `type` (metric) | — | `simple`, `derived`, `ratio`, `cumulative` |
 | `filter` | — | MetricFlow filter syntax for metric-level filtering |
+
+## Production Governance Patterns
+
+| Pattern | Description |
+|---------|-------------|
+| **Domain ownership** | Each domain team owns its semantic models and metrics |
+| **Naming conventions** | Prefix metrics by domain: `finance__revenue`, `marketing__cac` |
+| **Testing** | Add data tests to underlying models; validate metric freshness |
+| **Join graph design** | Keep entity relationships explicit; avoid fan-out joins |
+| **Performance tuning** | Pre-aggregate high-cardinality dimensions; use `agg_time_dimension` |
+| **AI readiness** | Consistent definitions prevent LLM hallucination on business metrics |
 
 ## Example Usage
 

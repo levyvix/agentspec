@@ -1,6 +1,7 @@
 # Kafka Fundamentals
 
-> **Purpose**: Topics, partitions, consumer groups, exactly-once semantics, Schema Registry, Redpanda
+> **Purpose**: Topics, partitions, consumer groups, exactly-once semantics, KRaft, Schema Registry, Redpanda
+> **Version Coverage**: Apache Kafka 4.0+ (March 2025) -- ZooKeeper fully removed
 > **Confidence**: 0.94
 > **MCP Validated**: 2026-03-26
 
@@ -65,14 +66,15 @@ def produce_order(order: dict):
 | Compacted Topic | Retains latest value per key (like a table) | `cleanup.policy=compact` |
 | Schema Registry | Central schema store (Avro, Protobuf, JSON Schema) | Confluent / Apicurio |
 
-| Kafka vs Redpanda | Kafka | Redpanda |
-|-------------------|-------|----------|
+| Kafka vs Redpanda | Kafka 4.0 | Redpanda |
+|-------------------|-----------|----------|
 | Runtime | JVM (Java) | C++ (no JVM) |
-| Coordination | KRaft (formerly ZooKeeper) | Raft (built-in) |
+| Coordination | KRaft (ZooKeeper removed) | Raft (built-in) |
 | Tail latency (p99) | ~10ms | ~2ms |
 | API compatibility | Native | Kafka-compatible |
 | Tiered storage | Confluent only | Built-in |
 | Schema Registry | Confluent / Apicurio | Built-in |
+| Queue semantics | Share groups (4.0) | N/A |
 
 ## Common Mistakes
 
@@ -115,6 +117,65 @@ while True:
     process(msg)                           # process first
     consumer.commit(asynchronous=False)    # then commit
 ```
+
+## Kafka 4.0: Key Changes (March 2025)
+
+### ZooKeeper Fully Removed
+
+```properties
+# Kafka 4.0: KRaft is the ONLY coordination mode
+# ZooKeeper support has been completely removed
+
+# KRaft controller configuration
+process.roles=controller
+node.id=1
+controller.quorum.voters=1@controller1:9093,2@controller2:9093,3@controller3:9093
+controller.listener.names=CONTROLLER
+listeners=CONTROLLER://:9093
+
+# Combined mode (broker + controller in one process — dev/small clusters)
+process.roles=broker,controller
+node.id=1
+controller.quorum.voters=1@localhost:9093
+listeners=PLAINTEXT://:9092,CONTROLLER://:9093
+```
+
+### New Consumer Group Protocol (KIP-848)
+
+```python
+# Kafka 4.0: new consumer group protocol — faster rebalances
+# Dramatically reduces downtime during consumer scaling events
+# Uses server-side assignment — no stop-the-world rebalance
+
+conf = {
+    'bootstrap.servers': 'kafka:9092',
+    'group.id': 'order-processor',
+    'group.protocol': 'consumer',          # new protocol (4.0+)
+    # 'group.protocol': 'classic',         # legacy protocol (backward compat)
+    'enable.auto.commit': False,
+    'auto.offset.reset': 'earliest',
+}
+```
+
+### Queue Semantics (Share Groups)
+
+```properties
+# Kafka 4.0: share groups enable queue-like consumption
+# Multiple consumers can process from the same partition
+# Messages are distributed (not replicated) across consumers
+# Useful for work distribution / task queue patterns
+group.type=share
+```
+
+### Migration from ZooKeeper
+
+| Step | Action |
+|------|--------|
+| 1 | Upgrade to Kafka 3.7+ with ZooKeeper (bridge release) |
+| 2 | Run `kafka-metadata.sh` to migrate metadata to KRaft |
+| 3 | Switch controllers to KRaft mode |
+| 4 | Remove ZooKeeper dependency |
+| 5 | Upgrade to Kafka 4.0 (KRaft-only) |
 
 ## Related
 

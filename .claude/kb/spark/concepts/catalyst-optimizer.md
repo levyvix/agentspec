@@ -61,6 +61,49 @@ df = df.filter(F.col("order_date") >= "2026-01-01")
 df = df.withColumn("year", F.year("order_date"))
 ```
 
+## Spark 4.0 SQL Enhancements
+
+### PIPE Syntax (Readable Query Chaining)
+
+```sql
+-- Traditional (nested CTEs)
+WITH filtered AS (SELECT * FROM orders WHERE amount > 100),
+     grouped AS (SELECT region, SUM(amount) AS total FROM filtered GROUP BY region)
+SELECT * FROM grouped ORDER BY total DESC;
+
+-- Spark 4.0 PIPE syntax — reads top-to-bottom
+FROM orders
+|> WHERE amount > 100
+|> AGGREGATE SUM(amount) AS total GROUP BY region
+|> ORDER BY total DESC;
+```
+
+### SQL User-Defined Functions
+
+```sql
+-- Reusable SQL UDFs (no Python/Scala needed)
+CREATE FUNCTION discount_price(price DECIMAL, pct DECIMAL)
+RETURNS DECIMAL
+RETURN price * (1 - pct / 100);
+
+SELECT order_id, discount_price(amount, 10) AS discounted FROM orders;
+```
+
+### SQL Scripting (Control Flow)
+
+```sql
+-- Session variables + control flow in pure SQL
+DECLARE VARIABLE threshold = 1000;
+
+BEGIN
+  IF (SELECT COUNT(*) FROM staging.orders) > threshold THEN
+    INSERT INTO production.orders SELECT * FROM staging.orders;
+  ELSE
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Below threshold';
+  END IF;
+END;
+```
+
 ## Related
 
 - [partitioning](../concepts/partitioning.md)

@@ -6,9 +6,16 @@
 
 ## Overview
 
-DuckDB is an in-process analytical database that runs inside your application -- no server, no daemon, no cluster. It uses a columnar-vectorized execution engine optimized for OLAP queries over Parquet, CSV, JSON, and Iceberg files. Since v1.0 (2024) and through v1.5, DuckDB has matured into a production-grade engine that replaces Spark for many sub-terabyte analytical workloads.
+DuckDB is an in-process analytical database that runs inside your application -- no server, no daemon, no cluster. It uses a columnar-vectorized execution engine optimized for OLAP queries over Parquet, CSV, JSON, and Iceberg files. Since v1.0 (2024) through v1.2 (Feb 2025, codenamed "Histrionicus"), DuckDB has matured into a production-grade engine that replaces Spark for many sub-terabyte analytical workloads.
 
 DuckDB follows the SQLite model: a single library linked into your process. But where SQLite targets OLTP row-by-row operations, DuckDB targets analytical queries that scan millions of rows across columns.
+
+**DuckDB 1.2 highlights (Feb 2025):**
+- **Friendlier SQL**: `FROM table_name` without `SELECT`, `map['key']` returns value directly instead of list
+- **One-line install**: `curl https://install.duckdb.org | sh` on Linux/macOS
+- **Improved randomness**: `random()` uses larger state (breaking: seeds produce different values)
+- **Client API versioning**: reworked clients page with support tiers
+- **Community ecosystem growth**: GSheet extension, Smallpond (distributed DuckDB via DeepSeek), Duckberg (Iceberg reader)
 
 ## Key Concepts
 
@@ -18,16 +25,25 @@ DuckDB stores and processes data in columnar format using a vectorized pipeline.
 
 ### Extension System
 
-DuckDB ships lean and extends via loadable extensions:
+DuckDB ships lean and extends via loadable extensions. Extensions auto-load on first use or can be manually managed. Run `UPDATE EXTENSIONS;` periodically to get latest features.
 
 - **httpfs** -- Query files on S3, GCS, Azure Blob, or HTTP endpoints directly
-- **iceberg** -- Read Apache Iceberg tables with snapshot time-travel
+- **iceberg** -- Read/write Apache Iceberg tables with snapshot time-travel (frequently updated)
+- **aws** -- AWS Glue catalog integration, SageMaker Lakehouse connectivity
 - **spatial** -- GEOMETRY type with ST_ functions for geospatial analytics
 - **json** -- Structured JSON parsing and querying
 - **delta** -- Read Delta Lake tables
 - **postgres_scanner / mysql_scanner** -- Attach and query remote Postgres/MySQL
+- **gsheet** -- Read/write data to Google Sheets (community)
 
-Extensions are installed with `INSTALL httpfs; LOAD httpfs;` or auto-loaded when needed.
+```sql
+-- Extensions auto-install on first use, or manually:
+INSTALL iceberg; LOAD iceberg;
+-- Keep extensions up-to-date:
+UPDATE EXTENSIONS;
+-- Update specific extensions only:
+UPDATE EXTENSIONS (iceberg, httpfs);
+```
 
 ### VARIANT Type
 
@@ -64,12 +80,13 @@ DuckDB can serve as the analytical backend for MCP-based AI agents. An MCP serve
 
 | Strength | Limitation |
 |----------|------------|
-| Zero infrastructure | Single-node only, no distributed execution |
-| Reads Parquet/Iceberg/Delta natively | Write support for lakehouse formats is limited |
+| Zero infrastructure | Single-node only (Smallpond adds distributed, but experimental) |
+| Reads Parquet/Iceberg/Delta natively | Write support for Iceberg improving but still maturing |
 | Sub-second queries on GB-scale data | Multi-TB datasets need Spark or a warehouse |
 | Embeds in Python, Node, R, Java, Rust | Concurrent write access is restricted |
 | Extension ecosystem growing fast | Some extensions are community-maintained |
-| Free and open source (MIT) | No managed service (by design) |
+| Free and open source (MIT) | No managed service (MotherDuck is cloud-hosted option) |
+| One-line install on Linux/macOS | Breaking changes between versions (e.g., map[] semantics in 1.2) |
 
 ## See Also
 

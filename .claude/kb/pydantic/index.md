@@ -1,7 +1,7 @@
 # Pydantic Knowledge Base
 
-> **Purpose**: Python data validation for LLM output parsing and structured extraction
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Pydantic V2 data validation, computed fields, TypeAdapter, discriminated unions, settings, LLM output
+> **MCP Validated**: 2026-03-26
 
 ## Quick Navigation
 
@@ -45,6 +45,10 @@
 | **Field Types** | Type annotations with Optional, Annotated, and Field constraints |
 | **Validators** | Decorators for custom field-level and model-level validation |
 | **Nested Models** | Composable hierarchical data structures |
+| **Computed Fields** | `@computed_field` for derived properties included in serialization/schema |
+| **TypeAdapter** | Validate non-BaseModel types (lists, dicts, unions) |
+| **Discriminated Unions** | `Field(discriminator=...)` for efficient tagged union validation |
+| **Pydantic Settings** | `BaseSettings` for env vars, .env, TOML, YAML config loading |
 
 ---
 
@@ -63,3 +67,5 @@
 | Agent | Primary Files | Use Case |
 |-------|---------------|----------|
 | ai-prompt-specialist-gcp | patterns/llm-output-validation.md, patterns/extraction-schema.md | Define Pydantic schemas for LLM structured output |
+| python-developer | concepts/base-model.md, concepts/validators.md | Build validated data models |
+| data-quality-analyst | patterns/custom-validators.md | Define data quality checks with Pydantic |

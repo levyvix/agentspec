@@ -74,15 +74,16 @@ ALTER TABLE orders_deprecated RENAME TO orders;
 
 ## Quick Reference
 
-| Change | Risk | Strategy |
-|--------|------|----------|
-| Add nullable column | None | ALTER TABLE ADD directly |
-| Add NOT NULL column | Low | Add nullable → backfill → add constraint |
-| Rename column | Medium | Add new → alias view → migrate → drop old |
-| Change type (widen) | Low | ALTER TABLE ALTER TYPE (INT→BIGINT) |
-| Change type (narrow) | High | Create new column → CAST → validate → swap |
-| Drop column | High | Deprecation lifecycle (30+ days) |
-| Drop table | Critical | Rename to _deprecated → wait → drop |
+| Change | Risk | Delta 4.x Strategy | Iceberg v3 Strategy |
+|--------|------|-------------------|-------------------|
+| Add nullable column | None | `mergeSchema` or `ALTER ADD` | `ALTER TABLE ADD` |
+| Add NOT NULL column | Low | Add nullable -> backfill -> constraint | Add with default value (v3) |
+| Rename column | Medium | Column mapping mode (name) | `ALTER TABLE RENAME` |
+| Change type (widen) | Low | **Type widening** (no rewrite, 4.0+) | `ALTER TABLE ALTER TYPE` |
+| Change type (narrow) | High | New column -> CAST -> validate -> swap | Not allowed (by design) |
+| Drop column | High | Column mapping + deprecation lifecycle | `ALTER TABLE DROP` + deprecation |
+| Drop table | Critical | Rename to _deprecated -> wait -> drop | Same pattern |
+| Add Variant column | None | Native (4.0+) | Native (v3) |
 
 ## Common Mistakes
 

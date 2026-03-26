@@ -1,12 +1,12 @@
 # Catalog Wars
 
-> **Purpose**: Catalog comparison — Unity Catalog, Gravitino, Nessie, Polaris, decision matrix
-> **Confidence**: 0.90
+> **Purpose**: Catalog comparison — Unity Catalog 0.3.1, Gravitino 1.1, Nessie, Polaris TLP 1.3, decision matrix
+> **Confidence**: 0.92
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Data catalogs manage metadata, access control, and table discovery across lakehouse engines. The "catalog wars" reflects the competition between vendor-backed catalogs (Unity, Polaris) and open-source alternatives (Gravitino, Nessie). Choice depends on ecosystem lock-in tolerance, multi-engine needs, and governance requirements.
+Data catalogs manage metadata, access control, and table discovery across lakehouse engines. The landscape shifted significantly in 2025-2026: Apache Polaris graduated to TLP (Feb 2026), Gravitino reached 1.0 GA with AI-native metadata (Sep 2025), and Unity Catalog OSS hit 0.3.1 with managed Delta tables. The "catalog wars" are converging toward REST catalog standards (Iceberg REST spec) as the common protocol.
 
 ## The Concept
 
@@ -44,23 +44,36 @@ MERGE BRANCH dev_feature INTO main IN nessie;
 
 ## Quick Reference
 
-| Catalog | Backed By | Format Support | Open Source | Multi-Engine | RBAC |
-|---------|----------|---------------|------------|-------------|------|
-| Unity Catalog | Databricks | Delta, Iceberg (UniForm) | OSS fork | Limited (Spark, some Trino) | Full |
-| Polaris | Snowflake | Iceberg (REST) | Yes (Apache) | Spark, Trino, Flink | Full |
-| Gravitino | Apache | Iceberg, Hive, JDBC | Yes | Spark, Trino, Flink, Presto | Basic |
-| Nessie | Dremio | Iceberg | Yes | Spark, Trino, Flink | Git-based |
-| Hive Metastore | Apache | Hive, Iceberg (adapter) | Yes | All | Basic |
-| AWS Glue | AWS | Iceberg, Delta, Hive | No | Spark, Trino, Athena | IAM |
+| Catalog | Backed By | Version | Format Support | Open Source | Multi-Engine | Governance |
+|---------|----------|---------|---------------|------------|-------------|------------|
+| Unity Catalog | Databricks | OSS 0.3.1 | Delta, Iceberg (UniForm) | OSS fork | Spark, DuckDB, Trino | ABAC + tags + quality monitoring |
+| Apache Polaris | Apache (TLP) | 1.3.0 | Iceberg + generic tables (Delta, Hudi) | Full ASF | Any (REST standard) | RBAC + OPA (1.3) |
+| Apache Gravitino | Apache (TLP) | 1.1.0 | Iceberg, Hive, JDBC, Kafka, Lance | Full ASF | Any engine | Unified RBAC + OpenLineage |
+| Nessie | Dremio | 0.95+ | Iceberg | Yes | Spark, Trino, Flink | Git-based branching |
+| Hive Metastore | Apache | 3.x | Hive, Iceberg (adapter) | Yes | All | Basic (legacy) |
+| AWS Glue | AWS | v4 | Iceberg, Delta, Hive | No | Spark, Trino, Athena | IAM |
 
 | Decision Factor | Weight | Best Option |
 |----------------|--------|-------------|
-| Multi-engine flexibility | High | Gravitino, Polaris |
+| Multi-engine flexibility | High | Polaris (REST standard), Gravitino |
 | Git-like branching | High | Nessie |
 | Databricks ecosystem | High | Unity Catalog |
 | Snowflake + Iceberg | High | Polaris |
-| Minimal vendor lock-in | High | Gravitino, Nessie |
+| Minimal vendor lock-in | High | Polaris (TLP), Gravitino (TLP) |
+| AI/ML metadata (models, vectors) | High | Gravitino 1.1 (Model Catalog + Lance) |
 | Managed service | Medium | AWS Glue, Unity (Databricks-managed) |
+| Non-Iceberg format federation | Medium | Polaris 1.3 (generic tables), Gravitino |
+
+## 2025-2026 Milestones
+
+| Event | Date | Significance |
+|-------|------|-------------|
+| Gravitino 1.0 GA | Sep 2025 | First stable release, unified RBAC, metadata-driven actions |
+| Gravitino 1.1 | Dec 2025 | Lance REST service for AI, multi-cluster filesets |
+| Polaris 1.3 | Jan 2026 | Generic tables (non-Iceberg), OPA auth, Iceberg metrics |
+| Polaris TLP graduation | Feb 2026 | Full Apache TLP status, vendor-independent governance |
+| Unity Catalog 0.3.1 | Feb 2026 | Managed Delta tables, improved credential renewal |
+| Delta Lake 4.1 | Mar 2026 | Catalog-managed tables GA, server-side planning preview |
 
 ## Common Mistakes
 

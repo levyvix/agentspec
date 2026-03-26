@@ -1,12 +1,12 @@
 # RAG Pipelines
 
-> **Purpose**: Retrieval-augmented generation architecture -- chunking, indexing, re-ranking, hybrid search
-> **Confidence**: 0.90
+> **Purpose**: RAG architecture -- chunking, indexing, hybrid search, reranking, agentic RAG, context engineering
+> **Confidence**: 0.95
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Retrieval-Augmented Generation (RAG) grounds LLM responses in external knowledge by retrieving relevant documents before generation. The pipeline has distinct stages -- ingestion (load, chunk, embed, store) and inference (retrieve, rerank, generate) -- each with tunable parameters that directly impact answer quality. Modern RAG systems combine dense vector search with sparse keyword search (hybrid) and add a cross-encoder reranking step for precision.
+Retrieval-Augmented Generation (RAG) grounds LLM responses in external knowledge by retrieving relevant documents before generation. In 2026, RAG has evolved beyond simple "embed + retrieve + generate" into multiple architecture variants: Advanced RAG (hybrid search + reranking + query transforms), Agentic RAG (agent decides when/what to retrieve), and GraphRAG (knowledge graph augmentation). The pipeline has distinct stages -- ingestion (load, chunk, embed, store) and inference (retrieve, rerank, generate) -- each with tunable parameters. Context engineering (structured input design) has replaced naive prompt stuffing.
 
 ## The Concept
 

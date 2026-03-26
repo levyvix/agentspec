@@ -85,6 +85,21 @@ CREATE TABLE fact_order_items (
 );
 ```
 
+## Dimensional Modeling in 2025+
+
+Kimball dimensional modeling remains the dominant approach for analytics, but the modern data stack introduces key enhancements:
+
+| Evolution | Impact |
+|----------|--------|
+| **Semantic layers** (dbt Metrics, Cube) | Abstract joins; analysts query metrics, not raw star schemas |
+| **OBT as a mart** | Build denormalized tables from star schema for specific dashboards |
+| **Data Vault + Dim marts** | Data Vault for raw integration, dimensional marts for consumption |
+| **Liquid clustering** (Delta 4.x) | Replaces manual partitioning and Z-ORDER on fact tables |
+| **Identity columns** (Delta 4.0+) | Native auto-increment surrogate keys, replacing sequence-based approaches |
+| **Data contracts** | Enforce grain, types, and constraints at write time |
+
+The Kimball bus matrix remains essential for planning which conformed dimensions are shared across facts. Data Mesh teams can own their domain's star schemas while sharing conformed dimensions via a "shared" or "master" domain.
+
 ## Related
 
 - [scd-types](scd-types.md)

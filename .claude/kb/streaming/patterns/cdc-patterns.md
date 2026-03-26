@@ -1,6 +1,7 @@
 # CDC Patterns
 
-> **Purpose**: Change Data Capture with Debezium, Flink CDC, Delta Lake CDF, Iceberg incremental reads
+> **Purpose**: Change Data Capture with Debezium 3.x, Flink CDC, Delta Lake CDF, Iceberg incremental reads
+> **Version Coverage**: Debezium 3.0+ (Oct 2024), Flink CDC 3.x, Kafka 4.0 compatible
 > **Confidence**: 0.90
 > **MCP Validated**: 2026-03-26
 
@@ -206,6 +207,54 @@ WHERE _change_type IN ('INSERT', 'UPDATE_AFTER');
   "transforms.unwrap.delete.handling.mode": "rewrite"
 }
 ```
+
+## Debezium 3.x Enhancements (2024-2025)
+
+### Async Debezium Engine
+
+```java
+// Debezium 3.x: asynchronous engine for higher throughput
+// No longer tied to Kafka Connect runtime — can embed anywhere
+DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
+    .using(props)
+    .notifying(record -> {
+        // Process CDC events asynchronously
+        processChange(record);
+    })
+    .build();
+
+ExecutorService executor = Executors.newSingleThreadExecutor();
+executor.execute(engine);
+```
+
+### Kubernetes Operator
+
+```yaml
+# Debezium 3.x: native Kubernetes operator for cloud-native CDC
+apiVersion: debezium.io/v1alpha1
+kind: DebeziumServer
+metadata:
+  name: mysql-cdc
+spec:
+  version: 3.0.8
+  sink:
+    type: kafka
+    config:
+      bootstrap.servers: kafka:9092
+  source:
+    class: io.debezium.connector.mysql.MySqlConnector
+    config:
+      database.hostname: mysql
+      database.port: "3306"
+      topic.prefix: cdc.ecommerce
+```
+
+### Kafka 4.0 Compatibility
+
+| Debezium Version | Kafka Connect | Kafka Broker |
+|-----------------|---------------|-------------|
+| 3.0.8+ | 3.9.0 | 3.9.0+ / 4.0 compatible |
+| 3.1+ | 4.0+ | 4.0+ (KRaft-only) |
 
 ## Related
 

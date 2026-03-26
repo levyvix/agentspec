@@ -46,13 +46,25 @@ WHERE user_id = 'user-to-forget' AND event_timestamp < '2025-01-01';
 
 | Feature | Iceberg v2 | Iceberg v3 |
 |---------|-----------|-----------|
-| Row-level deletes | Copy-on-write only | Position + equality deletes |
-| Delete mode | copy-on-write | merge-on-read (faster writes) |
+| Row-level deletes | Position + equality deletes | **Binary deletion vectors** (bitmap-based, faster) |
+| Delete mode | copy-on-write or merge-on-read | merge-on-read with deletion vectors |
 | Partition evolution | Yes | Yes (improved metadata) |
-| Hidden partitioning | Yes | Yes |
-| Schema evolution | Full | Full |
-| REST Catalog | Community spec | Apache standard |
-| Engine support | Spark, Trino, Flink | Spark, Trino, Flink, Dremio, StarRocks |
+| Hidden partitioning | Yes | Yes + **multi-argument transforms** |
+| Schema evolution | Full | Full + **default column values** |
+| New types | — | **Variant** (semi-structured), **Geometry/Geography** (geospatial), nanosecond timestamps |
+| Row lineage | No | **Yes** (track row origin across writes) |
+| REST Catalog | Community spec | Apache standard (Polaris TLP) |
+| Engine support | Spark, Trino, Flink | Spark, Trino, Flink, DuckDB, Snowflake, Dremio, StarRocks |
+
+### Iceberg v4 (Proposed, in development)
+
+| Proposal | Purpose |
+|----------|---------|
+| Content-addressable metadata | Deduplicate metadata files, reduce storage |
+| Streaming-friendly commits | Lower commit latency for real-time ingestion |
+| Improved statistics | Better min/max/NDV stats for query planning |
+| Relative file paths | Simplified table relocation and migration |
+| Metadata compression | Reduce metadata overhead for large tables |
 
 | Metadata Layer | Purpose |
 |---------------|---------|

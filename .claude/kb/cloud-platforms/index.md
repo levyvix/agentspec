@@ -2,6 +2,7 @@
 
 > **Purpose**: Cloud data platforms — Snowflake Cortex, Databricks LakeFlow, BigQuery AI, cross-platform
 > **MCP Validated**: 2026-03-26
+> **Latest**: Cortex AI Functions + Cortex Agents GA (Nov 2025), LakeFlow Connect GA with 20+ connectors, BigQuery AI.GENERATE/AI.EMBED/AI.SIMILARITY with Gemini 3.0
 
 ## Quick Navigation
 

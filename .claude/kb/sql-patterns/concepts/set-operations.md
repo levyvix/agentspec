@@ -1,8 +1,8 @@
 # Set Operations
 
-> **Purpose**: UNION/INTERSECT/EXCEPT, LATERAL joins, UNNEST/FLATTEN across dialects
+> **Purpose**: UNION/INTERSECT/EXCEPT, LATERAL joins, UNNEST/FLATTEN, ASOF JOIN across dialects
 > **Confidence**: 0.90
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with ASOF JOIN cross-references
 
 ## Overview
 
@@ -69,6 +69,25 @@ SELECT * FROM table_a
 UNION ALL      -- no sort, no dedup — much faster
 SELECT * FROM table_b
 ```
+
+## ASOF JOIN (Temporal Lookup)
+
+```sql
+-- DuckDB: find most recent exchange rate for each order
+SELECT o.order_id, o.amount, r.rate
+FROM orders o
+ASOF JOIN exchange_rates r
+    ON o.currency = r.currency
+   AND o.order_ts >= r.effective_ts;
+-- Returns the r row with the largest effective_ts <= o.order_ts
+```
+
+| Dialect | ASOF JOIN Support | Alternative |
+|---------|-------------------|-------------|
+| DuckDB | Native `ASOF JOIN` | -- |
+| Snowflake | Preview | LATERAL + ORDER BY + LIMIT 1 |
+| BigQuery | No | Correlated subquery or window function |
+| Spark SQL | No | Window function with `LAST_VALUE` |
 
 ## Related
 

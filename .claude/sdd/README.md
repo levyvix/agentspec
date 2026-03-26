@@ -1,6 +1,6 @@
 # AgentSpec
 
-> **The AI-Native Specification Framework for Claude Code**
+> **Spec-Driven Development Framework for Data Engineering on Claude Code**
 >
 > *"From Specification to Specialized Execution"*
 
@@ -11,36 +11,26 @@
 | Aspect | Details |
 |--------|---------|
 | **Project** | AgentSpec - Spec-Driven Development Framework |
-| **Tagline** | Spec-Driven Development for AI-Native Teams |
+| **Tagline** | Spec-Driven Development for Data Engineering |
 | **Business Problem** | Gap between unstructured "vibe coding" and stale traditional specifications |
-| **Solution** | 5-phase workflow with 16 specialized AI agents and curated knowledge bases |
-| **Target Audience** | AI-native development teams using Claude Code |
+| **Solution** | 5-phase workflow with 58 specialized AI agents, 22 KB domains, and 21 commands |
+| **Target Audience** | Data engineering teams using Claude Code |
 | **License** | MIT |
 
 ### What This Is
 
-AgentSpec transforms requirements into working code with full traceability. It provides a structured 5-phase development workflow (Brainstorm → Define → Design → Build → Ship) powered by specialized AI agents that match to tasks automatically, grounded by curated knowledge bases for accuracy.
+AgentSpec transforms requirements into working code with full traceability. It provides a structured 5-phase development workflow (Brainstorm -> Define -> Design -> Build -> Ship) powered by specialized AI agents that match to tasks automatically, grounded by curated knowledge bases for accuracy.
 
 **The Core Insight:** *"The AI doesn't just need to know WHAT to build - it needs to know WHO should build each part."*
 
 Traditional specs produce a task list. AgentSpec produces a **team assignment**.
 
-### Health Score: 8.5/10
-
-| Criterion | Score | Evidence |
-|-----------|-------|----------|
-| Architecture Clarity | 9/10 | Well-defined 5-phase pipeline with clear contracts |
-| Agent Coverage | 9/10 | 16 agents across 4 categories |
-| KB Grounding | 8/10 | MCP-validated patterns, extensible domain system |
-| Documentation | 8/10 | Comprehensive but needs OSS polish |
-| Extensibility | 9/10 | Framework-agnostic agent discovery |
-| Testability | 7/10 | Framework needs validation tests |
-
 ### Key Insights
 
 1. **Strength:** Automatic agent matching + KB grounding = unique differentiator vs competitors
-2. **Concern:** No Judge layer to validate specs before expensive BUILD phase (planned)
-3. **Opportunity:** Local telemetry can drive continuous improvement
+2. **Strength:** Deep data engineering specialization (dbt, Spark, Airflow, Flink, Iceberg, medallion architecture)
+3. **Concern:** No Judge layer to validate specs before expensive BUILD phase (planned)
+4. **Opportunity:** Local telemetry can drive continuous improvement
 
 ---
 
@@ -56,14 +46,12 @@ Traditional specs produce a task list. AgentSpec produces a **team assignment**.
 8. [Requirements](#requirements)
 9. [Open Questions](#open-questions)
 10. [Success Metrics](#success-metrics)
-11. [Competitive Landscape](#competitive-landscape)
-12. [Anti-Patterns](#anti-patterns)
-13. [Extending AgentSpec](#extending-agentspec)
-14. [Quick Start](#quick-start)
-15. [Stakeholders & Roles](#stakeholders--roles)
-16. [Quality Verification](#quality-verification)
-17. [References](#references)
-18. [Version History](#version-history)
+11. [Anti-Patterns](#anti-patterns)
+12. [Extending AgentSpec](#extending-agentspec)
+13. [Quick Start](#quick-start)
+14. [Quality Verification](#quality-verification)
+15. [References](#references)
+16. [Version History](#version-history)
 
 ---
 
@@ -73,27 +61,28 @@ Traditional specs produce a task list. AgentSpec produces a **team assignment**.
 
 | # | Decision | Rationale | Status |
 |---|----------|-----------|--------|
-| D1 | 5-phase pipeline (Brainstorm→Define→Design→Build→Ship) | Balances rigor with pragmatism | **Implemented** |
+| D1 | 5-phase pipeline (Brainstorm->Define->Design->Build->Ship) | Balances rigor with pragmatism | **Implemented** |
 | D2 | Agent matching in Design phase via Glob discovery | Framework-agnostic, zero configuration | **Implemented** |
 | D3 | KB grounding via Technical Context in Define | Prevents hallucinated patterns | **Implemented** |
 | D4 | Model allocation: Opus (0-2), Sonnet (3), Haiku (4) | Cost/quality optimization | **Implemented** |
 | D5 | Clarity Score 12/15 minimum gate | Catches incomplete specs early | **Implemented** |
+| D6 | Data engineering specialization across agents, KB, and commands | Deep domain expertise for DE workflows | **Implemented** |
 
 ### Process Decisions
 
 | # | Decision | Rationale | Status |
 |---|----------|-----------|--------|
-| D6 | `/iterate` command for mid-stream changes | Maintains traceability | **Implemented** |
-| D7 | Archive completed features with lessons learned | Knowledge capture | **Implemented** |
-| D8 | Agent attribution in BUILD_REPORT | Clear ownership | **Implemented** |
+| D7 | `/iterate` command for mid-stream changes | Maintains traceability | **Implemented** |
+| D8 | Archive completed features with lessons learned | Knowledge capture | **Implemented** |
+| D9 | Agent attribution in BUILD_REPORT | Clear ownership | **Implemented** |
 
 ### Planned Decisions
 
 | # | Decision | Rationale | Status |
 |---|----------|-----------|--------|
-| D9 | Add LLM-as-Judge layer (Phase 1.5) | Catch errors before expensive BUILD | **Planned** |
-| D10 | Multi-LLM review via OpenRouter | Diverse perspectives | **Planned** |
-| D11 | Local-only telemetry (opt-in) | Privacy-first learning | **Planned** |
+| D10 | Add LLM-as-Judge layer (Phase 1.5) | Catch errors before expensive BUILD | **Planned** |
+| D11 | Multi-LLM review via OpenRouter | Diverse perspectives | **Planned** |
+| D12 | Local-only telemetry (opt-in) | Privacy-first learning | **Planned** |
 
 ---
 
@@ -102,83 +91,80 @@ Traditional specs produce a task list. AgentSpec produces a **team assignment**.
 ### The 5-Phase Pipeline
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    AGENTSPEC PIPELINE                                            │
-├─────────────────────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                                  │
-│  ┌──────────┐    ┌──────────┐    ┌──────────────┐    ┌───────────────┐    ┌──────────┐         │
-│  │ Phase 0  │───▶│ Phase 1  │───▶│   Phase 2    │───▶│    Phase 3    │───▶│ Phase 4  │         │
-│  │BRAINSTORM│    │  DEFINE  │    │    DESIGN    │    │     BUILD     │    │   SHIP   │         │
-│  │(Optional)│    │          │    │              │    │               │    │          │         │
-│  └────┬─────┘    └────┬─────┘    └──────┬───────┘    └───────┬───────┘    └────┬─────┘         │
-│       │               │                 │                    │                 │               │
-│       ▼               ▼                 ▼                    ▼                 ▼               │
-│   Questions       Technical         Agent              Delegation         Archive             │
-│   + Approaches    Context           Matching           + Execution        + Lessons           │
-│   + YAGNI         + Clarity         + KB Lookup        + Attribution                          │
-│                   Score 12/15                          + Verification                         │
-│                                                                                                │
-│  ◀───────────────────────────────────────────────────────────────────────────────────────────▶ │
-│                                    /iterate (any phase)                                        │
-│                                                                                                │
-└─────────────────────────────────────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------------------------------------------------+
+|                                    AGENTSPEC PIPELINE                                                    |
++---------------------------------------------------------------------------------------------------------+
+|                                                                                                          |
+|  +----------+    +----------+    +--------------+    +---------------+    +----------+                   |
+|  | Phase 0  |--->| Phase 1  |--->|   Phase 2    |--->|    Phase 3    |--->| Phase 4  |                   |
+|  |BRAINSTORM|    |  DEFINE  |    |    DESIGN    |    |     BUILD     |    |   SHIP   |                   |
+|  |(Optional)|    |          |    |              |    |               |    |          |                   |
+|  +----+-----+    +----+-----+    +------+-------+    +-------+-------+    +----+-----+                   |
+|       |               |                 |                    |                 |                          |
+|       v               v                 v                    v                 v                          |
+|   Questions       Technical         Agent              Delegation         Archive                        |
+|   + Approaches    Context           Matching           + Execution        + Lessons                      |
+|   + YAGNI         + Clarity         + KB Lookup        + Attribution                                     |
+|                   Score 12/15                          + Verification                                    |
+|                                                                                                          |
+|  <-------------------------------------------------------------------------->                            |
+|                                    /iterate (any phase)                                                  |
+|                                                                                                          |
++---------------------------------------------------------------------------------------------------------+
 ```
 
 ### Data Flow
 
 ```text
-                           ┌─────────────────────────────────────┐
-                           │         .claude/kb/                 │
-                           │  ┌──────────────────────────────┐   │
-                           │  │  User-created KB domains     │   │
-                           │  │  (via /create-kb)            │   │
-                           │  └──────────────┬───────────────┘   │
-                           └─────────────────┼───────────────────┘
-                                             │
-                                             ▼
-┌──────────────┐          ┌──────────────────────────────┐
-│   DEFINE     │─────────▶│         KB Domains           │
-│              │          │    (from Technical Context)  │
-│ • Location   │          └──────────────┬───────────────┘
-│ • KB Domains │                         │
-│ • IaC Impact │                         ▼
-└──────────────┘          ┌──────────────────────────────┐
-                          │          DESIGN              │
-                          │                              │
-                          │  Agent Matching:             │
-                          │  Glob(.claude/agents/**)     │
-                          │         │                    │
-                          │         ▼                    │
-                          │  ┌────────────────────┐      │
-                          │  │ Capability Index   │      │
-                          │  │ • Keywords         │      │
-                          │  │ • Roles            │      │
-                          │  │ • Patterns         │      │
-                          │  └─────────┬──────────┘      │
-                          │            │                 │
-                          │            ▼                 │
-                          │  File Manifest + Agent       │
-                          └──────────────┬───────────────┘
-                                         │
-                                         ▼
-                          ┌──────────────────────────────┐
-                          │          BUILD               │
-                          │                              │
-                          │  For each file:              │
-                          │  ┌─────────────────────┐     │
-                          │  │ Has @agent-name?    │     │
-                          │  └──────────┬──────────┘     │
-                          │       YES   │   NO           │
-                          │         ┌───┴───┐            │
-                          │         ▼       ▼            │
-                          │    Task()    Direct          │
-                          │    Invoke    Build           │
-                          │         │       │            │
-                          │         └───┬───┘            │
-                          │             ▼                │
-                          │      BUILD_REPORT            │
-                          │    + Agent Attribution       │
-                          └──────────────────────────────┘
+                           +-------------------------------------+
+                           |         .claude/kb/                 |
+                           |  +------------------------------+   |
+                           |  |  22 curated KB domains       |   |
+                           |  |  (dbt, Spark, Airflow, ...)  |   |
+                           |  +------------------------------+   |
+                           +------------------+------------------+
+                                              |
+                                              v
++------------------+         +------------------------------+
+|   DEFINE         |-------->|         KB Domains           |
+|                  |         |    (from Technical Context)  |
+| - Location       |         +------------------------------+
+| - KB Domains     |                        |
+| - IaC Impact     |                        v
+| - Data Lineage   |         +------------------------------+
++------------------+         |          DESIGN              |
+                             |                              |
+                             |  Agent Matching:             |
+                             |  Glob(.claude/agents/**)     |
+                             |         |                    |
+                             |         v                    |
+                             |  +--------------------+      |
+                             |  | Capability Index   |      |
+                             |  | - Keywords         |      |
+                             |  | - Roles            |      |
+                             |  | - Patterns         |      |
+                             |  +--------------------+      |
+                             |            |                 |
+                             |            v                 |
+                             |  File Manifest + Agent       |
+                             +------------------------------+
+                                            |
+                                            v
+                             +------------------------------+
+                             |          BUILD               |
+                             |                              |
+                             |  For each file:              |
+                             |  Has @agent-name?            |
+                             |       YES     NO             |
+                             |         |       |            |
+                             |         v       v            |
+                             |    Task()    Direct          |
+                             |    Invoke    Build           |
+                             |         |       |            |
+                             |         v       v            |
+                             |      BUILD_REPORT            |
+                             |    + Agent Attribution       |
+                             +------------------------------+
 ```
 
 ### Phase Details
@@ -201,18 +187,20 @@ Traditional specs assume the AI knows where to put files. AgentSpec explicitly a
 
 | Question | Why It Matters |
 |----------|----------------|
-| **Deployment Location** | Prevents misplaced files (src/ vs functions/ vs deploy/) |
+| **Deployment Location** | Prevents misplaced files (models/ vs functions/ vs deploy/) |
 | **KB Domains** | Design phase pulls correct patterns from curated knowledge |
 | **IaC Impact** | Catches infrastructure needs early, triggers specialized agents |
+| **Data Lineage** | Maps upstream/downstream dependencies for pipeline design |
 
 ```markdown
 ## Technical Context
 
 | Aspect | Value | Notes |
 |--------|-------|-------|
-| **Deployment Location** | src/api/ | REST API service |
-| **KB Domains** | {your-domains} | Which patterns to consult |
-| **IaC Impact** | New resources | Infrastructure changes needed |
+| **Deployment Location** | models/staging/ | dbt staging models |
+| **KB Domains** | dbt, sql-patterns, data-modeling | Patterns to consult |
+| **IaC Impact** | None | No infrastructure changes |
+| **Data Lineage** | raw.orders -> stg_orders | Source to target mapping |
 ```
 
 ### 2. Agent Matching (Design Phase)
@@ -221,72 +209,74 @@ Design dynamically discovers available agents and matches them to tasks:
 
 ```text
 Step 1: Discover        Step 2: Index           Step 3: Match
-──────────────────      ─────────────           ─────────────
+------------------      -------------           -------------
 
-Glob(.claude/           agents:                 main.py → @backend-developer
-  agents/**/*.md)         backend-developer:    schema.py → @data-modeler
-       │                    keywords: [api,     config.yaml → @infra-deployer
-       ▼                      rest, backend]    test_main.py → @test-generator
-16 agent files              role: "Backend
-                              API developer"
+Glob(.claude/           agents:                 stg_orders.sql -> @dbt-specialist
+  agents/**/*.md)         dbt-specialist:       spark_job.py -> @spark-engineer
+       |                    keywords: [dbt,     quality.py -> @data-quality-analyst
+       v                      model, staging]   dag.py -> @airflow-specialist
+58 agent files              role: "Data
+                              Transformation
+                              Engineer"
 ```
 
-**Framework-Agnostic:** New agents added to `.claude/agents/` automatically become available for matching - zero configuration.
-
-> **Note:** The agents shown above (`@backend-developer`, `@data-modeler`, etc.) are hypothetical examples. Your actual agents are discovered from `.claude/agents/`.
+**Framework-Agnostic:** New agents added to `.claude/agents/` automatically become available for matching -- zero configuration.
 
 ### 3. Agent Delegation (Build Phase)
 
 Build invokes matched specialists via the Task tool:
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    AGENT DELEGATION                              │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  File Manifest:                                                  │
-│  ┌────────────────────────────────────────────────────────┐     │
-│  │ main.py    │ @backend-developer   │ API patterns      │     │
-│  │ schema.py  │ @data-modeler        │ Pydantic models   │     │
-│  │ test.py    │ @test-generator      │ pytest fixtures   │     │
-│  └────────────────────────────────────────────────────────┘     │
-│                          │                                       │
-│                          ▼                                       │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                   PARALLEL EXECUTION                      │   │
-│  │                                                           │   │
-│  │  Task(subagent: "backend-developer", prompt: "...")      │   │
-│  │  Task(subagent: "data-modeler", prompt: "...")           │   │
-│  │  Task(subagent: "test-generator", prompt: "...")         │   │
-│  │                                                           │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                          │                                       │
-│                          ▼                                       │
-│  BUILD_REPORT:                                                   │
-│  ┌────────────────────────────────────────────────────────┐     │
-│  │ File         │ Agent                  │ Status │ Notes │     │
-│  │ main.py      │ @backend-developer     │   OK   │ ...   │     │
-│  │ schema.py    │ @data-modeler          │   OK   │ ...   │     │
-│  │ test.py      │ @test-generator        │   OK   │ ...   │     │
-│  └────────────────────────────────────────────────────────┘     │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------+
+|                    AGENT DELEGATION                          |
++-------------------------------------------------------------+
+|                                                              |
+|  File Manifest:                                              |
+|  +--------------------------------------------------------+ |
+|  | stg_orders.sql  | @dbt-specialist    | staging model   | |
+|  | spark_job.py    | @spark-engineer    | transformation  | |
+|  | test_quality.py | @test-generator    | pytest suite    | |
+|  +--------------------------------------------------------+ |
+|                          |                                   |
+|                          v                                   |
+|  +--------------------------------------------------------+ |
+|  |                   PARALLEL EXECUTION                    | |
+|  |                                                         | |
+|  |  Task(subagent: "dbt-specialist", prompt: "...")       | |
+|  |  Task(subagent: "spark-engineer", prompt: "...")       | |
+|  |  Task(subagent: "test-generator", prompt: "...")       | |
+|  +--------------------------------------------------------+ |
+|                          |                                   |
+|                          v                                   |
+|  BUILD_REPORT:                                               |
+|  +--------------------------------------------------------+ |
+|  | File             | Agent              | Status | Notes  | |
+|  | stg_orders.sql   | @dbt-specialist    |   OK   | ...    | |
+|  | spark_job.py     | @spark-engineer    |   OK   | ...    | |
+|  | test_quality.py  | @test-generator    |   OK   | ...    | |
+|  +--------------------------------------------------------+ |
+|                                                              |
++-------------------------------------------------------------+
 ```
 
 ---
 
 ## The Agent Ecosystem
 
-AgentSpec leverages an ecosystem of 16 specialized agents:
+AgentSpec leverages an ecosystem of **58 specialized agents** across 8 categories:
 
 ### By Category
 
-| Category | Count | Agents | Specialization |
-|----------|-------|--------|----------------|
-| **Workflow** | 6 | brainstorm, define, design, build, ship, iterate | SDD phases |
-| **Code Quality** | 4 | code-reviewer, code-cleaner, code-documenter, test-generator | Quality assurance |
-| **Communication** | 4 | adaptive-explainer, linear-project-manager, meeting-analyst, the-planner | Documentation |
-| **Exploration** | 2 | codebase-explorer, kb-architect | Analysis |
+| Category | Count | Key Agents | Specialization |
+|----------|-------|------------|----------------|
+| **Workflow** | 6 | brainstorm, define, design, build, ship, iterate | SDD phase execution |
+| **Architect** | 8 | schema-designer, pipeline-architect, medallion-architect, lakehouse-architect, genai-architect, the-planner, data-platform-engineer, meeting-analyst | System-level design |
+| **Cloud** | 10 | aws-data-architect, aws-deployer, aws-lambda-architect, gcp-data-architect, ai-data-engineer-cloud, ai-data-engineer-gcp, ai-prompt-specialist-gcp, lambda-builder, ci-cd-specialist, supabase-specialist | Cloud infrastructure |
+| **Platform** | 6 | fabric-architect, fabric-pipeline-developer, fabric-security-specialist, fabric-cicd-specialist, fabric-logging-specialist, fabric-ai-specialist | Microsoft Fabric |
+| **Python** | 6 | python-developer, code-reviewer, code-cleaner, code-documenter, llm-specialist, ai-prompt-specialist | Code quality and prompts |
+| **Test** | 3 | test-generator, data-quality-analyst, data-contracts-engineer | Quality assurance |
+| **Data Engineering** | 15 | dbt-specialist, spark-engineer, spark-specialist, spark-troubleshooter, spark-performance-analyzer, spark-streaming-architect, sql-optimizer, streaming-engineer, airflow-specialist, lakeflow-specialist, lakeflow-expert, lakeflow-architect, lakeflow-pipeline-builder, ai-data-engineer, qdrant-specialist | DE implementation |
+| **Dev** | 4 | prompt-crafter, codebase-explorer, shell-script-specialist, meeting-analyst | Developer productivity |
 
 ### Agent Structure
 
@@ -307,10 +297,6 @@ Each agent follows a standard structure for capability extraction:
 
 ## Core Capabilities <- Keywords for matching
 
-| Capability | Description |
-|------------|-------------|
-| **{Verb}** | {What it does}
-
 ## Process <- How it works
 
 ## Tools Available <- What it can use
@@ -327,81 +313,125 @@ Design phase matches agents using these keywords:
 | Core Capabilities | All capability names |
 | Process steps | Domain-specific terms |
 
-**Pro tip:** Use specific keywords in your agent's description for better matching:
-
-```markdown
-# Good: "Expert in dbt transformations and Snowflake data modeling"
-# Bad: "Helps with data stuff"
-```
-
 ---
 
 ## Knowledge Base Integration
 
-AgentSpec integrates deeply with the curated Knowledge Base:
+AgentSpec integrates deeply with 22 curated Knowledge Base domains:
 
 ### Available Domains
 
-KB domains are user-created and project-specific. Use `/create-kb` to add domains for your stack.
+| Domain | Focus |
+|--------|-------|
+| dbt | Transformations, incremental strategies, testing, mesh |
+| spark | DataFrames, Catalyst optimizer, read/write patterns |
+| sql-patterns | Window functions, CTEs, cross-dialect, deduplication |
+| airflow | DAG design, operators, sensors, dynamic task mapping |
+| streaming | Flink, Kafka, CDC patterns, streaming databases |
+| data-modeling | Star schema, Data Vault, SCD, normalization |
+| data-quality | Great Expectations, Soda, observability, contracts |
+| lakehouse | Iceberg, Delta Lake, DuckLake, catalogs |
+| medallion | Bronze/Silver/Gold layers, data quality gates |
+| lakeflow | Databricks DLT, serverless pipelines |
+| cloud-platforms | Snowflake, Databricks, BigQuery |
+| aws | Lambda, S3, Glue, SAM |
+| gcp | Cloud Run, Pub/Sub, BigQuery |
+| microsoft-fabric | Lakehouse, Warehouse, Pipelines, AI |
+| modern-stack | DuckDB, Polars, SQLMesh |
+| ai-data-engineering | RAG, vector DBs, feature stores, LLMOps |
+| prompt-engineering | Chain-of-thought, extraction, structured output |
+| genai | Multi-agent systems, guardrails, tool calling |
+| pydantic | Validation, LLM output schemas |
+| python | Dataclasses, type hints, clean architecture |
+| testing | pytest, fixtures, integration tests |
+| terraform | Modules, state, workspaces |
 
-Domains are registered in `.claude/kb/_index.yaml` and follow the standard structure documented in `.claude/kb/README.md`.
+Domains are registered in `.claude/kb/_index.yaml`. Use `/create-kb` to add new domains.
 
 ### KB Flow
 
 ```text
 DEFINE                    DESIGN                    BUILD
-──────                    ──────                    ─────
+------                    ------                    -----
 
-KB Domains:          →    Read patterns:       →    Agents consult:
-• {domain-1}              • {pattern-a}             • KB/{domain-1}/patterns/
-• {domain-2}              • {pattern-b}             • KB/{domain-2}/patterns/
+KB Domains:          ->    Read patterns:       ->    Agents consult:
+- dbt                      - incremental-model       - KB/dbt/patterns/
+- sql-patterns             - cross-dialect            - KB/sql-patterns/patterns/
+- data-modeling            - star-schema              - KB/data-modeling/patterns/
 ```
 
 ### KB Domain Structure
 
 ```text
 .claude/kb/{domain}/
-├── index.md           # Domain overview
-├── quick-reference.md # Cheat sheet
-├── concepts/          # Core concepts
-├── patterns/          # Implementation patterns
-└── specs/             # YAML specifications (optional)
++-- index.md           # Domain overview
++-- quick-reference.md # Cheat sheet
++-- concepts/          # Core concepts (3-6 files)
++-- patterns/          # Implementation patterns (3-6 files)
++-- specs/             # YAML specifications (optional)
 ```
 
 ---
 
 ## Commands & Artifacts
 
-### Commands
+### All Commands (21)
 
-| Command | Phase | Purpose | Model | Input |
-|---------|-------|---------|-------|-------|
-| `/brainstorm` | 0 | Explore ideas through dialogue | Opus | Vague idea or topic |
-| `/define` | 1 | Capture and validate requirements | Opus | Idea or BRAINSTORM doc |
-| `/design` | 2 | Create architecture + agent matching | Opus | DEFINE doc |
-| `/build` | 3 | Execute with agent delegation | Sonnet | DESIGN doc |
-| `/ship` | 4 | Archive with lessons learned | Haiku | DEFINE doc |
-| `/iterate` | Any | Update documents mid-stream | Sonnet | Any SDD doc + changes |
+#### SDD Workflow (7)
+
+| Command | Phase | Purpose | Model |
+|---------|-------|---------|-------|
+| `/brainstorm` | 0 | Explore ideas through collaborative dialogue | Opus |
+| `/define` | 1 | Capture and validate requirements | Opus |
+| `/design` | 2 | Create architecture + agent matching | Opus |
+| `/build` | 3 | Execute with agent delegation | Sonnet |
+| `/ship` | 4 | Archive with lessons learned | Haiku |
+| `/iterate` | Any | Update documents mid-stream | Sonnet |
+| `/create-pr` | -- | Create pull request with conventional commits | -- |
+
+#### Data Engineering (8)
+
+| Command | Purpose |
+|---------|---------|
+| `/pipeline` | DAG/pipeline scaffolding |
+| `/schema` | Interactive schema design (star schema, Data Vault, SCD) |
+| `/data-quality` | Quality rules generation (Great Expectations, Soda) |
+| `/lakehouse` | Table format and catalog guidance (Iceberg, Delta) |
+| `/sql-review` | SQL-specific code review |
+| `/ai-pipeline` | RAG/embedding pipeline scaffolding |
+| `/data-contract` | Contract authoring (ODCS) |
+| `/migrate` | Legacy ETL migration |
+
+#### Core & Utilities (6)
+
+| Command | Purpose |
+|---------|---------|
+| `/create-kb` | Create a complete KB domain from scratch |
+| `/review` | Dual AI code review |
+| `/meeting` | Meeting transcript analysis |
+| `/memory` | Save session insights to storage |
+| `/sync-context` | Update CLAUDE.md from codebase |
+| `/readme-maker` | Generate README from codebase analysis |
 
 ### Artifact Lifecycle
 
 ```text
 .claude/sdd/
-├── features/                          # Active work
-│   ├── BRAINSTORM_{FEATURE}.md       # Phase 0 output
-│   ├── DEFINE_{FEATURE}.md           # Phase 1 output
-│   └── DESIGN_{FEATURE}.md           # Phase 2 output
-│
-├── reports/                           # Build outputs
-│   └── BUILD_REPORT_{FEATURE}.md     # Phase 3 output
-│
-└── archive/                           # Completed work
-    └── {FEATURE}/
-        ├── BRAINSTORM_{FEATURE}.md   # (if used)
-        ├── DEFINE_{FEATURE}.md
-        ├── DESIGN_{FEATURE}.md
-        ├── BUILD_REPORT_{FEATURE}.md
-        └── SHIPPED_{DATE}.md         # Phase 4 output
++-- features/                          # Active work
+|   +-- BRAINSTORM_{FEATURE}.md       # Phase 0 output
+|   +-- DEFINE_{FEATURE}.md           # Phase 1 output
+|   +-- DESIGN_{FEATURE}.md           # Phase 2 output
+|
++-- reports/                           # Build outputs
+|   +-- BUILD_REPORT_{FEATURE}.md     # Phase 3 output
+|
++-- archive/                           # Completed work
+    +-- {FEATURE}/
+        +-- BRAINSTORM_{FEATURE}.md   # (if used)
+        +-- DEFINE_{FEATURE}.md
+        +-- DESIGN_{FEATURE}.md
+        +-- BUILD_REPORT_{FEATURE}.md
+        +-- SHIPPED_{DATE}.md         # Phase 4 output
 ```
 
 ### Key Artifact Sections
@@ -413,9 +443,10 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 
 | Aspect | Value | Notes |
 |--------|-------|-------|
-| **Deployment Location** | src/api/ | REST API service |
-| **KB Domains** | {your-domains} | Which patterns to consult |
-| **IaC Impact** | New resources | Infrastructure changes needed |
+| **Deployment Location** | models/staging/ | dbt staging models |
+| **KB Domains** | dbt, sql-patterns | Patterns to consult |
+| **IaC Impact** | None | No infrastructure changes |
+| **Data Lineage** | raw.orders -> stg_orders | Source to target |
 ```
 
 #### DESIGN (Agent Assignment)
@@ -425,17 +456,16 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 
 | # | File | Action | Purpose | Agent | Dependencies |
 |---|------|--------|---------|-------|--------------|
-| 1 | main.py | Create | API handler | @backend-developer | None |
-| 2 | schema.py | Create | Pydantic models | @data-modeler | None |
-| 3 | test.py | Create | Tests | @test-generator | 1, 2 |
+| 1 | models/staging/stg_orders.sql | Create | Staging model | @dbt-specialist | None |
+| 2 | models/marts/fct_orders.sql | Create | Fact table | @dbt-specialist | 1 |
+| 3 | tests/test_orders.py | Create | Quality tests | @data-quality-analyst | 1, 2 |
 
 ## Agent Assignment Rationale
 
 | Agent | Files | Why This Agent |
 |-------|-------|----------------|
-| @backend-developer | 1 | API patterns from KB |
-| @data-modeler | 2 | Pydantic model validation |
-| @test-generator | 3 | pytest fixtures specialist |
+| @dbt-specialist | 1, 2 | dbt model patterns from KB |
+| @data-quality-analyst | 3 | Great Expectations suite |
 ```
 
 #### BUILD_REPORT (Attribution)
@@ -445,9 +475,8 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 
 | Agent | Files | Specialization Applied |
 |-------|-------|------------------------|
-| @backend-developer | 2 | REST API, request handlers |
-| @data-modeler | 2 | Pydantic models, validation |
-| @test-generator | 2 | pytest, fixtures |
+| @dbt-specialist | 2 | Incremental models, refs, schema tests |
+| @data-quality-analyst | 1 | Great Expectations suite |
 | (direct) | 1 | DESIGN patterns only |
 ```
 
@@ -465,6 +494,8 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 | FR-004 | System must support `/iterate` for mid-stream changes | P1-High | Implemented |
 | FR-005 | System must archive completed features with lessons | P1-High | Implemented |
 | FR-006 | System must provide agent attribution in BUILD_REPORT | P1-High | Implemented |
+| FR-007 | System must provide data engineering-specific commands | P1-High | Implemented |
+| FR-008 | System must include curated DE knowledge base domains | P1-High | Implemented |
 
 ### Non-Functional Requirements
 
@@ -483,26 +514,17 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 | C-002 | Must not require external dependencies | Technical | Self-contained |
 | C-003 | Agent files must follow standard structure | Convention | For matching |
 
-### Assumptions
-
-| ID | Assumption | Risk if Wrong | Mitigation |
-|----|------------|---------------|------------|
-| A-001 | Users have Claude Code CLI installed | Won't work | Document as prerequisite |
-| A-002 | Users maintain KB domains | Stale patterns | Add freshness warnings |
-| A-003 | Specialized agents produce better code | No benefit | Measure and compare |
-
 ---
 
 ## Open Questions
 
-| # | Question | Context | Priority | Owner |
-|---|----------|---------|----------|-------|
-| Q1 | Should Judge layer be opt-in or opt-out? | User experience vs safety | HIGH | TBD |
-| Q2 | How to handle agent matching confidence scores? | Edge cases need fallbacks | HIGH | TBD |
-| Q3 | Should KB freshness warnings be automatic? | Stale patterns risk | MEDIUM | TBD |
-| Q4 | How to measure agent quality objectively? | Need metrics | MEDIUM | TBD |
-| Q5 | Should DESIGN allow manual agent override? | User control vs automation | MEDIUM | TBD |
-| Q6 | How to handle circular dependencies in file manifest? | Build ordering | LOW | TBD |
+| # | Question | Context | Priority |
+|---|----------|---------|----------|
+| Q1 | Should Judge layer be opt-in or opt-out? | User experience vs safety | HIGH |
+| Q2 | How to handle agent matching confidence scores? | Edge cases need fallbacks | HIGH |
+| Q3 | Should KB freshness warnings be automatic? | Stale patterns risk | MEDIUM |
+| Q4 | How to measure agent quality objectively? | Need metrics | MEDIUM |
+| Q5 | Should DESIGN allow manual agent override? | User control vs automation | MEDIUM |
 
 ---
 
@@ -510,80 +532,24 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 
 ### Framework Quality Metrics
 
-| Metric | Current | Target | Measurement |
-|--------|---------|--------|-------------|
-| Agent matching accuracy | ~75% | 92% | DESIGN file audits |
-| Features with full agent coverage | 60% | 95% | BUILD_REPORT analysis |
-| KB freshness (< 3 months) | 85% | 95% | KB metadata |
-| DEFINE→DESIGN success rate | 85% | 95% | Phase progression |
-| BUILD rework rate | ~20% | <8% | Iteration tracking |
-
-### Adoption Metrics
-
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Features using full pipeline | >80% | Archive count |
-| Agent delegation usage | >70% | BUILD_REPORT analysis |
-| KB domain utilization | Growing | Technical Context audit |
+| Agent matching accuracy | 92% | DESIGN file audits |
+| Features with full agent coverage | 95% | BUILD_REPORT analysis |
+| KB freshness (< 3 months) | 95% | KB metadata |
+| DEFINE->DESIGN success rate | 95% | Phase progression |
+| BUILD rework rate | <8% | Iteration tracking |
 
 ### Comparison: With vs Without AgentSpec
 
 | Dimension | Without AgentSpec | With AgentSpec |
 |-----------|-------------------|----------------|
 | File placement | Random/guessed | Explicit in Technical Context |
-| Pattern consistency | Varies | KB-grounded |
-| Code ownership | Unclear | Agent attribution |
+| Pattern consistency | Varies | KB-grounded (22 domains) |
+| Code ownership | Unclear | Agent attribution (58 agents) |
 | Traceability | None | Full artifact chain |
 | Specialist expertise | None | Automatic matching |
-
----
-
-## Competitive Landscape
-
-### Framework Comparison
-
-| Dimension | Spec-Kit (GitHub) | OpenSpec (Fission-AI) | AgentSpec |
-|-----------|-------------------|----------------------|-----------|
-| **Philosophy** | "Specs as executable" | "Fluid not rigid" | "Who builds, not just what" |
-| **Backing** | GitHub (enterprise) | Indie/startup | Claude Code ecosystem |
-| **Phases** | 5 (Constitution→Implement) | 4 (new→apply→archive) | 5 (Brainstorm→Ship) |
-| **Agent Awareness** | None | None | **Full orchestration** |
-| **KB Grounding** | None | None | **Extensible domain system** |
-| **Agent Matching** | None | None | **Dynamic discovery** |
-| **Agent Delegation** | None | None | **Task tool invocation** |
-
-### Positioning
-
-```text
-                    COMPLEXITY
-                         │
-              ┌──────────┼──────────┐
-              │          │          │
-              │    AgentSpec        │
-         HIGH │    (orchestration)  │
-              │          ▲          │
-              │          │          │
-              │    Spec-Kit         │
-       MEDIUM │    (governance)     │
-              │          ▲          │
-              │          │          │
-              │    OpenSpec         │
-          LOW │    (pragmatic)      │
-              │                     │
-              └─────────────────────┘
-                    TOOL-AGNOSTIC ────────► SPECIALIZED
-```
-
-### Unique Value Proposition
-
-| Feature | Competitors | AgentSpec |
-|---------|-------------|-----------|
-| Agent Matching | Manual or None | **Automatic** |
-| Spec Validation | None | **Judge layer (planned)** |
-| KB Grounding | None | **MCP-validated, extensible** |
-| Multi-LLM Review | None | **OpenRouter (planned)** |
-| Usage Analytics | None | **Local telemetry (planned)** |
-| Quality Gates | Informal | **Objective, automated** |
+| Data lineage | Manual | Captured in Define phase |
 
 ---
 
@@ -595,11 +561,12 @@ KB Domains:          →    Read patterns:       →    Agents consult:
 |--------------|---------|----------|
 | **Skipping Define** | "I know what to build" | Even clear requirements benefit from Technical Context |
 | **Over-Brainstorming** | 10 questions, 5 approaches | Max 5 questions, 3 approaches. Apply YAGNI |
-| **Generic Agent Assignment** | All files → `(general)` | Invest in agent ecosystem |
+| **Generic Agent Assignment** | All files -> `(general)` | Invest in agent ecosystem |
 | **Empty KB Domains** | "We don't have patterns" | Use `/create-kb` before Design |
 | **Monolithic Design** | One 1000-line file | Break into files that map to single agents |
 | **Skipping /iterate** | "I'll just edit the code" | Changes should flow through specs |
 | **Ignoring Attribution** | Not checking BUILD_REPORT | Attribution reveals quality patterns |
+| **SELECT * in production** | Missing columns, bloated scans | Always expand to explicit columns |
 
 ### Warning Signs
 
@@ -610,27 +577,7 @@ You're about to make a mistake if:
 - Your Clarity Score is below 12/15
 - Your BUILD_REPORT has no agent attribution
 - You're skipping phases "to save time"
-```
-
-### The "Just Code It" Trap
-
-```text
-WRONG                              RIGHT
-─────                              ─────
-
-"I'll just write the code"    vs    "Let me /define first"
-        │                                   │
-        ▼                                   ▼
-   Code works but:                    Spec captures:
-   • No KB patterns                   • Location decision
-   • Random file location             • KB domains to use
-   • No agent expertise               • Agent assignments
-   • No traceability                  • Full attribution
-        │                                   │
-        ▼                                   ▼
-   Future you: "Why is               Future you: "Oh, @code-reviewer
-   this code here?"                  validated this with
-                                     patterns from KB"
+- Your SQL has no partition filters on large tables
 ```
 
 ---
@@ -643,21 +590,21 @@ WRONG                              RIGHT
 
 ```bash
 # Location: .claude/agents/{category}/{agent-name}.md
-touch .claude/agents/data-engineering/dbt-specialist.md
+touch .claude/agents/data-engineering/iceberg-specialist.md
 ```
 
 2. **Follow the standard structure:**
 
 ```markdown
-# DBT Specialist
+# Iceberg Specialist
 
-> Expert in dbt transformations and data modeling
+> Expert in Apache Iceberg table format, partition evolution, and catalog management
 
 ## Identity
 
 | Attribute | Value |
 |-----------|-------|
-| **Role** | Data Transformation Engineer |
+| **Role** | Table Format Engineer |
 | **Model** | Sonnet |
 | **Phase** | 3 - Build |
 
@@ -665,149 +612,97 @@ touch .claude/agents/data-engineering/dbt-specialist.md
 
 | Capability | Description |
 |------------|-------------|
-| **Model** | Create dbt models with refs |
-| **Test** | Add schema tests |
-| **Document** | Generate docs |
+| **Partition** | Design and evolve partition strategies |
+| **Compact** | Optimize table maintenance and compaction |
+| **Migrate** | Convert between table formats |
 ```
 
-3. **The agent is automatically discoverable** - Design phase will find it via `Glob(.claude/agents/**/*.md)`
+3. **The agent is automatically discoverable** -- Design phase will find it via `Glob(.claude/agents/**/*.md)`
 
 ### Adding a New KB Domain
 
-1. **Create the domain structure:**
+1. **Use the command:**
 
 ```bash
-mkdir -p .claude/kb/dbt
-touch .claude/kb/dbt/{index.md,quick-reference.md}
-mkdir -p .claude/kb/dbt/{concepts,patterns}
+/create-kb "iceberg"
 ```
 
-2. **Register in KB index:**
+2. **Or manually create the structure:**
+
+```bash
+mkdir -p .claude/kb/iceberg/{concepts,patterns}
+touch .claude/kb/iceberg/{index.md,quick-reference.md}
+```
+
+3. **Register in KB index** (`.claude/kb/_index.yaml`):
 
 ```yaml
-# .claude/kb/_index.yaml
 domains:
-  dbt:
-    description: "dbt transformation patterns"
-    entry_point: ".claude/kb/dbt/index.md"
+  iceberg:
+    description: "Apache Iceberg table format patterns"
+    entry_point: ".claude/kb/iceberg/index.md"
 ```
 
-3. **Reference in DEFINE Technical Context:**
+4. **Reference in DEFINE Technical Context:**
 
 ```markdown
-## Technical Context
-
-| Aspect | Value |
-|--------|-------|
-| **KB Domains** | dbt |  # Now available
+| **KB Domains** | iceberg, lakehouse |
 ```
 
 ---
 
 ## Quick Start
 
-### Full Pipeline (Complex Feature)
+### Full Pipeline (Data Engineering Feature)
 
 ```bash
 # Phase 0: Explore the idea (optional)
-/brainstorm "Build a user notification system"
+/brainstorm "Build an incremental orders pipeline with SCD Type 2"
 
 # Phase 1: Define requirements with Technical Context
-/define .claude/sdd/features/BRAINSTORM_NOTIFICATION_SYSTEM.md
+/define .claude/sdd/features/BRAINSTORM_ORDERS_PIPELINE.md
 
 # Phase 2: Design with Agent Matching
-/design .claude/sdd/features/DEFINE_NOTIFICATION_SYSTEM.md
+/design .claude/sdd/features/DEFINE_ORDERS_PIPELINE.md
 
 # Phase 3: Build with Agent Delegation
-/build .claude/sdd/features/DESIGN_NOTIFICATION_SYSTEM.md
+/build .claude/sdd/features/DESIGN_ORDERS_PIPELINE.md
 
 # Phase 4: Archive
-/ship .claude/sdd/features/DEFINE_NOTIFICATION_SYSTEM.md
+/ship .claude/sdd/features/DEFINE_ORDERS_PIPELINE.md
 ```
 
-### Clear Requirements (Skip Brainstorm)
+### Using DE-Specific Commands
 
 ```bash
-# Phase 1: Define directly
-/define "Build a REST API endpoint for user authentication"
+# Design a star schema
+/schema "Star schema for e-commerce analytics"
 
-# Continue: /design → /build → /ship
+# Scaffold a pipeline
+/pipeline "Daily orders ETL from Postgres to Snowflake"
+
+# Generate quality checks
+/data-quality models/staging/stg_orders.sql
+
+# Author a data contract
+/data-contract "orders dataset for analytics team"
 ```
 
-### Mid-Stream Changes
+### Making Changes Mid-Stream
 
 ```bash
-# Update any phase
-/iterate DEFINE_AUTH.md "Add OAuth support requirement"
-/iterate DESIGN_AUTH.md "Change to use JWT tokens"
+# Update DEFINE with new requirement
+/iterate DEFINE_ORDERS_PIPELINE.md "Add support for late-arriving facts"
+
+# Update DESIGN with architecture change
+/iterate DESIGN_ORDERS_PIPELINE.md "Switch from full refresh to incremental"
 ```
-
-### Decision Flowchart
-
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│                    SHOULD I USE AGENTSPEC?                           │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  Start: "I need to build something"                                  │
-│         │                                                            │
-│         ▼                                                            │
-│  ┌─────────────────────────────┐                                     │
-│  │ Is it complex?              │                                     │
-│  │ (> 3 files, multi-component)│                                     │
-│  └─────────────┬───────────────┘                                     │
-│           YES  │  NO                                                 │
-│         ┌──────┴──────┐                                              │
-│         ▼             ▼                                              │
-│    AgentSpec     Direct coding                                       │
-│         │                                                            │
-│         ▼                                                            │
-│  ┌─────────────────────────────┐                                     │
-│  │ Idea clear or vague?        │                                     │
-│  └─────────────┬───────────────┘                                     │
-│        CLEAR   │  VAGUE                                              │
-│         ┌──────┴──────┐                                              │
-│         ▼             ▼                                              │
-│     /define      /brainstorm                                         │
-│                       │                                              │
-│                       ▼                                              │
-│                   /define                                            │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Stakeholders & Roles
-
-### For AgentSpec Usage
-
-| Role | Responsibilities | Commands Used |
-|------|------------------|---------------|
-| **Product Owner** | Define requirements, approve DEFINE | `/define`, review DEFINE_*.md |
-| **Tech Lead** | Review DESIGN, approve architecture | `/design`, review DESIGN_*.md |
-| **Developer** | Execute BUILD, verify results | `/build`, `/iterate` |
-| **Team** | Archive and capture lessons | `/ship`, review archive/ |
-
-### RACI Matrix (Per Feature)
-
-| Activity | Product Owner | Tech Lead | Developer |
-|----------|---------------|-----------|-----------|
-| Brainstorm | R/A | C | C |
-| Define requirements | R/A | C | I |
-| Design architecture | C | R/A | C |
-| Build implementation | I | C | R/A |
-| Ship and archive | I | A | R |
-
-**Legend:** R = Responsible, A = Accountable, C = Consulted, I = Informed
 
 ---
 
 ## Quality Verification
 
 ### Document Quality Checklist
-
-Run before finalizing any SDD document:
 
 ```text
 COMPLETENESS
@@ -828,36 +723,25 @@ TRACEABILITY
 [ ] Lessons captured (SHIPPED)
 ```
 
-### Agent Quality Checklist
+### Data Engineering Quality Checklist
 
 ```text
-STRUCTURE
-[ ] Has name, description in frontmatter
-[ ] Has Identity table with Role
-[ ] Has Core Capabilities section
-[ ] Has Process section
-[ ] Has Tools Available section
+SQL QUALITY
+[ ] sqlfluff lint passes (0 violations)
+[ ] No SELECT * in production models
+[ ] Explicit type casts in joins
+[ ] Partition filters on large tables
 
-CONTENT
-[ ] Description has matching keywords
-[ ] Examples are realistic
-[ ] Anti-patterns documented
-```
+DATA QUALITY
+[ ] unique + not_null on primary keys
+[ ] Relationships on foreign keys
+[ ] Source freshness within SLA
+[ ] PII columns tagged and masked
 
-### KB Domain Quality Checklist
-
-```text
-STRUCTURE
-[ ] Has index.md with overview
-[ ] Has quick-reference.md
-[ ] Has concepts/ folder
-[ ] Has patterns/ folder
-
-CONTENT
-[ ] MCP validated
-[ ] Freshness date recorded
-[ ] Cross-references work
-[ ] Code examples tested
+SCHEMA GOVERNANCE
+[ ] No breaking changes without deprecation
+[ ] Data contract published for consumers
+[ ] Lineage documented in Technical Context
 ```
 
 ---
@@ -867,19 +751,25 @@ CONTENT
 | Resource | Location |
 |----------|----------|
 | SDD Index | `.claude/sdd/_index.md` |
-| Agents | `.claude/agents/` |
-| Knowledge Base | `.claude/kb/` |
-| Commands | `.claude/commands/workflow/` |
+| Architecture | `.claude/sdd/architecture/ARCHITECTURE.md` |
+| Workflow Contracts | `.claude/sdd/architecture/WORKFLOW_CONTRACTS.yaml` |
 | Templates | `.claude/sdd/templates/` |
 | Archive | `.claude/sdd/archive/` |
+| Agents (58) | `.claude/agents/` |
+| Knowledge Base (22) | `.claude/kb/` |
+| SDD Commands | `.claude/commands/workflow/` |
+| DE Commands | `.claude/commands/data-engineering/` |
+| Core Commands | `.claude/commands/core/` |
 
 ---
 
 ## Version History
 
-| Version | Date       | Changes                            |
-|---------|------------|------------------------------------|
-| 1.0.0   | 2026-02-17 | Public release as AgentSpec v1.0.0 |
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.1.0 | 2026-03-26 | Multi-cloud coverage: 58 agents across 8 categories, 23 KB domains |
+| 2.0.0 | 2026-03-26 | Data engineering pivot: 11 KB domains, 11 DE agents, 8 DE commands |
+| 1.0.0 | 2026-02-17 | Public release as AgentSpec v1.0.0 with 16 agents |
 
 ---
 
@@ -887,25 +777,26 @@ CONTENT
 
 AgentSpec is designed for a future where:
 
-1. **AI models are specialists** - Not one-size-fits-all, but domain experts
-2. **Specifications are executable** - Not just documentation, but orchestration
-3. **Quality comes from expertise** - Specialists produce better code than generalists
-4. **Knowledge is curated** - Patterns validated by MCP, not hallucinated
-5. **Traceability is automatic** - Every file has an owner, every decision has rationale
+1. **AI models are specialists** -- Not one-size-fits-all, but domain experts
+2. **Specifications are executable** -- Not just documentation, but orchestration
+3. **Quality comes from expertise** -- Specialists produce better code than generalists
+4. **Knowledge is curated** -- Patterns validated by MCP, not hallucinated
+5. **Traceability is automatic** -- Every file has an owner, every decision has rationale
+6. **Data engineering is first-class** -- Pipelines, schemas, and quality are built-in concerns
 
-**AgentSpec is not just a specification framework. It's an AI team orchestration system.**
+**AgentSpec is not just a specification framework. It's an AI team orchestration system for data engineering.**
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                  │
-│   "Tell me WHAT to build, I'll figure out WHO should build it"  │
-│                                                                  │
-│                         — AgentSpec                              │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------+
+|                                                               |
+|   "Tell me WHAT to build, I'll figure out WHO should         |
+|    build it -- with the right data engineering patterns."    |
+|                                                               |
+|                         -- AgentSpec v2.1                     |
+|                                                               |
++-------------------------------------------------------------+
 ```
 
 ---
 
-*Document Updated: 2026-02-17 | AgentSpec v1.0.0*
-*Frameworks Applied: Meeting Analyst (10-section), Codebase Explorer (Executive Summary), Code Documenter (Quality Checklists)*
+*Document Updated: 2026-03-26 | AgentSpec v2.1.0*

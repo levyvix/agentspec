@@ -14,21 +14,21 @@
 | Guide | Description |
 |-------|-------------|
 | [Tutorials](tutorials/) | dbt, star schema, data quality, Spark, streaming, RAG walkthroughs |
-| [Reference](reference/) | Full catalog: 27 agents, 20 commands, 11 KB domains |
+| [Reference](reference/) | Full catalog: 58 agents, 21 commands, 22 KB domains |
 
 ## Data Engineering Quick Links
 
-- [DE Commands](../.claude/commands/data-engineering/README.md) — 8 data engineering slash commands
-- [DE Agents](../.claude/agents/data-engineering/README.md) — 11 specialist agents with routing guide
-- [KB Domains](../.claude/kb/_index.yaml) — 11 knowledge base domains
+- [DE Commands](../.claude/commands/data-engineering/README.md) -- 8 data engineering slash commands
+- [DE Agents](../.claude/agents/data-engineering/) -- 15 specialist agents
+- [KB Domains](../.claude/kb/_index.yaml) -- 22 knowledge base domains
 
 ## Framework Quick Links
 
-- [SDD Workflow](../.claude/sdd/architecture/WORKFLOW_CONTRACTS.yaml) — Phase transition rules
-- [All Agents](../.claude/agents/README.md) — 27 agents across 5 categories
-- [All Commands](../.claude/commands/README.md) — 20 slash commands
+- [SDD Workflow](../.claude/sdd/architecture/WORKFLOW_CONTRACTS.yaml) -- Phase transition rules
+- [All Agents](../.claude/agents/README.md) -- 58 agents across 8 categories
+- [All Commands](../.claude/commands/README.md) -- 21 slash commands
 
 ## Need Help?
 
-- [GitHub Issues](https://github.com/luanmorenommaciel/agentspec/issues) — Bug reports
-- [Discussions](https://github.com/luanmorenommaciel/agentspec/discussions) — Questions and ideas
+- [GitHub Issues](https://github.com/luanmorenomaciel/agentspec/issues) -- Bug reports
+- [Discussions](https://github.com/luanmorenomaciel/agentspec/discussions) -- Questions and ideas

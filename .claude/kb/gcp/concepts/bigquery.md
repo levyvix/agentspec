@@ -90,6 +90,62 @@ job_config = bigquery.LoadJobConfig(
 client.load_table_from_uri(uri, table_id, job_config=job_config)
 ```
 
+## BigLake Iceberg Tables (2025-2026)
+
+BigLake Iceberg tables bring open lakehouse capabilities to BigQuery with customer-owned GCS storage.
+
+```sql
+-- Create a BigLake Iceberg table in BigQuery
+CREATE TABLE my_dataset.events
+(
+  event_id STRING,
+  event_type STRING,
+  payload JSON,
+  created_at TIMESTAMP
+)
+WITH CONNECTION `my-project.us.my-connection`
+OPTIONS (
+  file_format = 'PARQUET',
+  table_format = 'ICEBERG',
+  storage_uri = 'gs://my-bucket/iceberg/events'
+);
+
+-- Insert data (tracked by BigQuery, Iceberg snapshots auto-exported)
+INSERT INTO my_dataset.events VALUES
+  ('evt-001', 'click', JSON '{"page": "/home"}', CURRENT_TIMESTAMP());
+
+-- Time travel query
+SELECT * FROM my_dataset.events
+FOR SYSTEM_TIME AS OF TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR);
+```
+
+### Key Features
+
+| Feature | Status |
+|---------|--------|
+| Schema evolution (add/drop/rename columns) | GA |
+| Automatic storage optimization (clustering, file sizing) | GA |
+| Iceberg V2 snapshot export | GA |
+| BigLake Metastore (managed catalog) | GA |
+| Iceberg REST Catalog API | Preview |
+| Table partitioning | Preview |
+| Multi-statement transactions | Preview |
+| Column-level security and data masking | GA |
+
+### BigQuery DataFrames 2.0
+
+Process multimodal data (images, audio, text) with Pandas-compatible API at BigQuery scale:
+
+```python
+import bigframes.pandas as bpd
+
+# Read BigQuery table as DataFrame (scales to TB)
+df = bpd.read_gbq("my_project.my_dataset.events")
+
+# Standard Pandas operations execute in BigQuery
+result = df.groupby("event_type").count()
+```
+
 ## Related
 
 - [GCS](../concepts/gcs.md) - Source for batch loading

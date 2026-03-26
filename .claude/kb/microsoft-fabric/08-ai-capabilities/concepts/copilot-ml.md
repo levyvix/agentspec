@@ -1,4 +1,4 @@
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 # Copilot and ML Models
 
@@ -8,6 +8,13 @@
 ## Overview
 
 Microsoft Fabric Copilot is powered by Azure OpenAI and provides AI assistance across all Fabric workloads -- Data Factory, Data Engineering, Data Science, Warehouse, and Power BI. It reads workspace metadata, schemas, and context to generate code, queries, and visualizations. Fabric also includes a full Data Science workload with MLflow integration for training, tracking, and deploying ML models directly within the platform.
+
+**Key 2025 updates:**
+- **Copilot available on F2+ SKUs** (April 2025) -- no longer requires F64 or higher
+- **Fabric Copilot Capacity (FCC)** -- consolidated billing for Copilot usage across capacities
+- **AI Functions in Warehouse** (preview) -- T-SQL functions for sentiment analysis, text classification, entity extraction, and summarization powered by LLMs
+- **Fabric Data Agents** -- AI agents that enhance data-driven decision-making with natural language interfaces
+- **Copilot sidecar chat tools** (Nov 2025) -- real-time data exploration with conversational AI
 
 ## The Pattern
 
@@ -59,6 +66,27 @@ mlflow.register_model(model_uri, "churn_prediction_model")
 | Pipeline design | Data Factory | Suggest pipeline activities and structure |
 | Data profiling | Data Science | Summarize datasets, suggest transformations |
 | Report creation | Power BI | Build visuals from natural language |
+| Sidecar chat | All workloads | Real-time conversational data exploration (Nov 2025) |
+| Data agents | Platform | Natural language interfaces for data-driven decisions |
+
+## AI Functions in Warehouse (Preview)
+
+T-SQL functions powered by LLMs, available directly in Warehouse queries:
+
+```sql
+-- Classify text using AI Functions
+SELECT
+    feedback_id,
+    feedback_text,
+    AI.CLASSIFY(feedback_text, 'positive', 'negative', 'neutral') AS sentiment
+FROM customer_feedback;
+
+-- Extract structured data from unstructured text
+SELECT
+    ticket_id,
+    AI.EXTRACT(description, 'product_name, issue_type, severity') AS extracted
+FROM support_tickets;
+```
 
 ## ML Capabilities
 
@@ -67,9 +95,10 @@ mlflow.register_model(model_uri, "churn_prediction_model")
 | MLflow tracking | Auto-configured experiment tracking |
 | Model registry | Centralized model versioning |
 | PREDICT function | T-SQL function for model inference |
-| AI Functions | LLM-powered transforms (summarize, classify) |
+| AI Functions | LLM-powered transforms in T-SQL (sentiment, classify, extract) |
 | Batch scoring | Spark-based batch predictions |
 | SynapseML | Pre-built ML transforms for Spark |
+| Fabric Data Agents | Natural language AI agents for data exploration |
 
 ## Common Mistakes
 

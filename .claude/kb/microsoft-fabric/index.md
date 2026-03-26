@@ -1,9 +1,10 @@
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 # Microsoft Fabric Knowledge Base
 
-> **Purpose**: Unified analytics platform -- Lakehouse, Warehouse, Data Factory, KQL, Copilot, governance, CI/CD
+> **Purpose**: Unified analytics platform -- Lakehouse, Warehouse, Data Factory, Real-Time Intelligence, Copilot, governance, CI/CD
 > **Platform**: Microsoft Fabric (SaaS on OneLake)
+> **Latest**: March 2026 -- FabCon announcements, Copilot on F2+, fabric-cicd tool GA, Eventhouse endpoints for Warehouse, AI Functions in T-SQL
 
 ## Quick Navigation
 
@@ -28,14 +29,15 @@
 
 | Concept | Description |
 |---------|-------------|
-| **OneLake** | Centralized logical data lake shared across all Fabric workloads |
-| **Lakehouse** | Delta-based storage combining data lake flexibility with SQL analytics |
-| **Warehouse** | Full T-SQL engine for structured analytics with RLS and masking |
-| **Data Factory** | Low-code ETL/ELT with Copy Activity, Dataflows, and pipelines |
-| **KQL** | Kusto Query Language for real-time intelligence and monitoring |
-| **Copilot** | Azure OpenAI-powered assistant across all Fabric workloads |
-| **Deployment Pipelines** | Built-in CI/CD for Dev/Test/Prod promotion |
-| **Capacity** | Compute model using CU (Capacity Units) billed per SKU |
+| **OneLake** | Centralized logical data lake with shortcuts to S3, ADLS, GCS, SharePoint, OneDrive, Azure Blob |
+| **Lakehouse** | Delta-based storage with SQL analytics endpoint and Eventhouse endpoint (2025) |
+| **Warehouse** | Full T-SQL engine with AI Functions (preview), RLS, masking, COPY INTO from OneLake |
+| **Data Factory** | Low-code ETL/ELT with Copy Activity, Dataflows Gen2, and pipelines |
+| **Real-Time Intelligence** | Eventhouse (KQL), Eventstream, Data Activator for streaming analytics |
+| **Copilot** | Azure OpenAI-powered assistant across all workloads, available on F2+ SKUs (April 2025) |
+| **CI/CD** | Git integration (GitHub/Azure DevOps) + Deployment Pipelines + `fabric-cicd` Python library |
+| **Capacity** | Compute model using CU (Capacity Units), F2 to F256+ SKUs |
+| **Databases** | SQL database and Cosmos DB mirroring (GA Nov 2025) |
 
 ## Learning Path
 

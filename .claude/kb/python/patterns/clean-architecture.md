@@ -1,7 +1,7 @@
 # Clean Architecture
 
-> **Purpose**: Clean code structure, naming conventions, module organization for Python projects
-> **MCP Validated:** 2026-02-17
+> **Purpose**: Clean code structure, naming conventions, module organization, uv for Python projects
+> **MCP Validated:** 2026-03-26
 
 ## When to Use
 
@@ -164,6 +164,51 @@ Typical usage:
 """
 ```
 
+## Modern Project Setup with uv
+
+```bash
+# Create project with uv (replaces pip, poetry, pyenv, virtualenv)
+uv init my_pipeline --python 3.13
+cd my_pipeline
+
+# Add dependencies
+uv add pydantic sqlalchemy
+uv add pytest ruff --dev
+
+# Run tests
+uv run pytest
+
+# Lock dependencies for reproducibility
+uv lock
+```
+
+### pyproject.toml (uv-managed)
+
+```toml
+[project]
+name = "my-pipeline"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.0",
+    "sqlalchemy>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 99
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow", "integration"]
+```
+
 ## Anti-Patterns to Avoid
 
 | Anti-Pattern | Problem | Clean Alternative |
@@ -174,6 +219,8 @@ Typical usage:
 | Star imports `from x import *` | Namespace pollution | Explicit imports |
 | Circular imports | Architectural issue | Dependency inversion |
 | Print debugging | Not production-safe | `logging` module |
+| `pip install` + `requirements.txt` | Fragile, no lockfile | `uv add` + `uv lock` |
+| Manual venv creation | Error-prone | `uv sync` (auto-creates venv) |
 
 ## See Also
 

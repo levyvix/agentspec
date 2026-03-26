@@ -96,6 +96,34 @@ def etl_pipeline(spark: SparkSession, date: str) -> None:
         .save("s3://lake/silver/orders"))
 ```
 
+## Spark 4.0: VARIANT Type for Semi-Structured Data
+
+```python
+# VARIANT type — no schema definition needed for JSON
+from pyspark.sql.types import VariantType
+
+# Read JSON data as VARIANT (schema-free)
+df = spark.sql("""
+    SELECT id, parse_json(raw_json) AS payload
+    FROM raw_events
+""")
+
+# Query with JSONPath — type-safe extraction
+df.select(
+    F.col("id"),
+    F.col("payload:user.name").cast("string").alias("user_name"),
+    F.col("payload:items[0].price").cast("decimal(10,2)").alias("first_item_price"),
+).show()
+
+# VARIANT in table definition
+spark.sql("""
+    CREATE TABLE events (
+        event_id BIGINT,
+        event_data VARIANT
+    ) USING DELTA
+""")
+```
+
 ## See Also
 
 - [delta-integration](../patterns/delta-integration.md)

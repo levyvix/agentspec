@@ -1,9 +1,9 @@
 # Python Testing Quick Reference
 
 > Fast lookup tables. For code examples, see linked files.
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
-## pytest CLI Commands
+## pytest CLI Commands (pytest 8+)
 
 | Command | Purpose | Notes |
 |---------|---------|-------|
@@ -16,6 +16,9 @@
 | `pytest --tb=short` | Short tracebacks | Cleaner output |
 | `pytest --co` | Collect only | List tests without running |
 | `pytest -n auto` | Parallel execution | Requires pytest-xdist |
+| `pytest --lf` | Re-run last failed | Fast iteration |
+| `pytest --ff` | Failures first | Run failed first, then rest |
+| `pytest --sw` | Stepwise | Stop on fail, resume next run |
 
 ## Fixture Scopes
 
@@ -39,6 +42,28 @@
 | Monkeypatch | `monkeypatch.setattr(obj, "attr", val)` | pytest-native patching |
 | Env vars | `monkeypatch.setenv("KEY", "val")` | Override env variables |
 
+## pytest-asyncio Patterns
+
+| Pattern | Syntax | Notes |
+|---------|--------|-------|
+| Async test | `@pytest.mark.asyncio` + `async def test_x():` | Requires `pytest-asyncio` |
+| Async fixture | `@pytest.fixture` + `async def setup():` | Supports yield for teardown |
+| Auto mode | `asyncio_mode = "auto"` in pyproject.toml | All async tests auto-detected |
+| Strict mode | `asyncio_mode = "strict"` | Requires explicit marker |
+| Custom event loop | Override `event_loop` fixture | Session-scoped loop |
+
+## Hypothesis (Property-Based Testing)
+
+| Pattern | Syntax | Notes |
+|---------|--------|-------|
+| Basic | `@given(st.integers())` | Auto-generates test inputs |
+| Text | `@given(st.text(min_size=1))` | Random strings |
+| Lists | `@given(st.lists(st.integers()))` | Random lists |
+| Composite | `@st.composite` | Build complex strategies |
+| Assume | `assume(x > 0)` | Filter invalid inputs |
+| Settings | `@settings(max_examples=500)` | Control test count |
+| Reproduce | `@example(42)` | Pin specific case |
+
 ## Decision Matrix
 
 | Use Case | Choose |
@@ -49,6 +74,10 @@
 | Reusable test objects | Factory fixtures |
 | Test PySpark transforms | SparkSession fixture + DataFrame assertions |
 | Slow/external resource | Mock it or mark with `@pytest.mark.slow` |
+| Test async code | `pytest-asyncio` with `@pytest.mark.asyncio` |
+| Find edge cases automatically | Hypothesis `@given` with strategies |
+| Speed up CI test suite | `pytest-xdist` with `-n auto` |
+| Hide param from test name | `pytest.HIDDEN_PARAM` (pytest 8.4+) |
 
 ## Common Pitfalls
 
@@ -59,6 +88,9 @@
 | Assert on mock without `assert_called` | Use `mock.assert_called_once_with(...)` |
 | Hard-code test data everywhere | Use factory fixtures or parametrize |
 | Skip edge cases (None, empty, huge) | Always test boundary conditions |
+| `asyncio.run()` in tests | `@pytest.mark.asyncio` with async test |
+| Manually write 100 edge cases | `@given(st.integers())` with Hypothesis |
+| Sequential CI when tests are independent | `pytest -n auto` with xdist |
 
 ## Related Documentation
 

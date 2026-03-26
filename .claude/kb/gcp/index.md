@@ -2,6 +2,7 @@
 
 > **Purpose**: Google Cloud Platform serverless services for event-driven data pipelines
 > **MCP Validated**: 2026-02-17
+> **Last Updated**: 2026-03-26 (BigLake Iceberg, Cloud Run GPUs, Vertex AI Gemini 3, Dataflow ML)
 
 ## Quick Navigation
 
@@ -62,6 +63,19 @@
 | **Advanced** | patterns/pubsub-fanout.md, patterns/multi-bucket-pipeline.md |
 
 ---
+
+## GCP Data Platform Updates (2025-2026)
+
+| Service | Key Update | Date |
+|---------|-----------|------|
+| **BigQuery** | BigLake Iceberg tables GA, BigLake Metastore GA, Iceberg REST Catalog API (Preview) | 2025 |
+| **BigQuery** | Data Engineering Agent (Preview) - natural language pipeline creation | Nov 2025 |
+| **BigQuery** | DataFrames 2.0 - multimodal data science with Pandas API | Apr 2025 |
+| **Cloud Run** | GPU support GA (NVIDIA), pay-per-second, scale-to-zero, <5s startup | Jun 2025 |
+| **Cloud Run** | IAP direct integration GA, multi-region HA (Preview), MCP server (Preview) | 2026 |
+| **Dataflow** | H100 GPU support (A3 VMs), TPU support for ML workloads | Jan 2026 |
+| **Vertex AI** | Gemini 3 GA, Gemini 2.5 Flash/Pro, Live API GA, Model Garden 200+ models | 2025 |
+| **Vertex AI** | Agent Builder with tool governance, Agent Development Kit (ADK) | Dec 2025 |
 
 ## Agent Usage
 

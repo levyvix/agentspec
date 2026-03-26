@@ -44,9 +44,13 @@ ls .claude/kb/          # Knowledge Base
 
 3. Choose the right category:
    - `workflow/` — SDD phase agents
-   - `code-quality/` — code review, testing, cleaning, documentation
-   - `communication/` — explanation, planning, analysis
-   - `exploration/` — codebase navigation, KB management
+   - `architect/` — system-level design and architecture
+   - `cloud/` — AWS, GCP, CI/CD, deployment
+   - `platform/` — Microsoft Fabric specialists
+   - `python/` — code quality, prompts, documentation
+   - `test/` — testing, data quality, data contracts
+   - `data-engineering/` — DE implementation specialists
+   - `dev/` — developer productivity tools
 
 4. Test with Claude Code:
 

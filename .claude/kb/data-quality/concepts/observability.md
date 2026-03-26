@@ -6,7 +6,21 @@
 
 ## Overview
 
-Data observability extends monitoring beyond "did the pipeline succeed?" to "is the data correct?" The five pillars are **freshness**, **volume**, **schema**, **distribution**, and **lineage**. Modern observability tools (Monte Carlo, Elementary, Metaplane) detect anomalies automatically using statistical models over metadata — no manual threshold configuration required.
+Data observability extends monitoring beyond "did the pipeline succeed?" to "is the data correct?" The five pillars are **freshness**, **volume**, **schema**, **distribution**, and **lineage**. Modern observability tools (Monte Carlo, Elementary, Metaplane, Anomalo, Bigeye) detect anomalies automatically using statistical models over metadata -- no manual threshold configuration required.
+
+**2025-2026 trends:**
+- **Gartner predicts 50% of enterprises** with distributed data architectures will adopt data observability by 2026 (up from <20% in 2024)
+- **AI-powered anomaly detection** is becoming standard -- Monte Carlo (ML-based), Soda 4.0 (AI observability), Anomalo (automated profiling)
+- **dbt-native observability** via Elementary (OSS) is gaining traction as a cost-effective alternative
+- **Platform-native observability** emerging: Databricks Unity Catalog lineage, Snowflake data quality monitoring
+- **Convergence of quality + observability** -- tools combining proactive checks (quality) with reactive monitoring (observability)
+
+**Tool landscape (2026):**
+- **Comprehensive**: Monte Carlo, Bigeye, Acceldata
+- **Quality-focused**: Soda, Anomalo, Great Expectations
+- **Platform-native**: Databricks Unity Catalog, Snowflake
+- **dbt-native**: Elementary (OSS), SYNQ (acquired by dbt Labs)
+- **Budget-conscious**: Great Expectations (OSS), Elementary (OSS)
 
 ## The Concept
 

@@ -1,6 +1,6 @@
 # Lakehouse Knowledge Base
 
-> **Purpose**: Open table formats and catalogs — Iceberg v3, Delta Lake 4.1, DuckLake, Unity, Gravitino
+> **Purpose**: Open table formats and catalogs — Iceberg v3 (v4 proposed), Delta Lake 4.1, DuckLake 0.3, Unity Catalog 0.3.1, Gravitino 1.1, Polaris TLP
 > **MCP Validated**: 2026-03-26
 
 ## Quick Navigation

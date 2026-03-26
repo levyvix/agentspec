@@ -32,15 +32,35 @@ WHEN NOT MATCHED THEN INSERT *;
 
 ## Quick Reference
 
-| Change Type | Iceberg | Delta | Avro | Breaking? |
+| Change Type | Iceberg v3 | Delta 4.x | Avro | Breaking? |
 |-------------|---------|-------|------|-----------|
-| Add column (nullable) | ALTER TABLE ADD | mergeSchema | Add with default | No |
+| Add column (nullable) | `ALTER TABLE ADD` | `mergeSchema` | Add with default | No |
 | Add column (NOT NULL) | Requires default | Requires default | No default = breaking | Yes |
-| Drop column | ALTER TABLE DROP | Not supported (use overwriteSchema) | Remove with default | Depends |
-| Rename column | ALTER TABLE RENAME | Not supported | N/A (use aliases) | Yes (for consumers) |
-| Widen type (INT→BIGINT) | ALTER TABLE ALTER | Supported | Promotion rules | No |
-| Narrow type (BIGINT→INT) | Not allowed | Not allowed | Not allowed | Yes |
+| Drop column | `ALTER TABLE DROP` | Column mapping mode (name) | Remove with default | Depends |
+| Rename column | `ALTER TABLE RENAME` | Column mapping mode (name) | N/A (use aliases) | Yes (for consumers) |
+| Widen type (INT->BIGINT) | `ALTER TABLE ALTER` | **Type widening** (4.0+, no data rewrite) | Promotion rules | No |
+| Narrow type (BIGINT->INT) | Not allowed | Not allowed | Not allowed | Yes |
 | Reorder columns | Supported | Not applicable | Positional in Avro | No |
+| **Variant type** | **v3 native** | **4.0+ native** | N/A | No (additive) |
+| **Geospatial types** | **v3 (geometry/geography)** | Not native | N/A | No (additive) |
+| **Default values** | **v3 native** | Supported | Supported | No |
+
+### Delta Lake 4.0+ Type Widening
+
+```sql
+-- Enable type widening (no data rewrite required)
+ALTER TABLE orders SET TBLPROPERTIES ('delta.enableTypeWidening' = 'true');
+
+-- Supported widenings:
+-- BYTE -> SHORT, INT, BIGINT, DECIMAL, DOUBLE
+-- SHORT -> INT, BIGINT, DECIMAL, DOUBLE
+-- INT -> BIGINT, DECIMAL, DOUBLE
+-- BIGINT -> DECIMAL
+-- FLOAT -> DOUBLE
+-- DECIMAL -> DECIMAL (greater precision/scale)
+-- DATE -> TIMESTAMP_NTZ
+ALTER TABLE orders ALTER COLUMN quantity TYPE BIGINT;  -- INT -> BIGINT, no rewrite
+```
 
 ## Common Mistakes
 

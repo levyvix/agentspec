@@ -2,7 +2,7 @@
 
 Complete catalog of commands, agents, KB domains, templates, and configuration.
 
-## Slash Commands (20 total)
+## Slash Commands (21 total)
 
 ### Workflow Commands (7)
 
@@ -29,10 +29,11 @@ Complete catalog of commands, agents, KB domains, templates, and configuration.
 | `/data-contract` | Contract authoring (ODCS) | data-contracts-engineer |
 | `/migrate` | Legacy ETL migration | dbt-specialist + spark-engineer |
 
-### Core Commands (3)
+### Core Commands (4)
 
 | Command | Purpose | Input |
 |---------|---------|-------|
+| `/meeting` | Meeting transcript analysis | Transcript text or file path |
 | `/memory` | Save session insights to storage | Optional context note |
 | `/sync-context` | Update CLAUDE.md from codebase | `--section`, `--dry-run` |
 | `/readme-maker` | Generate README.md | `--output`, `--style` |
@@ -49,75 +50,186 @@ Complete catalog of commands, agents, KB domains, templates, and configuration.
 |---------|---------|-------|
 | `/review` | Dual AI code review | `uncommitted`, `committed`, `--base`, `--deep` |
 
-## Agents (27 total)
+---
+
+## Agents (58 total)
+
+Agents are organized into 8 categories. Each agent declares a tier (T1/T2/T3) governing its template requirements, line budget, and response format.
+
+| Tier | Name | Use For |
+|------|------|---------|
+| T1 | Utility | Single-purpose tools, lightweight helpers (80-150 lines) |
+| T2 | Domain Expert | Domain specialists with KB resolution and confidence scoring (150-350 lines) |
+| T3 | Platform Specialist | MCP-dependent agents with live platform access (350-600 lines) |
 
 ### Workflow Agents (6)
 
-| Agent | Trigger | Model |
-|-------|---------|-------|
-| brainstorm-agent | Raw ideas, vague requirements | Opus |
-| define-agent | Requirements capture, data contracts | Opus |
-| design-agent | Architecture planning, pipeline design | Opus |
-| build-agent | Implementation execution, DE delegation | Sonnet |
-| ship-agent | Feature archival | Haiku |
-| iterate-agent | Mid-stream changes | Sonnet |
+Drive the SDD workflow phases.
 
-### Code Quality Agents (4)
+| Agent | Tier | Model | Phase | Purpose |
+|-------|------|-------|-------|---------|
+| `brainstorm-agent` | T2 | Sonnet | 0 | Explore ideas through collaborative dialogue |
+| `define-agent` | T2 | Sonnet | 1 | Capture requirements with clarity scoring |
+| `design-agent` | T2 | Opus | 2 | Create technical architecture with file manifest |
+| `build-agent` | T2 | Opus | 3 | Execute implementation with agent delegation |
+| `ship-agent` | T2 | Sonnet | 4 | Archive with lessons learned |
+| `iterate-agent` | T2 | Sonnet | All | Update documents with cascade awareness |
 
-| Agent | Trigger | DE Capabilities |
-|-------|---------|----------------|
-| code-reviewer | Code review requests | SQL anti-patterns, PII detection, partition checks, dbt test coverage |
-| code-cleaner | Refactoring, DRY cleanup | CTE refactoring, SELECT * expansion, Jinja whitespace cleanup |
-| code-documenter | README, API docs, docstrings | — |
-| test-generator | Test writing, coverage gaps | Great Expectations suites, dbt tests, row count/type validation |
+### Architect Agents (8)
 
-### Data Engineering Agents (11)
+System-level design and architecture decisions.
 
-| Agent | Trigger | Model | Primary KB |
-|-------|---------|-------|-----------|
-| spark-engineer | PySpark jobs, Spark SQL | Sonnet | spark |
-| pipeline-architect | Airflow/Dagster DAGs | Sonnet | airflow |
-| dbt-specialist | dbt models, macros, tests | Sonnet | dbt |
-| data-quality-analyst | Quality checks, GE suites | Sonnet | data-quality |
-| schema-designer | Star schema, SCD, Data Vault | Sonnet | data-modeling |
-| data-platform-engineer | Platform selection, cost optimization | Sonnet | cloud-platforms |
-| lakehouse-architect | Iceberg, Delta, catalogs | Sonnet | lakehouse |
-| streaming-engineer | Flink, Kafka, Spark Streaming, CDC | Sonnet | streaming |
-| ai-data-engineer | RAG, embeddings, vector DBs, features | Opus | ai-data-engineering |
-| sql-optimizer | Query plans, cross-dialect SQL | Sonnet | sql-patterns |
-| data-contracts-engineer | ODCS, SLAs, schema governance | Sonnet | data-quality |
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `genai-architect` | T1 | Opus | Multi-agent orchestration, agentic workflows, production AI systems |
+| `the-planner` | T2 | Opus | Strategic architecture and comprehensive implementation plans |
+| `kb-architect` | T2 | Sonnet | Knowledge base domain creation and audit |
+| `lakehouse-architect` | T2 | Sonnet | Iceberg, Delta Lake, catalog governance design |
+| `medallion-architect` | T1 | Sonnet | Bronze/Silver/Gold layer design, data quality progression |
+| `pipeline-architect` | T2 | Sonnet | Airflow, Dagster, DAG design patterns |
+| `schema-designer` | T2 | Sonnet | Dimensional modeling, SCD, Data Vault |
+| `data-platform-engineer` | T2 | Sonnet | Snowflake, Databricks, BigQuery, cost optimization |
 
-### Communication Agents (4)
+### Cloud Agents (10)
 
-| Agent | Trigger | Model |
-|-------|---------|-------|
-| adaptive-explainer | Technical explanations | Sonnet |
-| linear-project-manager | Linear issue/project management | Opus |
-| meeting-analyst | Meeting transcript analysis | Sonnet |
-| the-planner | Strategic planning, roadmaps | Opus |
+Cloud provider services, deployment, and CI/CD.
 
-### Exploration Agents (2)
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `aws-data-architect` | T1 | Sonnet | Lambda, S3, Glue, Redshift, MWAA, serverless pipelines |
+| `aws-deployer` | T3 | Sonnet | SAM, CloudFormation, CI/CD, Terraform for AWS |
+| `aws-lambda-architect` | T3 | Sonnet | SAM templates, least-privilege IAM policies |
+| `lambda-builder` | T3 | Sonnet | Python Lambda handlers, S3-triggered functions |
+| `gcp-data-architect` | T1 | Sonnet | BigQuery, Cloud Run, Pub/Sub, Dataflow, Vertex AI |
+| `ai-data-engineer-gcp` | T2 | Sonnet | GCP serverless architectures, Cloud Functions, BigQuery pipelines |
+| `ai-data-engineer-cloud` | T3 | Sonnet | Cloud architecture optimization, AI/ML pipelines |
+| `ai-prompt-specialist-gcp` | T3 | Sonnet | Google Gemini, Vertex AI, multi-modal document extraction |
+| `ci-cd-specialist` | T3 | Sonnet | Azure DevOps, Terraform, Databricks Asset Bundles |
+| `supabase-specialist` | T3 | Opus | pgvector, RLS, Edge Functions, Auth, Realtime |
 
-| Agent | Trigger | Model |
-|-------|---------|-------|
-| codebase-explorer | Codebase navigation | Sonnet |
-| kb-architect | KB domain creation/audit | Sonnet |
+### Platform Agents (6)
 
-## Knowledge Base Domains (11)
+Microsoft Fabric specialists.
 
-| Domain | Concepts | Patterns | Topics |
-|--------|----------|----------|--------|
-| `dbt` | 5 | 5 | Models, macros, incremental, testing, packages |
-| `spark` | 4 | 4 | PySpark, Spark SQL, tuning, structured streaming |
-| `sql-patterns` | 3 | 4 | Window functions, CTEs, anti-patterns, optimization |
-| `airflow` | 4 | 4 | DAGs, operators, sensors, dynamic task mapping |
-| `streaming` | 4 | 4 | Flink SQL, Kafka, Spark Streaming, CDC |
-| `data-modeling` | 4 | 4 | Dimensional modeling, SCD, normalization, schema evolution |
-| `data-quality` | 4 | 4 | Great Expectations, Soda, observability, data contracts |
-| `lakehouse` | 4 | 4 | Iceberg v3, Delta Lake, catalog wars, DuckLake |
-| `cloud-platforms` | 4 | 4 | Snowflake Cortex, Databricks Lakeflow, BigQuery AI |
-| `ai-data-engineering` | 5 | 5 | RAG, vector DBs, feature stores, LLMOps, embeddings |
-| `modern-stack` | 4 | 4 | DuckDB, Polars, SQLMesh, local-first analytics |
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `fabric-architect` | T3 | Opus | End-to-end Fabric architecture, OneLake, workload selection |
+| `fabric-pipeline-developer` | T3 | Sonnet | Data Factory pipelines, PySpark notebooks, Dataflow Gen2 |
+| `fabric-ai-specialist` | T3 | Sonnet | Fabric Copilot, ML models, AI Skills, Azure OpenAI |
+| `fabric-cicd-specialist` | T3 | Sonnet | Fabric CI/CD, Git integration, deployment pipelines |
+| `fabric-logging-specialist` | T3 | Sonnet | Workspace monitoring, KQL queries, dashboards |
+| `fabric-security-specialist` | T3 | Opus | RLS, permissions, data masking, encryption, compliance |
+
+### Python Agents (6)
+
+Python development, code quality, and prompt engineering.
+
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `python-developer` | T1 | Sonnet | Python code architecture, dataclasses, type hints |
+| `code-reviewer` | T2 | Sonnet | Review code for quality and security issues |
+| `code-cleaner` | T2 | Sonnet | Clean code, remove redundant comments, apply DRY |
+| `code-documenter` | T2 | Sonnet | Generate documentation, READMEs, API docs |
+| `ai-prompt-specialist` | T1 | Sonnet | Prompt optimization, structured extraction, few-shot |
+| `llm-specialist` | T3 | Opus | Advanced prompt engineering, chain-of-thought, structured output |
+
+### Test Agents (3)
+
+Testing, data quality, and contract validation.
+
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `test-generator` | T2 | Sonnet | Generate pytest tests with fixtures |
+| `data-quality-analyst` | T2 | Sonnet | Great Expectations, dbt tests, data contracts |
+| `data-contracts-engineer` | T2 | Sonnet | ODCS, SLAs, schema governance |
+
+### Data Engineering Agents (15)
+
+Implementation specialists for data pipelines and processing.
+
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `dbt-specialist` | T2 | Sonnet | dbt models, macros, tests, incremental strategies |
+| `spark-engineer` | T2 | Sonnet | PySpark, Spark SQL, distributed processing |
+| `spark-specialist` | T2 | Opus | Spark architecture, configuration, performance |
+| `spark-troubleshooter` | T1 | Sonnet | Spark debugging — OOM, data skew, shuffle failures |
+| `spark-performance-analyzer` | T1 | Sonnet | Spark tuning — memory, partitions, joins, AQE |
+| `spark-streaming-architect` | T3 | Sonnet | Structured Streaming, Kafka, real-time pipelines |
+| `streaming-engineer` | T2 | Sonnet | Flink, Kafka, Spark Streaming, CDC |
+| `sql-optimizer` | T2 | Sonnet | Query plans, cross-dialect SQL, window functions |
+| `airflow-specialist` | T3 | Sonnet | Apache Airflow 3.0, DAGs, TaskFlow API |
+| `lakeflow-architect` | T3 | Sonnet | Databricks Lakeflow, Medallion architecture |
+| `lakeflow-expert` | T3 | Sonnet | DLT troubleshooting, CDC, SCD Type 2 |
+| `lakeflow-pipeline-builder` | T3 | Sonnet | DLT pipeline creation, quality expectations |
+| `lakeflow-specialist` | T1 | Sonnet | Declarative pipelines, materialized views, streaming tables |
+| `ai-data-engineer` | T2 | Sonnet | RAG pipelines, vector DBs, feature stores |
+| `qdrant-specialist` | T3 | Opus | Qdrant vector database, collection management |
+
+### Dev Agents (4)
+
+Developer tools and productivity.
+
+| Agent | Tier | Model | Purpose |
+|-------|------|-------|---------|
+| `prompt-crafter` | T1 | Sonnet | SDD-lite PROMPT.md builder with agent matching |
+| `codebase-explorer` | T2 | Sonnet | Analyze codebase structure with health scoring |
+| `meeting-analyst` | T2 | Sonnet | Extract decisions and action items from meetings |
+| `shell-script-specialist` | T2 | Sonnet | Production-grade Bash scripts, automation, deployment scripts |
+
+---
+
+## Knowledge Base Domains (22 total)
+
+Domains are grouped into five areas. Each domain contains an `index.md`, a `quick-reference.md`, and `concepts/` and `patterns/` subdirectories.
+
+### Core Data Engineering (5)
+
+| Domain | Description | Key Topics |
+|--------|-------------|------------|
+| `dbt` | dbt development patterns — Fusion Engine, Mesh, Semantic Layer | Models, macros, incremental strategies, testing, semantic layer |
+| `spark` | PySpark and Spark SQL patterns | DataFrames, partitioning, Catalyst optimizer, Delta integration |
+| `airflow` | Orchestration patterns — Airflow 3.x, Dagster, Prefect | DAG design, TaskFlow API, sensors, dynamic task mapping |
+| `sql-patterns` | Cross-dialect SQL — DuckDB, Snowflake, BigQuery, Spark | Window functions, CTEs, deduplication, pivot/unpivot |
+| `streaming` | Stream processing — Flink, Kafka, Spark Streaming, CDC | Flink SQL, Kafka producer/consumer, streaming databases |
+
+### Data Design and Quality (3)
+
+| Domain | Description | Key Topics |
+|--------|-------------|------------|
+| `data-modeling` | Schema design — dimensional modeling, Data Vault, SCD types | Star schema, Data Vault 2.0, SCD Type 2, schema evolution |
+| `data-quality` | Data quality, contracts, and observability | Great Expectations, Soda Core, dbt tests, ODCS, Monte Carlo |
+| `medallion` | Medallion Architecture — Bronze/Silver/Gold layer design | Layer transitions, data quality gates, incremental loading |
+
+### Infrastructure and Platforms (4)
+
+| Domain | Description | Key Topics |
+|--------|-------------|------------|
+| `lakehouse` | Open table formats and catalogs — Iceberg v3, Delta Lake | Iceberg v3, Delta Lake 4.1, DuckLake, Unity Catalog, Gravitino |
+| `cloud-platforms` | Cloud data platforms — Snowflake, Databricks, BigQuery | Snowflake Cortex, Databricks Lakeflow, BigQuery AI, cost optimization |
+| `lakeflow` | Databricks Lakeflow — DLT pipelines and expectations | Materialized views, streaming tables, CDC, DABs deployment |
+| `microsoft-fabric` | Microsoft Fabric — end-to-end platform | Lakehouse, Warehouse, Pipelines, Real-Time Analytics, KQL, CI/CD, AI |
+
+### Cloud Provider Deep Dives (3)
+
+| Domain | Description | Key Topics |
+|--------|-------------|------------|
+| `aws` | AWS data engineering — Lambda, S3, Glue, MWAA | SAM templates, IAM policies, S3 triggers, Powertools logging |
+| `gcp` | Google Cloud Platform — Cloud Run, Pub/Sub, BigQuery | Cloud Run scaling, event-driven pipelines, GCS-triggered workflows |
+| `terraform` | Terraform IaC — resources, modules, state | GCP/AWS modules, remote state, workspaces, provider config |
+
+### AI and Prompt Engineering (7)
+
+| Domain | Description | Key Topics |
+|--------|-------------|------------|
+| `ai-data-engineering` | AI data engineering — RAG, vector DBs, feature stores | Embedding pipelines, LLMOps, text-to-SQL, training data |
+| `modern-stack` | Modern data tools — DuckDB, Polars, SQLMesh | Local-first analytics, analytical query patterns |
+| `prompt-engineering` | Prompt engineering — chain-of-thought, extraction | Few-shot prompting, structured extraction, system prompts |
+| `genai` | GenAI architecture — multi-agent systems, RAG | State machines, tool calling, guardrails, evaluation |
+| `pydantic` | Pydantic patterns — BaseModel, validators | LLM output validation, extraction schemas, error handling |
+| `python` | Python patterns — dataclasses, type hints | Clean architecture, generators, context managers |
+| `testing` | Testing patterns — pytest, fixtures, mocking | Unit tests, fixture factories, integration tests, Spark testing |
+
+---
 
 ## SDD Templates
 
@@ -130,6 +242,8 @@ All templates live in `.claude/sdd/templates/`:
 | `DESIGN_TEMPLATE.md` | Phase 2 | Architecture with file manifest | Pipeline Architecture (DAG, partitions, incremental, quality gates) |
 | `BUILD_REPORT_TEMPLATE.md` | Phase 3 | Execution report with agent attribution | Data Quality Results (dbt build, sqlfluff, GE, freshness) |
 | `SHIPPED_TEMPLATE.md` | Phase 4 | Archive with lessons learned | — |
+
+---
 
 ## KB Templates
 
@@ -144,6 +258,8 @@ All templates live in `.claude/kb/_templates/`:
 | `domain-manifest.yaml.template` | Domain metadata and file registry |
 | `spec.yaml.template` | Machine-readable specifications |
 | `test-case.json.template` | Validation test cases |
+
+---
 
 ## Configuration
 
@@ -165,6 +281,8 @@ Project settings in `.claude/settings.local.json` (auto-generated, gitignored �
 
 - `permissions` — tool access control
 - `outputStyle` — response formatting (e.g., "Explanatory")
+
+---
 
 ## File Naming Conventions
 

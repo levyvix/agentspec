@@ -1,6 +1,6 @@
 # Data Modeling Knowledge Base
 
-> **Purpose**: Schema design — dimensional modeling, Data Vault, SCD types, schema evolution
+> **Purpose**: Schema design — dimensional modeling, Data Vault 2.0, SCD types, OBT debate, schema evolution (Iceberg/Delta/Avro)
 > **MCP Validated**: 2026-03-26
 
 ## Quick Navigation
@@ -37,8 +37,10 @@
 |---------|-------------|
 | **Dimensional Modeling** | Kimball star schema — facts (events) + dimensions (attributes) |
 | **SCD Types** | Track historical changes: Type 1 (overwrite) through Type 6 (hybrid) |
-| **Schema Evolution** | Add/rename/drop columns without breaking consumers |
-| **Data Vault** | Hub-link-satellite model for enterprise-scale warehousing |
+| **Schema Evolution** | Add/rename/drop columns without breaking consumers (Iceberg v3, Delta 4.x, Avro) |
+| **Data Vault 2.0** | Hub-link-satellite model for enterprise-scale warehousing; automation via AutomateDV/dbt |
+| **One Big Table (OBT)** | Denormalized wide table for BI dashboards; trade-offs vs star schema |
+| **Modeling in 2025+** | Star schema + semantic layer, OBT for dashboards, Data Vault for enterprise integration |
 
 ---
 

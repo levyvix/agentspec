@@ -2,7 +2,7 @@
 
 > **Purpose**: ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, NTILE, running totals, QUALIFY — cross-dialect
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with QUALIFY support notes and Spark SQL 3.4+ QUALIFY
 
 ## Overview
 
@@ -75,6 +75,15 @@ QUALIFY ROW_NUMBER() OVER (
     PARTITION BY id ORDER BY updated_at DESC
 ) = 1
 ```
+
+## Frame Clause Quick Reference
+
+| Frame | Meaning | Use Case |
+|-------|---------|----------|
+| `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` | All rows from start to here | Running total |
+| `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW` | 3-row sliding window | Moving average |
+| `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` | Entire partition | Partition-level aggregate |
+| `RANGE BETWEEN INTERVAL '7' DAY PRECEDING AND CURRENT ROW` | Time-based window | 7-day rolling (DuckDB, Snowflake) |
 
 ## Related
 

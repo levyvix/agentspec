@@ -1,7 +1,7 @@
 # Layer Transitions
 
 > **Purpose**: End-to-end Bronze to Silver to Gold transformation flow with orchestration
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -134,7 +134,8 @@ def run_medallion_pipeline(config: dict):
     )
 
     # Post-processing
-    spark.sql(f"OPTIMIZE {config['silver_table']} ZORDER BY ({', '.join(config['business_keys'])})")
+    # Delta 4.x: liquid clustering (no ZORDER needed if CLUSTER BY is set)
+    spark.sql(f"OPTIMIZE {config['silver_table']}")
     spark.sql(f"OPTIMIZE {config['gold_table']}")
 
     return results

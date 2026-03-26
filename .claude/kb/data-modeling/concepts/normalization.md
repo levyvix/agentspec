@@ -55,11 +55,12 @@ JOIN regions r ON c.region_id = r.region_id;
 | 3NF | No transitive dependencies | `region_name` stored with `customer` |
 | BCNF | Every determinant is a candidate key | Rare edge cases beyond 3NF |
 
-| Approach | Joins | Storage | Query Speed | Best For |
-|----------|-------|---------|-------------|----------|
-| 3NF | Many | Low | Slow (analytics) | OLTP, source systems |
-| Star schema | Few | Medium | Fast | Data warehouse |
-| OBT | Zero | High | Fastest | BI dashboards, specific use cases |
+| Approach | Joins | Storage | Query Speed | Best For | Cloud DWH Cost |
+|----------|-------|---------|-------------|----------|---------------|
+| 3NF | Many | Low | Slow (analytics) | OLTP, source systems | High compute |
+| Star schema | Few | Medium | Fast | Data warehouse | Balanced |
+| OBT | Zero | High | Fastest | BI dashboards, high concurrency | Low compute, high storage |
+| Nested/repeated (BigQuery) | Zero (UNNEST) | Medium | Fast | BigQuery-native analytics | Optimized |
 
 ## Common Mistakes
 

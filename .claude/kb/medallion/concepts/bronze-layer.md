@@ -2,7 +2,7 @@
 
 > **Purpose**: Raw ingestion layer -- append-only, schema-on-read, preserving full source fidelity
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
@@ -98,7 +98,7 @@ def stream_to_bronze(kafka_topic: str, bronze_table: str, checkpoint: str):
     )
 ```
 
-## SQL Alternative
+## SQL Alternative (Delta Lake)
 
 ```sql
 CREATE TABLE IF NOT EXISTS bronze.raw_orders (
@@ -115,6 +115,45 @@ TBLPROPERTIES (
     'delta.autoOptimize.optimizeWrite' = 'true',
     'delta.autoOptimize.autoCompact' = 'true'
 );
+```
+
+## SQL Alternative (Iceberg)
+
+```sql
+CREATE TABLE IF NOT EXISTS bronze.raw_orders (
+    order_id STRING,
+    customer_id STRING,
+    order_data STRING,
+    _ingested_at TIMESTAMP DEFAULT current_timestamp(),
+    _source_system STRING,
+    _source_file STRING
+)
+USING ICEBERG
+PARTITIONED BY (days(_ingested_at))
+TBLPROPERTIES (
+    'format-version' = '3',
+    'write.parquet.compression-codec' = 'zstd'
+);
+```
+
+## Shift-Left Quality at Bronze (2025+ Best Practice)
+
+While Bronze should remain raw, modern practice validates basic structural integrity at ingestion to catch issues early:
+
+```python
+def validate_bronze_structure(df, required_columns: list[str]) -> tuple:
+    """Validate basic structure before writing to Bronze. Not transformation -- just sanity."""
+    # Check required columns exist
+    missing = [c for c in required_columns if c not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns in source: {missing}")
+
+    # Check not completely empty
+    if df.head(1) == []:
+        raise ValueError("Source data is empty -- skipping Bronze write")
+
+    # Optionally check file is parseable (no corrupt JSON/CSV)
+    return df
 ```
 
 ## Related

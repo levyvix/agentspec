@@ -122,6 +122,73 @@ terraform {
 - State files contain sensitive data -- never commit to git
 - Use `sensitive = true` on outputs that reference secrets
 
+## Ephemeral Values and State (Terraform 1.10+/1.11+)
+
+The biggest state security improvement in Terraform history: **ephemeral values never enter state or plan files**.
+
+### Before (secrets in state)
+```hcl
+# BAD: password stored in plaintext in terraform.tfstate
+resource "aws_db_instance" "postgres" {
+  password = var.db_password  # Persisted in state!
+}
+```
+
+### After (secrets out of state)
+```hcl
+# GOOD: ephemeral password never stored anywhere
+ephemeral "random_password" "db_password" {
+  length = 16
+}
+
+resource "aws_db_instance" "postgres" {
+  password_wo         = ephemeral.random_password.db_password.result
+  password_wo_version = 1  # Increment to trigger rotation
+}
+```
+
+### Where Ephemeral Values Can Be Used
+
+| Context | Supported Since |
+|---------|----------------|
+| Ephemeral resources | 1.10 |
+| Provider and provisioner blocks | 1.10 |
+| Ephemeral input variables | 1.10 |
+| Output values | 1.10 |
+| Write-only args on managed resources | 1.11 |
+
+### OpenTofu Alternative: State Encryption
+
+OpenTofu provides native state encryption as an alternative approach:
+- Encrypts the entire state file at rest
+- Supports multiple encryption providers
+- Available since OpenTofu 1.8
+
+## HCP Terraform Stacks
+
+Stacks are a configuration layer for managing multi-environment infrastructure:
+
+```hcl
+# stack.tfstack.hcl
+component "networking" {
+  source = "./modules/networking"
+  inputs = {
+    cidr_block = var.cidr
+  }
+}
+
+component "database" {
+  source = "./modules/database"
+  inputs = {
+    vpc_id = component.networking.vpc_id
+  }
+}
+```
+
+- Components share a lifecycle and deploy together
+- Each deployment can target a different environment
+- Available in HCP Terraform (not open-source Terraform)
+
 ## Related
 
 - [Providers](../concepts/providers.md)

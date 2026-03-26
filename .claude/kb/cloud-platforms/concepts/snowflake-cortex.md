@@ -9,19 +9,37 @@ Snowflake has evolved from a cloud data warehouse into an AI data platform. Cort
 
 ## Key Concepts
 
-### Cortex AI Functions
+### Cortex AI Functions (GA Nov 2025)
 
-Built-in SQL functions that call hosted LLMs without infrastructure management:
+Built-in SQL functions that call hosted LLMs without infrastructure management. Seven functions reached GA in November 2025, delivering production-ready AI capabilities within the Snowflake SQL engine:
 
-| Function | Purpose | Example Use Case |
-|----------|---------|------------------|
-| `COMPLETE` | Text generation/completion | Summarization, Q&A, translation |
-| `EXTRACT` | Structured data from text | Pull entities from unstructured docs |
-| `CLASSIFY` | Text classification | Sentiment buckets, topic tagging |
-| `EMBED` | Vector embeddings | Semantic search, RAG pipelines |
-| `SENTIMENT` | Sentiment scoring | Customer feedback analysis |
+| Function | Purpose | Example Use Case | Status |
+|----------|---------|------------------|--------|
+| `AI_COMPLETE` | Text generation/completion (multimodal: text + images) | Summarization, Q&A, translation, image analysis | GA (Nov 2025) |
+| `AI_CLASSIFY` | Classify text or images into categories | Sentiment buckets, topic tagging, image categorization | GA (Nov 2025) |
+| `AI_EMBED` | Vector embeddings for text or images | Semantic search, RAG pipelines, clustering | GA (Nov 2025) |
+| `AI_SIMILARITY` | Embedding similarity between two inputs | Deduplication, recommendation, matching | GA (Nov 2025) |
+| `AI_TRANSCRIBE` | Audio/video transcription | Meeting notes, call center analytics | GA (Nov 2025) |
+| `AI_TRANSLATE` | Language translation | Multi-language content | GA (earlier) |
+| `AI_FILTER` | Boolean classification via LLM prompt | Row-level filtering with natural language | GA (earlier) |
+| `AI_REDACT` | Automated PII protection | Compliance, data masking | 2025 |
 
-Cortex runs models like Mistral, Llama, and Arctic. No data leaves Snowflake's security perimeter.
+Cortex supports models including **OpenAI GPT-5.2**, Mistral, Llama 3.1, and Arctic. Multimodal support handles text and images. No data leaves Snowflake's security perimeter.
+
+**Key capability**: Cortex AI Functions now work in **incremental dynamic table refresh** (GA Sep 2025), enabling AI-powered enrichment that runs automatically as data updates.
+
+### Cortex Agents (GA Nov 2025)
+
+Orchestrate across structured and unstructured data sources:
+
+- **Planning**: Parse requests, split tasks into subtasks, route across tools
+- **Tool use**: Cortex Search (unstructured) + Cortex Analyst (structured)
+- **Reflection**: Evaluate results, iterate, or generate final response
+- **Monitoring**: Track metrics, analyze performance, refine behavior
+
+### Snowflake Intelligence (Late 2025)
+
+Unified natural language interface for business users to ask questions across governed data without writing SQL. Combines Cortex Analyst and Cortex Search.
 
 ### Snowpark
 
@@ -73,12 +91,14 @@ Snowflake-managed tables using Apache Iceberg format:
 
 | Dimension | Cortex AI | BQML | Mosaic AI |
 |-----------|-----------|------|-----------|
-| Interface | SQL functions | SQL CREATE MODEL | Python SDK + UI |
-| Model hosting | Managed (Arctic, Mistral, Llama) | Managed (Gemini, PaLM) | Managed + custom fine-tune |
-| Custom models | Limited (Cortex Fine-Tuning) | Import TensorFlow/ONNX | Full MLflow lifecycle |
-| Vector search | Cortex Search | Vector Search index | Vector Search (Mosaic) |
+| Interface | SQL functions (AI_*) | SQL CREATE MODEL + AI.GENERATE | Python SDK + UI |
+| Model hosting | Managed (GPT-5.2, Mistral, Llama, Arctic) | Managed (Gemini 3.0, Claude, Llama) | Managed + custom fine-tune |
+| Custom models | Cortex Fine-Tuning | Import TensorFlow/ONNX | Full MLflow lifecycle |
+| Vector search | Cortex Search | Vector Search index | Vector Search + Reranker |
+| Agents | Cortex Agents (GA) | Vertex AI Agents | Mosaic AI Agents |
 | GPU access | Abstracted | Abstracted | Direct (GPU clusters) |
-| Strength | Simplicity, zero-MLOps | SQL-native ML training | Full ML/AI lifecycle |
+| Multimodal | Text + images (AI_COMPLETE) | Gemini 3.0 multimodal | Multi-modal serving |
+| Strength | Simplicity, zero-MLOps, SQL-native | SQL-native ML + Gemini integration | Full ML/AI lifecycle |
 
 ### Platform Considerations
 

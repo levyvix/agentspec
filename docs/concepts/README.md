@@ -48,21 +48,24 @@ Brainstorm is optional. You can start directly with `/define` if requirements ar
 
 ### 2. Agents (the specialists)
 
-27 specialized agents, each with a specific domain:
+58 specialized agents, each with a specific domain:
 
-| Category | Count | What They Do |
+| Category | Count | Key Purpose |
 |----------|-------|-------------|
-| **Workflow** | 6 | Drive each SDD phase (brainstorm through ship) |
-| **Code Quality** | 4 | Review (DE-aware), clean (SQL/dbt), document, and test (GE/dbt) code |
-| **Data Engineering** | 11 | dbt, Spark, Airflow, schema design, SQL optimization, streaming, lakehouse, data quality, AI/ML data, platform engineering, data contracts |
-| **Communication** | 4 | Explain, plan, manage projects, analyze meetings |
-| **Exploration** | 2 | Navigate codebases and manage knowledge bases |
+| **Workflow** | 6 | SDD phase execution |
+| **Architect** | 8 | System-level design (schema, pipeline, lakehouse, medallion, genai, planning) |
+| **Cloud** | 10 | AWS, GCP, CI/CD, deployment |
+| **Platform** | 6 | Microsoft Fabric specialists |
+| **Python** | 6 | Code quality, prompts, documentation |
+| **Test** | 3 | Testing, data quality, data contracts |
+| **Data Engineering** | 15 | dbt, Spark, Airflow, Flink, Lakeflow, SQL, streaming |
+| **Dev** | 4 | Developer productivity (codebase explorer, prompt crafter, shell scripts) |
 
-During `/build`, the build-agent delegates to DE specialists: dbt models go to `dbt-specialist`, Spark jobs to `spark-engineer`, quality checks to `data-quality-analyst`, and pipeline DAGs to `pipeline-architect`.
+During `/build`, the build-agent delegates to DE specialists: dbt models go to `dbt-specialist`, Spark jobs to `spark-specialist`, quality checks to `data-quality-analyst`, pipeline DAGs to `airflow-specialist`, and streaming workloads to `spark-streaming-architect`.
 
 ### 3. Knowledge Base (the memory)
 
-11 KB domains ground agent responses in verified patterns instead of hallucinated SQL:
+22 KB domains ground agent responses in verified patterns instead of hallucinated SQL:
 
 | Domain | Topics |
 |--------|--------|
@@ -77,6 +80,17 @@ During `/build`, the build-agent delegates to DE specialists: dbt models go to `
 | `cloud-platforms` | Snowflake, Databricks, BigQuery |
 | `ai-data-engineering` | RAG, vector DBs, feature stores, LLMOps |
 | `modern-stack` | DuckDB, Polars, SQLMesh, local-first analytics |
+| `aws` | Lambda, S3, Glue, SAM, serverless patterns |
+| `gcp` | Cloud Run, Pub/Sub, BigQuery, Dataflow |
+| `microsoft-fabric` | Lakehouse, Warehouse, Pipelines, CI/CD |
+| `lakeflow` | Databricks Lakeflow (DLT), serverless pipelines |
+| `medallion` | Bronze/Silver/Gold architecture, layer transitions |
+| `prompt-engineering` | Chain-of-thought, few-shot, structured extraction |
+| `genai` | Multi-agent systems, RAG architecture, guardrails |
+| `pydantic` | Validation, LLM output schemas, base models |
+| `python` | Clean architecture, type hints, dataclasses |
+| `testing` | pytest, fixtures, integration tests, CI |
+| `terraform` | Modules, state, workspaces, IaC patterns |
 
 Create additional domains with `/create-kb <domain>` and agents will consult them during `/design` and `/build`.
 

@@ -1,12 +1,12 @@
 # One Big Table (OBT)
 
-> **Purpose**: Denormalized analytics table — when to use, materialization strategy, trade-offs
-> **Confidence**: 0.90
+> **Purpose**: Denormalized analytics table — when to use, the 2025+ debate, materialization strategy, trade-offs
+> **Confidence**: 0.92
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-The One Big Table (OBT) pattern pre-joins all dimensions into a single wide table optimized for BI dashboards. Zero joins at query time means fast queries, but high storage and complex refresh logic. Best for specific dashboard use cases, not as a general warehouse strategy.
+The One Big Table (OBT) pattern pre-joins all dimensions into a single wide table optimized for BI dashboards. Zero joins at query time means fast queries, but high storage and complex refresh logic. The OBT vs Star Schema debate intensified in 2025 as cloud data warehouses made storage cheap and join overhead became the performance bottleneck for high-concurrency dashboards. The consensus: OBT works as a mart layer on top of star schemas, not as a replacement for dimensional modeling.
 
 ## The Pattern
 
@@ -101,6 +101,35 @@ SELECT DISTINCT segment FROM dim_customer WHERE is_current = TRUE;
 -- OBT only for dashboard-specific heavy queries
 SELECT customer_segment, SUM(net_amount) FROM obt_order_analytics
 WHERE year = 2026 GROUP BY customer_segment;
+```
+
+## The 2025+ OBT Debate: Resolution
+
+The data community debated OBT vs Star Schema extensively in 2025. Key takeaways:
+
+| Argument | For OBT | For Star Schema |
+|----------|---------|----------------|
+| Query simplicity | Zero joins, any analyst can query | Requires SQL skill or semantic layer |
+| Performance | Fastest for single-table scans | Join overhead with high concurrency |
+| Flexibility | Fixed attributes, adding dims = full rebuild | Ad-hoc joins, easy to extend |
+| Consistency | Each OBT is isolated, definitions can drift | Conformed dimensions shared across facts |
+| Storage | Higher (repeated attributes) | Lower (normalized dims) |
+| Cloud DWH cost | Storage cheap, compute saved | Storage efficient, more compute on joins |
+
+**Best practice (2025+):** Use star schema as the foundation (Silver/Gold layer). Build purpose-specific OBTs as materialized marts for dashboards. Use a semantic layer (dbt Metrics, Cube, AtScale) to abstract join complexity for analysts. This gives the best of both worlds: consistency from star schema, performance from OBT where needed.
+
+```sql
+-- Pattern: Star schema foundation + OBT mart
+-- Gold layer: star schema (reusable, consistent)
+CREATE TABLE gold.fact_orders (...);
+CREATE TABLE gold.dim_customer (...);
+CREATE TABLE gold.dim_product (...);
+
+-- Mart layer: OBT for specific dashboard (disposable, rebuildable)
+CREATE OR REPLACE TABLE mart.obt_executive_dashboard AS
+SELECT ... FROM gold.fact_orders
+JOIN gold.dim_customer USING (customer_sk)
+JOIN gold.dim_product USING (product_sk);
 ```
 
 ## Related

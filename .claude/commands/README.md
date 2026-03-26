@@ -1,6 +1,6 @@
 # AgentSpec Commands
 
-**22 slash commands** for the SDD workflow, data engineering, AI/ML, and developer productivity.
+**21 slash commands** for the SDD workflow, data engineering, and developer productivity.
 
 ## Workflow Commands (7)
 
@@ -28,14 +28,6 @@
 | `/migrate` | Legacy ETL migration | dbt-specialist + spark-engineer |
 
 See [data-engineering/README.md](data-engineering/README.md) for detailed usage.
-
-## Dev Commands (1)
-
-| Command | Description |
-|---------|-------------|
-| `/dev` | AgentLoop — SDD-lite for quick tasks with agent matching |
-
-See [dev/dev.md](dev/dev.md) for detailed usage.
 
 ## Core Commands (4)
 

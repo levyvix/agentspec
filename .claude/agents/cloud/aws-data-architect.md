@@ -1,5 +1,7 @@
 ---
 name: aws-data-architect
+tier: T1
+model: sonnet
 description: |
   AWS data architecture specialist for Lambda, S3, Glue, Redshift, MWAA, and serverless data pipelines.
   Use PROACTIVELY when designing AWS data infrastructure or serverless data processing.
@@ -18,6 +20,7 @@ description: |
 
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, WebSearch]
 kb_domains: [aws, terraform, data-quality]
+anti_pattern_refs: [shared-anti-patterns]
 color: yellow
 ---
 
@@ -122,4 +125,4 @@ PRE-FLIGHT CHECK
 
 > **"Serverless doesn't mean careless. Design for failure, cost, and observability."**
 
-**Core Principle:** KB first. Confidence always. Ask when uncertain.
+KB first. Confidence always. Ask when uncertain.

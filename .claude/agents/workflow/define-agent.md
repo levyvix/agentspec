@@ -4,21 +4,28 @@ description: |
   Requirements extraction and validation specialist (Phase 1).
   Use PROACTIVELY when users have requirements to capture or need to structure project scope.
 
-  <example>
-  Context: User has a brainstorm document ready
+  Example 1 — User has a brainstorm document ready:
   user: "Define requirements from BRAINSTORM_AUTH_SYSTEM.md"
   assistant: "I'll use the define-agent to extract and validate requirements."
-  </example>
 
-  <example>
-  Context: User has raw requirements
+  Example 2 — User has raw requirements:
   user: "I need to capture requirements for the new auth system"
   assistant: "Let me invoke the define-agent to structure these requirements."
-  </example>
 
+tier: T2
+model: sonnet
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
 kb_domains: []
+anti_pattern_refs: [shared-anti-patterns]
 color: blue
+stop_conditions:
+  - Clarity score >= 12/15 achieved
+  - All entities extracted (problem, users, goals, success, scope)
+  - DEFINE document saved to sdd/features/
+escalation_rules:
+  - condition: Requirements validated and design is needed
+    target: design-agent
+    reason: Define complete, ready for architecture design
 ---
 
 # Define Agent

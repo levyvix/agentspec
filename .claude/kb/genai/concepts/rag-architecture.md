@@ -1,12 +1,12 @@
 # RAG Architecture
 
-> **Purpose**: Retrieval-Augmented Generation pipeline design for grounded LLM responses
+> **Purpose**: Retrieval-Augmented Generation pipeline design -- variants, chunking, hybrid search, context engineering
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Retrieval-Augmented Generation (RAG) grounds LLM responses in external knowledge by retrieving relevant documents before generation. This eliminates hallucination for factual queries, enables domain-specific answers without fine-tuning, and keeps responses current with updated knowledge bases. The pipeline has four core stages: chunking, embedding, retrieval, and generation.
+Retrieval-Augmented Generation (RAG) grounds LLM responses in external knowledge by retrieving relevant documents before generation. In 2026, RAG has evolved from a simple "embed + retrieve + generate" pattern into an umbrella term covering fundamentally different architectures: Agentic RAG (agent decides when and what to retrieve), GraphRAG (knowledge graph augmentation), Corrective RAG (self-verification), and Multimodal RAG (text + image + tables). Context engineering -- treating the LLM's input as a structured system rather than a simple prompt -- has replaced basic prompt stuffing.
 
 ## The Pattern
 
@@ -25,11 +25,11 @@ class Chunk:
 class RAGConfig:
     chunk_size: int = 512
     chunk_overlap: int = 50
-    top_k: int = 10
+    top_k: int = 20           # increased: retrieve more, rerank down
     rerank_top_n: int = 5
     similarity_threshold: float = 0.7
-    embedding_model: str = "text-embedding-3-small"
-    generation_model: str = "gpt-4o"
+    embedding_model: str = "text-embedding-3-large"
+    generation_model: str = "claude-sonnet-4-6"
 
 class RAGPipeline:
     def __init__(self, config: RAGConfig):
@@ -44,32 +44,40 @@ class RAGPipeline:
         return chunks
 
     def retrieve(self, query: str, chunks: list[Chunk]) -> list[Chunk]:
-        """Retrieve top-k chunks by similarity, then rerank."""
-        # Step 1: Vector similarity search (top_k candidates)
-        candidates = self._vector_search(query, chunks, self.config.top_k)
-        # Step 2: Rerank for precision (top_n results)
+        """Hybrid search -> rerank -> threshold filter."""
+        # Step 1: Hybrid search (vector + BM25 keyword)
+        candidates = self._hybrid_search(query, chunks, self.config.top_k)
+        # Step 2: Cross-encoder rerank for precision
         reranked = self._rerank(query, candidates, self.config.rerank_top_n)
         # Step 3: Filter by threshold
         return [c for c in reranked if c.score >= self.config.similarity_threshold]
 
     def generate(self, query: str, context: list[Chunk]) -> str:
-        """Generate answer grounded in retrieved context."""
-        context_text = "\n---\n".join(c.text for c in context)
-        prompt = f"Answer based ONLY on the context below.\n\nContext:\n{context_text}\n\nQuestion: {query}"
+        """Generate answer with context engineering."""
+        context_text = "\n---\n".join(
+            f"[Source {i+1}] {c.text}" for i, c in enumerate(context))
+        prompt = f"""Answer based ONLY on the sources below. Cite using [Source N].
+If sources lack the answer, say so.
+
+Sources:
+{context_text}
+
+Question: {query}"""
         return self._call_llm(prompt)
 ```
 
-## RAG Variants
+## RAG Variants (2026)
 
 | Variant | Mechanism | Best For |
 |---------|-----------|----------|
-| Naive RAG | Single retrieval + generation | Simple Q&A |
-| Advanced RAG | Pre/post-retrieval optimization | Production systems |
-| Modular RAG | Swappable components (LEGO) | Flexible pipelines |
+| Naive RAG | Single retrieval + generation | Simple Q&A, prototypes |
+| Advanced RAG | Hybrid search + reranking + query transform | Production systems |
+| Agentic RAG | Agent decides when/what/how to retrieve | Multi-hop reasoning |
+| GraphRAG | Knowledge graph + entity extraction + community summaries | Relational reasoning |
+| Corrective RAG | Verify relevance, re-retrieve if needed | Critical applications |
 | Self-RAG | Self-reflective retrieval decisions | High-accuracy needs |
-| Corrective RAG | Verify and re-retrieve if needed | Critical applications |
-| GraphRAG | Knowledge graph augmentation | Relational reasoning |
-| Agentic RAG | Agent decides when/what to retrieve | Complex multi-hop queries |
+| Modular RAG | Swappable LEGO components | Flexible pipelines |
+| Multimodal RAG | Text + image + table retrieval | Document understanding |
 
 ## Chunking Strategies
 
@@ -77,46 +85,42 @@ class RAGPipeline:
 |----------|------|------|
 | Fixed-size | Simple, predictable | Breaks semantic units |
 | Semantic | Preserves meaning | Slower, variable size |
-| Recursive | Tries multiple separators | Good balance |
-| Document-aware | Respects structure (headers, etc.) | Requires parsing |
-| Sentence-window | Each chunk = sentence + context window | Higher storage |
+| Recursive | Tries multiple separators | Good balance (default choice) |
+| Document-aware | Respects structure (headers, tables) | Requires parsing |
+| Late chunking | Embed full doc, then chunk (preserves context) | Higher compute |
+
+## Context Engineering (2026)
+
+```text
+Traditional prompt stuffing:
+  "Here are some documents: {chunks}. Answer: {query}"
+
+Context engineering (structured input):
+  [System] Role + constraints + output format
+  [Context] Retrieved chunks with source IDs + relevance scores
+  [Instructions] Citation rules + fallback behavior
+  [Query] User question with any disambiguation
+  [Examples] Few-shot examples of ideal answers (optional)
+
+Key insight: treat the LLM's context window as a structured data pipeline,
+not a text concatenation. Order, format, and selection of context matters.
+```
 
 ## Common Mistakes
 
 ### Wrong
-
 ```python
-# Embedding entire documents without chunking
-embedding = embed(entire_document)  # too large, loses specificity
-
-# No reranking -- vector search alone has low precision
+# Vector search alone has low precision for production
 results = vector_search(query, top_k=3)  # may miss relevant chunks
+# No reranking, no hybrid search, no query transformation
 ```
 
 ### Correct
-
 ```python
-# Semantic chunking with overlap + hybrid search + reranking
-chunks = semantic_chunk(document, max_tokens=512, overlap=50)
-candidates = hybrid_search(query, top_k=20)  # vector + BM25 keyword
-results = rerank(query, candidates, top_n=5)  # cross-encoder precision
-```
-
-## Hybrid Search
-
-```python
-def hybrid_search(query: str, alpha: float = 0.7) -> list[Chunk]:
-    """Combine vector similarity with keyword (BM25) search.
-    alpha: weight for vector search (1.0 = pure vector, 0.0 = pure keyword)
-    """
-    vector_results = vector_search(query, top_k=20)
-    keyword_results = bm25_search(query, top_k=20)
-    # Reciprocal rank fusion
-    combined = reciprocal_rank_fusion(
-        [vector_results, keyword_results],
-        weights=[alpha, 1 - alpha],
-    )
-    return combined[:10]
+# Hybrid search -> rerank -> threshold filter
+candidates = hybrid_search(query, top_k=20)     # vector + BM25
+reranked = cross_encoder_rerank(query, candidates, top_n=5)
+filtered = [c for c in reranked if c.score >= 0.7]
 ```
 
 ## Related

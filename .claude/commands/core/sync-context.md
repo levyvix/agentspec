@@ -64,9 +64,13 @@ Glob(".claude/agents/**/*.md")
 
 # Categorize by folder
 - workflow/       → SDD pipeline agents (brainstorm, define, design, build, ship, iterate)
-- code-quality/   → Review, clean, test, document
-- communication/  → Explainer, meeting analyst, planner
-- exploration/    → Codebase explorer, KB architect
+- architect/      → System design (schema, pipeline, lakehouse, genai, planner)
+- cloud/          → AWS, GCP, CI/CD, deployment agents
+- platform/       → Microsoft Fabric specialists
+- python/         → Code review, clean, document, prompt engineering
+- test/           → Testing, data quality, data contracts
+- data-engineering/ → Spark, dbt, Airflow, Lakeflow, streaming, SQL
+- dev/            → Codebase explorer, meeting analyst, prompt crafter
 ```
 
 ### Step 4: Merge Updates

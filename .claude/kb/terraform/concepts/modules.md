@@ -101,6 +101,45 @@ output "api_url" {
 | No hardcoded backends | Backends belong in root module only |
 | Validate inputs | Use `validation` blocks on variables |
 | Minimal interface | Expose only necessary variables |
+| Use `for_each` over `count` | Better state addressing with map keys |
+| Variable validation refs (1.9+) | Reference other vars in validation conditions |
+
+## Variable Validation with References (Terraform 1.9+)
+
+```hcl
+variable "environment" {
+  type = string
+}
+
+variable "min_instances" {
+  type = number
+  validation {
+    condition     = var.environment == "prod" ? var.min_instances >= 2 : true
+    error_message = "Production requires at least 2 instances."
+  }
+}
+```
+
+## HCP Terraform Stacks for Multi-Environment Modules
+
+Stacks let you deploy the same module composition across environments:
+
+```hcl
+# deployment.tfdeploy.hcl
+deployment "dev" {
+  inputs = {
+    environment = "dev"
+    region      = "us-central1"
+  }
+}
+
+deployment "prod" {
+  inputs = {
+    environment = "prod"
+    region      = "us-central1"
+  }
+}
+```
 
 ## Common Mistakes
 

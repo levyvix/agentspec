@@ -1,12 +1,12 @@
 # Testing Framework
 
-> **Purpose**: dbt test types — generic, singular, custom macros, severity, store_failures
+> **Purpose**: dbt test types — generic, singular, custom macros, unit tests (v1.8+), severity, store_failures
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with unit testing (v1.8+)
 
 ## Overview
 
-dbt testing ensures data quality at the model level. **Generic tests** (unique, not_null, accepted_values, relationships) are declared in YAML. **Singular tests** are standalone SQL files returning failing rows. **Custom generic tests** are Jinja macros that accept parameters. Tests run via `dbt test` or `dbt build`.
+dbt testing ensures data quality at the model level. **Generic tests** (unique, not_null, accepted_values, relationships) are declared in YAML. **Singular tests** are standalone SQL files returning failing rows. **Custom generic tests** are Jinja macros that accept parameters. **Unit tests** (v1.8+) validate SQL modeling logic on static inputs before materialization, enabling test-driven development. Tests run via `dbt test` or `dbt build`.
 
 ## The Concept
 
@@ -35,14 +35,42 @@ models:
               field: order_id
 ```
 
+## Unit Tests (v1.8+)
+
+```yaml
+# models/marts/finance/_finance__unit_tests.yml
+unit_tests:
+  - name: test_order_total_calculation
+    description: "Verify order_total = quantity * unit_price"
+    model: fct_orders
+    given:
+      - input: ref('stg_stripe__orders')
+        rows:
+          - {order_id: 1, quantity: 3, unit_price: 10.00, discount_amount: 5.00}
+          - {order_id: 2, quantity: 1, unit_price: 25.00, discount_amount: 0}
+    expect:
+      rows:
+        - {order_id: 1, order_total: 30.00, net_revenue: 25.00}
+        - {order_id: 2, order_total: 25.00, net_revenue: 25.00}
+```
+
 ## Quick Reference
 
-| Test Type | Location | Returns | Use When |
-|-----------|----------|---------|----------|
-| Generic (built-in) | schema.yml | Failing rows | Standard column checks |
-| Singular | tests/*.sql | Failing rows | Complex multi-table logic |
-| Custom generic | macros/tests/ | Failing rows | Reusable parameterized checks |
-| Source freshness | sources.yml | Stale flag | Monitoring upstream data |
+| Test Type | Location | Returns | Use When | Min Version |
+|-----------|----------|---------|----------|-------------|
+| Generic (built-in) | schema.yml | Failing rows | Standard column checks | All |
+| Singular | tests/*.sql | Failing rows | Complex multi-table logic | All |
+| Custom generic | macros/tests/ | Failing rows | Reusable parameterized checks | All |
+| **Unit test** | models/*.yml | Pass/fail | Validate SQL logic on static inputs | **v1.8+** |
+| Source freshness | sources.yml | Stale flag | Monitoring upstream data | All |
+
+### Unit Test Limitations
+
+- SQL models only (not Python models)
+- Models in current project only
+- No `materialized view` models
+- No recursive SQL or introspective queries
+- Table names must be aliased to unit test `JOIN` logic
 
 ## Common Mistakes
 

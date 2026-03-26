@@ -1,4 +1,4 @@
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 # Lakehouse
 
@@ -7,7 +7,12 @@
 
 ## Overview
 
-The Fabric Lakehouse is a data architecture platform combining the best of data lakes and data warehouses. Built on OneLake (the unified logical data lake), it stores data in Delta Parquet format with full ACID transactions. Every Lakehouse automatically gets a SQL analytics endpoint for T-SQL queries and a default semantic model for Power BI.
+The Fabric Lakehouse is a data architecture platform combining the best of data lakes and data warehouses. Built on OneLake (the unified logical data lake), it stores data in Delta Parquet format with full ACID transactions. Every Lakehouse automatically gets a SQL analytics endpoint for T-SQL queries, a default semantic model for Power BI, and now an Eventhouse endpoint for real-time KQL analytics (GA Nov 2025).
+
+**Key 2025 updates:**
+- **Eventhouse endpoint for Lakehouse** -- KQL-powered real-time analytics over Lakehouse Delta tables
+- **OneLake shortcuts expanded** -- Azure Blob Storage (May 2025), SharePoint/OneDrive (Dec 2025), Key Vault support
+- **Govern in OneLake** (preview) -- tenant-level governance controls for OneLake data
 
 ## The Pattern
 
@@ -71,8 +76,9 @@ df.write.format("delta").mode("append").saveAsTable("my_table")
 | **Tables/** | Managed Delta tables (auto-registered in metastore) |
 | **Files/** | Unstructured files (CSV, JSON, images, etc.) |
 | **SQL endpoint** | Read-only T-SQL access to Delta tables |
+| **Eventhouse endpoint** | KQL real-time analytics over Delta tables (GA Nov 2025) |
 | **Semantic model** | Auto-generated Power BI dataset |
-| **Shortcuts** | Zero-copy references to external data (ADLS, S3, GCS) |
+| **Shortcuts** | Zero-copy references to ADLS, S3, GCS, Azure Blob, SharePoint, OneDrive |
 
 ## Related
 

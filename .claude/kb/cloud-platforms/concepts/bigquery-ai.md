@@ -51,12 +51,21 @@ FROM ML.PREDICT(
 );
 ```
 
-### AI.GENERATE with Gemini
+### AI Functions (GA Jan 2026)
 
-Call Gemini foundation models directly from SQL for text generation, summarization, classification, and extraction.
+BigQuery now offers dedicated AI functions integrated with Gemini 3.0 Pro/Flash, with simplified End User Credentials (EUC) setup -- no separate connection or service account needed:
+
+| Function | Purpose | Status |
+|----------|---------|--------|
+| `AI.GENERATE()` | Text and structured data generation via LLMs | GA (Jan 2026) |
+| `AI.EMBED()` | Embedding generation for text and images | GA (Jan 2026) |
+| `AI.SIMILARITY()` | Semantic similarity scores between text/images | GA (Jan 2026) |
+| `ML.GENERATE_TEXT()` | Text generation via Gemini, Claude, Llama | GA |
+| `ML.GENERATE_EMBEDDING()` | Text or multimodal embeddings | GA |
+| `AI.GENERATE_TABLE()` | Structured tabular data from LLMs | GA |
 
 ```sql
--- Summarize customer feedback using Gemini
+-- Summarize customer feedback using AI.GENERATE (simplified setup)
 SELECT
   feedback_id,
   feedback_text,
@@ -70,6 +79,11 @@ SELECT
   ).result AS ai_summary
 FROM `analytics.raw.customer_feedback`
 WHERE created_date >= CURRENT_DATE() - 7;
+
+-- Compute semantic similarity between queries
+SELECT
+  AI.SIMILARITY(query_a, query_b) AS similarity_score
+FROM search_pairs;
 ```
 
 ### BigLake
@@ -94,6 +108,14 @@ SQL-based transformation framework native to GCP (acquired from open-source proj
 - JavaScript for reusable macros and includes
 - Git-integrated with scheduling via Cloud Composer or BigQuery
 
+### Multimodal Tables (Preview Apr 2025)
+
+Store and analyze structured and unstructured data (images, documents, audio) in a single BigQuery table. Enables AI queries across mixed data types.
+
+### Apache Iceberg Support (Preview Apr 2025)
+
+BigQuery can now read and write Apache Iceberg tables on GCS, enabling multi-engine analytics and reducing vendor lock-in.
+
 ## Quick Reference
 
 | Capability | SQL Syntax | Use Case |
@@ -101,21 +123,33 @@ SQL-based transformation framework native to GCP (acquired from open-source proj
 | Train model | `CREATE MODEL` | ML from SQL |
 | Predict | `ML.PREDICT()` | Batch scoring |
 | Evaluate | `ML.EVALUATE()` | Model metrics |
-| Generate text | `AI.GENERATE()` | LLM from SQL |
-| Embed text | `ML.GENERATE_EMBEDDING()` | Vector creation |
+| Generate text | `AI.GENERATE()` | LLM from SQL (Gemini 3.0) |
+| Embed text/images | `AI.EMBED()` | Vector creation |
+| Similarity | `AI.SIMILARITY()` | Semantic matching |
+| Structured generation | `AI.GENERATE_TABLE()` | Tabular output from LLMs |
 | External table | `CREATE EXTERNAL TABLE` | Cross-cloud access |
 
 ## Common Mistakes
 
 ### Wrong
 ```sql
--- Running AI.GENERATE without a model connection
+-- Running AI.GENERATE without any model setup
 SELECT AI.GENERATE('summarize this text');
 ```
 
-### Correct
+### Correct (New: End User Credentials -- simplified setup)
 ```sql
--- First create a Cloud Resource connection and remote model
+-- With EUC (Jan 2026+), no separate connection needed for Vertex AI models
+-- Just authenticate via your user credentials
+SELECT AI.GENERATE(
+  MODEL `project.dataset.gemini_flash`,
+  'Summarize this text'
+).result;
+```
+
+### Correct (Legacy: Connection-based setup)
+```sql
+-- Create a Cloud Resource connection and remote model
 CREATE OR REPLACE MODEL `project.dataset.gemini_pro`
   REMOTE WITH CONNECTION `project.region.connection_id`
   OPTIONS(ENDPOINT = 'gemini-pro');

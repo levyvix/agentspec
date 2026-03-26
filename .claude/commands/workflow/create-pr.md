@@ -400,6 +400,6 @@ BRANCH
 ## Related
 
 - Review Command: `.claude/commands/review/review.md`
-- Code Reviewer Agent: `.claude/agents/code-quality/code-reviewer.md`
+- Code Reviewer Agent: `.claude/agents/python/code-reviewer.md`
 - Workflow: `.claude/sdd/_index.md`
 - Agents: `.claude/agents/workflow/`

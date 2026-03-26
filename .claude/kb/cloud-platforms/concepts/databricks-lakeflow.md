@@ -10,9 +10,16 @@ Databricks has consolidated its data engineering surface into LakeFlow (managed 
 
 ## The Concept
 
-### LakeFlow Connect
+### LakeFlow Connect (GA Feb 2025)
 
-Managed connectors that ingest from SaaS sources (Salesforce, SAP, Workday, databases) directly into Delta tables. No custom code required -- configure source, destination, and schedule.
+Managed, no-code ingestion connectors for SaaS applications and databases, powered by serverless compute and governed by Unity Catalog. The resulting pipelines use Lakeflow Spark Declarative Pipelines with incremental reads and writes.
+
+**GA connectors (as of Dec 2025):** Salesforce Platform, Workday Reports, MySQL, PostgreSQL, Meta Ads, Confluence, SharePoint, NetSuite, Microsoft SQL Server, and more. Available across AWS, Azure, and GCP.
+
+Components:
+- **Connection**: Unity Catalog securable storing authentication details
+- **Ingestion pipeline**: Serverless pipeline copying data into destination streaming tables
+- **Destination tables**: Delta streaming tables with incremental processing support
 
 ### Declarative Pipelines (formerly DLT)
 
@@ -75,21 +82,28 @@ Three-level namespace: `catalog.schema.table`. Governs tables, volumes, models, 
 
 | Component | Purpose |
 |-----------|---------|
-| Model Serving | Real-time endpoints for custom and foundation models |
+| Model Serving | Real-time endpoints for custom and foundation models (GPT-5.2, Claude Haiku 4.5, Gemini 3 Flash) |
 | AI Gateway | Unified proxy to OpenAI, Anthropic, Google with rate limiting |
-| Vector Search | Managed vector index for RAG over Delta tables |
+| Vector Search | Managed vector index for RAG over Delta tables + Reranker (GA Dec 2025) |
 | Feature Serving | Online feature store for ML inference |
 | Fine-Tuning | Supervised fine-tuning on foundation models |
+| AI Agents | Agent framework for building data-aware AI applications |
+
+### Lakebase (GA Dec 2025)
+
+Databricks' transactional database with autoscaling compute, scale-to-zero, branching, instant restore, readable secondaries, and ACL-based project control. Bridges OLTP and analytical workloads.
 
 ## Quick Reference
 
 | Feature | What It Replaces | Key Benefit |
 |---------|-----------------|-------------|
-| LakeFlow Connect | Fivetran/Airbyte | Native, governed ingestion |
+| LakeFlow Connect | Fivetran/Airbyte | Native, governed ingestion (20+ connectors) |
 | Declarative Pipelines | DLT (renamed) | Built-in expectations, auto-scaling |
 | Designer | Manual pipeline code | Visual ETL for non-coders |
 | Unity Catalog | Hive Metastore | Cross-workspace governance |
 | Mosaic AI | External ML platforms | Unified model lifecycle |
+| Lakebase | External OLTP databases | Transactional DB with auto-mirror to lakehouse |
+| Vector Search Reranker | Custom re-ranking | Better RAG relevance (GA Dec 2025) |
 
 ## Common Mistakes
 

@@ -1,23 +1,24 @@
 ---
 name: spark-troubleshooter
+tier: T1
+model: sonnet
 description: |
   Spark debugging specialist for diagnosing OOM errors, data skew, shuffle failures, and job hangs.
   Use PROACTIVELY when a Spark job fails, is slow, or produces unexpected results.
 
-  <example>
-  Context: Spark job failing
-  user: "My Spark job keeps dying with OOM on the executors"
-  assistant: "I'll use the spark-troubleshooter to diagnose the memory issue."
-  </example>
+  Example 1:
+  - Context: Spark job failing
+  - user: "My Spark job keeps dying with OOM on the executors"
+  - assistant: "I'll use the spark-troubleshooter to diagnose the memory issue."
 
-  <example>
-  Context: Spark job too slow
-  user: "This join is taking 3 hours instead of 20 minutes"
-  assistant: "I'll diagnose data skew and partition imbalance."
-  </example>
+  Example 2:
+  - Context: Spark job too slow
+  - user: "This join is taking 3 hours instead of 20 minutes"
+  - assistant: "I'll diagnose data skew and partition imbalance."
 
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
 kb_domains: [spark, sql-patterns]
+anti_pattern_refs: [shared-anti-patterns]
 color: red
 ---
 

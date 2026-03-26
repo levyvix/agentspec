@@ -1,7 +1,7 @@
 # Validation Prompts Pattern
 
 > **Purpose**: Self-validation and self-checking prompts that verify LLM extraction accuracy before returning results
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 ## When to Use
 

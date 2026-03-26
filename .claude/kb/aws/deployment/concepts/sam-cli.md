@@ -129,6 +129,27 @@ sam build --use-container --parallel
 | `--warm-containers` | local start-api | Reuse containers for speed |
 | `--tail` | logs | Stream logs in real-time |
 
+## SAM CLI Updates (2025-2026)
+
+| Feature | Version | Description |
+|---------|---------|-------------|
+| **Finch support** | Oct 2025 | Use Finch as alternative to Docker for local dev |
+| **SAM Accelerate (`sam sync`)** | GA | Hot-sync code changes in seconds, skip CloudFormation for code-only |
+| **Package performance flag** | Merged Apr 2025 | `SAM_CLI_BETA_PACKAGE_PERFORMANCE` caches zips for shared code |
+| **`sam build --watch`** | Proposed PR | Auto-rebuild on file changes (watchdog-based) |
+| **Python 3.14 runtime** | Nov 2025 | `--runtime python3.14` for init and build |
+
+```bash
+# SAM Accelerate: instant code deployment (skip CloudFormation)
+sam sync --stack-name my-stack --watch
+
+# Use Finch instead of Docker (auto-detected if Docker unavailable)
+sam build --use-container  # Works with Finch or Docker
+
+# Package performance: cache zip for multi-function templates
+SAM_CLI_BETA_PACKAGE_PERFORMANCE=1 sam deploy --config-env prod
+```
+
 ## Related
 
 - [AWS CLI](../concepts/aws-cli.md)

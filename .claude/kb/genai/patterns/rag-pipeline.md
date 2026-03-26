@@ -1,7 +1,7 @@
 # RAG Pipeline Pattern
 
-> **Purpose**: End-to-end RAG implementation with hybrid search, reranking, and evaluation
-> **MCP Validated**: 2026-02-17
+> **Purpose**: End-to-end RAG implementation with hybrid search, reranking, context engineering, and evaluation
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -123,16 +123,16 @@ Answer:"""
 | `chunk_overlap` | `50` | Overlap between chunks |
 | `top_k` | `20` | Candidates from initial retrieval |
 | `rerank_top_n` | `5` | Final chunks after reranking |
-| `embedding_model` | `text-embedding-3-small` | OpenAI embedding model |
+| `embedding_model` | `text-embedding-3-large` | OpenAI embedding model (Matryoshka-capable) |
 
 ## Example Usage
 
 ```python
 pipeline = ProductionRAGPipeline(
     vector_store=PineconeStore(index="knowledge-base"),
-    embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+    embedding_model=OpenAIEmbeddings(model="text-embedding-3-large"),
     reranker=CohereReranker(model="rerank-v3.5"),
-    llm=OpenAIChat(model="gpt-4o"),
+    llm=ChatAnthropic(model="claude-sonnet-4-6"),
 )
 docs = [Document(content=text, metadata={"source": "manual.pdf"}) for text in texts]
 pipeline.ingest(docs)

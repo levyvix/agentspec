@@ -1,7 +1,7 @@
 # Agentic Workflow Pattern
 
-> **Purpose**: Multi-step agent workflow with plan-and-execute orchestration for complex tasks
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Multi-step agent workflow with plan-and-execute orchestration and model tiering
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -18,7 +18,7 @@
                     +--------+----------+
                              |
                     +--------v----------+
-                    |   Planner Agent   |  (frontier model: GPT-4o, Claude Opus)
+                    |   Planner Agent   |  (Claude Opus 4.6 / GPT-4o)
                     | - Decompose task  |
                     | - Assign workers  |
                     | - Define success  |
@@ -27,8 +27,9 @@
               +--------------+--------------+
               |              |              |
      +--------v------+ +----v-------+ +----v--------+
-     | Worker Agent 1 | | Worker 2   | | Worker 3    |  (cheaper models)
+     | Worker Agent 1 | | Worker 2   | | Worker 3    |  (Sonnet 4.6 / Haiku)
      | (Research)     | | (Analyze)  | | (Write)     |
+     | + MCP tools    | | + tools    | | + tools     |
      +--------+------+ +----+-------+ +----+--------+
               |              |              |
               +--------------+--------------+
@@ -44,115 +45,96 @@
                     +-------------------+
 ```
 
-## Implementation
+## Implementation with LangGraph
 
 ```python
-from dataclasses import dataclass, field
-from typing import Any, Optional
-from enum import Enum
-import asyncio
+from langgraph.graph import StateGraph, START, END
+from langchain.chat_models import init_chat_model
+from typing import TypedDict, Annotated, Any
+import operator
 
-class TaskStatus(Enum):
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    NEEDS_REVISION = "needs_revision"
+class WorkflowState(TypedDict):
+    messages: Annotated[list, operator.add]
+    plan: list[dict]
+    results: dict[str, Any]
+    review_passed: bool
 
-@dataclass
-class Task:
-    id: str
-    description: str
-    assigned_agent: str
-    dependencies: list[str] = field(default_factory=list)
-    status: TaskStatus = TaskStatus.PENDING
-    result: Optional[Any] = None
-    max_retries: int = 2
-    retry_count: int = 0
+planner = init_chat_model("claude-opus-4-6", temperature=0)
+worker = init_chat_model("claude-sonnet-4-6", temperature=0)
+reviewer = init_chat_model("claude-opus-4-6", temperature=0)
 
-@dataclass
-class Plan:
-    goal: str
-    tasks: list[Task]
-    success_criteria: str
+def plan_step(state: WorkflowState):
+    """Frontier model decomposes request into tasks."""
+    response = planner.invoke([{
+        "role": "system",
+        "content": "Decompose into 2-5 executable tasks. Return JSON array."
+    }] + state["messages"])
+    return {"plan": parse_plan(response.content)}
 
-class AgenticWorkflow:
-    def __init__(self, planner_model: str, worker_model: str, reviewer_model: str):
-        self.planner_model = planner_model
-        self.worker_model = worker_model
-        self.reviewer_model = reviewer_model
-        self.state: dict[str, Any] = {}
+def execute_step(state: WorkflowState):
+    """Worker models execute each task with tools."""
+    results = {}
+    for task in state["plan"]:
+        response = worker.invoke([{
+            "role": "system",
+            "content": f"Execute: {task['description']}. Context: {results}"
+        }])
+        results[task["id"]] = response.content
+    return {"results": results}
 
-    async def run(self, user_request: str) -> str:
-        # Step 1: Plan
-        plan = await self._plan(user_request)
+def review_step(state: WorkflowState):
+    """Frontier model reviews all outputs."""
+    response = reviewer.invoke([{
+        "role": "system",
+        "content": "Review results. Respond PASS or NEEDS_REVISION."
+    }, {
+        "role": "user",
+        "content": f"Plan: {state['plan']}\nResults: {state['results']}"
+    }])
+    return {"review_passed": "PASS" in response.content}
 
-        # Step 2: Execute tasks respecting dependencies
-        for task in self._topological_sort(plan.tasks):
-            await self._execute_task(task)
+def route_review(state: WorkflowState) -> str:
+    return END if state["review_passed"] else "execute"
 
-        # Step 3: Review and iterate
-        review = await self._review(plan)
-        if review.needs_revision:
-            revised_tasks = [t for t in plan.tasks if t.status == TaskStatus.NEEDS_REVISION]
-            for task in revised_tasks:
-                if task.retry_count < task.max_retries:
-                    task.retry_count += 1
-                    task.status = TaskStatus.PENDING
-                    await self._execute_task(task)
+graph = StateGraph(WorkflowState)
+graph.add_node("plan", plan_step)
+graph.add_node("execute", execute_step)
+graph.add_node("review", review_step)
+graph.add_edge(START, "plan")
+graph.add_edge("plan", "execute")
+graph.add_edge("execute", "review")
+graph.add_conditional_edges("review", route_review, [END, "execute"])
+workflow = graph.compile()
+```
 
-        # Step 4: Synthesize final output
-        return await self._synthesize(plan)
+## Model Tiering Cost Comparison
 
-    async def _plan(self, request: str) -> Plan:
-        """Frontier model decomposes request into tasks."""
-        prompt = f"""Decompose this request into executable tasks.
-For each task specify: id, description, assigned_agent, dependencies.
+```text
+Frontier-only (Opus 4.6 everywhere):
+  10 steps x $0.015/step = $0.15 per workflow
 
-Request: {request}
+Plan-and-Execute (Opus plans, Sonnet executes):
+  2 Opus ($0.015) + 8 Sonnet ($0.003) = $0.054
+  Savings: ~64%
 
-Return as structured JSON."""
-        response = await self._call_llm(self.planner_model, prompt)
-        return self._parse_plan(response)
+Plan-and-Execute (Opus plans, Haiku executes):
+  2 Opus ($0.015) + 8 Haiku ($0.0005) = $0.034
+  Savings: ~77%
 
-    async def _execute_task(self, task: Task):
-        """Worker model executes a single task."""
-        # Gather dependency results
-        dep_context = {dep: self.state.get(dep) for dep in task.dependencies}
-        prompt = f"""Execute this task:
-{task.description}
-
-Context from previous steps:
-{dep_context}"""
-        task.status = TaskStatus.RUNNING
-        try:
-            result = await self._call_llm(self.worker_model, prompt)
-            task.result = result
-            task.status = TaskStatus.COMPLETED
-            self.state[task.id] = result
-        except Exception as e:
-            task.status = TaskStatus.FAILED
-            task.result = str(e)
-
-    async def _review(self, plan: Plan) -> "ReviewResult":
-        """Frontier model reviews all task outputs."""
-        results = {t.id: t.result for t in plan.tasks}
-        prompt = f"""Review these results against the success criteria.
-
-Goal: {plan.goal}
-Success Criteria: {plan.success_criteria}
-Results: {results}
-
-For each task, respond: PASS or NEEDS_REVISION with feedback."""
-        return await self._call_llm(self.reviewer_model, prompt)
+Model Pricing (per 1M tokens, input/output):
+  Claude Opus 4.6:   $15 / $75
+  Claude Sonnet 4.6:  $3 / $15
+  Claude Haiku 3.5:  $0.80 / $4
+  GPT-4o:             $2.50 / $10
+  GPT-4o-mini:        $0.15 / $0.60
 ```
 
 ## Configuration
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `planner_model` | `gpt-4o` | Frontier model for planning and review |
-| `worker_model` | `gpt-4o-mini` | Cheaper model for task execution |
+| `planner_model` | `claude-opus-4-6` | Frontier model for planning and review |
+| `worker_model` | `claude-sonnet-4-6` | Balanced model for task execution |
 | `max_retries` | `2` | Max revision attempts per task |
 | `timeout_seconds` | `120` | Per-task execution timeout |
 | `parallel_execution` | `True` | Execute independent tasks concurrently |
@@ -160,24 +142,16 @@ For each task, respond: PASS or NEEDS_REVISION with feedback."""
 ## Example Usage
 
 ```python
-workflow = AgenticWorkflow(
-    planner_model="gpt-4o",
-    worker_model="gpt-4o-mini",
-    reviewer_model="gpt-4o",
-)
-
-result = await workflow.run(
-    "Research the top 3 competitors in the LLM observability space, "
-    "analyze their pricing models, and write a comparison report."
-)
-```
-
-## Cost Comparison
-
-```text
-Frontier-only:  10 steps x $0.01/step = $0.10 per workflow
-Plan-and-Execute: 2 frontier + 8 cheap = (2 x $0.01) + (8 x $0.001) = $0.028
-Savings: ~72% cost reduction
+result = await workflow.ainvoke({
+    "messages": [{
+        "role": "user",
+        "content": "Research the top 3 competitors in the LLM observability space, "
+                   "analyze their pricing models, and write a comparison report."
+    }],
+    "plan": [],
+    "results": {},
+    "review_passed": False,
+})
 ```
 
 ## See Also

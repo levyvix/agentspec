@@ -13,7 +13,7 @@ Clone the AgentSpec framework into your project:
 
 ```bash
 # Clone the repository
-git clone https://github.com/luanmorenommaciel/agentspec.git
+git clone https://github.com/luanmorenomaciel/agentspec.git
 
 # Copy the .claude directory into your project
 cp -r agentspec/.claude your-project/.claude
@@ -23,7 +23,7 @@ Or add it directly to an existing project:
 
 ```bash
 cd your-project
-git clone https://github.com/luanmorenommaciel/agentspec.git /tmp/agentspec
+git clone https://github.com/luanmorenomaciel/agentspec.git /tmp/agentspec
 cp -r /tmp/agentspec/.claude .claude
 ```
 
@@ -33,13 +33,30 @@ The SDD directory structure is already set up:
 
 ```text
 your-project/.claude/
-├── agents/              # 27 specialized agents (ready to use)
-├── commands/            # 20 slash commands (ready to use)
-├── sdd/
-│   ├── features/        # Your active feature documents go here
-│   ├── reports/         # Build reports land here
-│   └── archive/         # Shipped features archived here
-└── kb/                  # 11 data engineering KB domains (ready to use)
++-- agents/              # 58 specialized agents (ready to use)
+|   +-- workflow/        # 6 SDD phase agents
+|   +-- architect/       # 8 system-level design agents
+|   +-- cloud/           # 10 AWS, GCP, CI/CD agents
+|   +-- platform/        # 6 Microsoft Fabric agents
+|   +-- python/          # 6 code quality + prompt agents
+|   +-- test/            # 3 testing + data quality agents
+|   +-- data-engineering/ # 15 DE implementation agents
+|   +-- dev/             # 4 developer productivity agents
+|
++-- commands/            # 21 slash commands (ready to use)
+|   +-- workflow/        # 7 SDD phase commands
+|   +-- data-engineering/ # 8 DE commands
+|   +-- core/            # 4 utility commands
+|   +-- knowledge/       # 1 KB command
+|   +-- review/          # 1 code review command
+|
++-- sdd/
+|   +-- features/        # Your active feature documents go here
+|   +-- reports/         # Build reports land here
+|   +-- archive/         # Shipped features archived here
+|   +-- templates/       # 5 document templates
+|
++-- kb/                  # 22 data engineering KB domains (ready to use)
 ```
 
 ## Your First Data Pipeline (5 minutes)
@@ -83,7 +100,7 @@ Output: `DESIGN_ORDERS_PIPELINE.md` with:
 
 - Architecture diagram with DAG structure
 - Partition strategy and incremental approach
-- File manifest with agent assignments (dbt-specialist, pipeline-architect)
+- File manifest with agent assignments (@dbt-specialist, @airflow-specialist, @spark-engineer)
 - Schema evolution plan
 - Data quality gates
 
@@ -95,7 +112,7 @@ Execute the implementation with agent delegation:
 claude> /build ORDERS_PIPELINE
 ```
 
-AgentSpec delegates dbt models to `dbt-specialist`, DAGs to `pipeline-architect`, and quality checks to `data-quality-analyst`. Verification includes `dbt build`, `sqlfluff lint`, and data quality assertions. Output: `BUILD_REPORT_ORDERS_PIPELINE.md`
+AgentSpec delegates dbt models to `@dbt-specialist`, DAGs to `@airflow-specialist`, Spark jobs to `@spark-engineer`, and quality checks to `@data-quality-analyst`. Verification includes `dbt build`, `sqlfluff lint`, and data quality assertions. Output: `BUILD_REPORT_ORDERS_PIPELINE.md`
 
 ### Step 5: Ship
 
@@ -124,13 +141,16 @@ claude> /sql-review models/marts/
 
 # Migrate legacy stored procedures
 claude> /migrate legacy/etl_orders_proc.sql
+
+# Author a data contract
+claude> /data-contract "Contract between orders team and analytics"
 ```
 
 ## What's Next
 
-- [Core Concepts](../concepts/) — understand how phases, agents, and KB work together
-- [Tutorials](../tutorials/) — dbt, star schema, data quality, Spark, streaming, RAG walkthroughs
-- [Reference](../reference/) — full command, agent, and KB domain catalog
+- [Core Concepts](../concepts/) -- understand how phases, agents, and KB work together
+- [Tutorials](../tutorials/) -- dbt, star schema, data quality, Spark, streaming, RAG walkthroughs
+- [Reference](../reference/) -- full command, agent, and KB domain catalog
 
 ## Troubleshooting
 
@@ -144,4 +164,4 @@ Check that `.claude/agents/` contains the agent `.md` files. Agents are discover
 The `/define` phase requires 12/15 to proceed. For data pipelines, ensure Source Inventory, Schema Contract, and Freshness SLAs are populated.
 
 **KB domain not loading?**
-Check `.claude/kb/_index.yaml` — the domain must be registered there. All 11 DE domains come pre-configured.
+Check `.claude/kb/_index.yaml` -- the domain must be registered there. All 22 KB domains come pre-configured.

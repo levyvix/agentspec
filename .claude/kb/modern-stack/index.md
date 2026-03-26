@@ -2,6 +2,7 @@
 
 > **Purpose**: Modern data tools — DuckDB, Polars, SQLMesh, Malloy, Evidence.dev, local-first analytics
 > **MCP Validated**: 2026-03-26
+> **Latest**: DuckDB 1.2 (Feb 2025) with friendlier SQL, Polars 1.39+ with new streaming engine and sink_batches, SQLMesh 0.231 with Fabric Warehouse support and linter rules
 
 ## Quick Navigation
 
@@ -9,7 +10,7 @@
 
 | File | Purpose |
 |------|---------|
-| [concepts/duckdb.md](concepts/duckdb.md) | DuckDB 1.5: columnar engine, extensions, VARIANT |
+| [concepts/duckdb.md](concepts/duckdb.md) | DuckDB 1.2+: columnar engine, extensions, friendlier SQL |
 | [concepts/polars.md](concepts/polars.md) | Lazy/eager eval, expression API, Polars Cloud |
 | [concepts/sqlmesh.md](concepts/sqlmesh.md) | Virtual environments, auto backfills, dbt compat |
 | [concepts/analytics-engineering.md](concepts/analytics-engineering.md) | Malloy, Evidence.dev, Observable |

@@ -1,7 +1,7 @@
 # LLM Output Validation
 
 > **Purpose**: Validate and parse LLM JSON responses into typed Pydantic models
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -138,6 +138,46 @@ try:
     # data = {"name": "John", "entity_type": "pers"}
 except ValueError:
     pass
+```
+
+## TypeAdapter for List Validation
+
+```python
+from pydantic import TypeAdapter
+
+# Validate a list of entities without wrapping in a BaseModel
+EntityListAdapter = TypeAdapter(list[ExtractedEntity])
+
+# Parse LLM output that returns a JSON array directly
+entities = EntityListAdapter.validate_json(llm_response)
+
+# Generate JSON Schema for arrays
+schema = EntityListAdapter.json_schema()
+```
+
+## Discriminated Unions for Multi-Type LLM Output
+
+```python
+from typing import Literal, Union
+from pydantic import BaseModel, Field
+
+class PersonEntity(BaseModel):
+    entity_type: Literal["person"]
+    name: str
+    role: str | None = None
+
+class OrgEntity(BaseModel):
+    entity_type: Literal["org"]
+    name: str
+    industry: str | None = None
+
+class EntityResult(BaseModel):
+    entities: list[Union[PersonEntity, OrgEntity]] = Field(
+        discriminator="entity_type"
+    )
+
+# Pydantic picks the right model based on entity_type
+result = EntityResult.model_validate_json(llm_response)
 ```
 
 ## See Also

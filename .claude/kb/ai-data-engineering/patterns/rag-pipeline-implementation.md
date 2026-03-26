@@ -1,6 +1,6 @@
 # RAG Pipeline Implementation
 
-> **Purpose**: End-to-end Retrieval-Augmented Generation with LangChain -- loading, chunking, embedding, retrieval, generation, and evaluation
+> **Purpose**: End-to-end RAG with LangChain -- loading, chunking, embedding, hybrid retrieval, generation, and RAGAS evaluation
 > **MCP Validated**: 2026-03-26
 
 ## When to Use

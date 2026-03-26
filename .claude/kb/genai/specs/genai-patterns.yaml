@@ -1,8 +1,8 @@
 schema_version: "1.0"
 domain: genai
 file_type: architecture_patterns
-last_validated: "2026-02-17"
-source: "MCP validated - WebSearch, Context7, Exa"
+last_validated: "2026-03-26"
+source: "MCP validated - Exa WebSearch, Context7, Anthropic Docs"
 
 # GenAI Architecture Patterns Specification
 # Machine-readable reference for agent decision-making
@@ -222,30 +222,54 @@ tool_calling_protocols:
     discovery: "dynamic"
     maintainer: "Anthropic (open standard)"
 
-frameworks_2025:
+frameworks_2026:
   langgraph:
     maintainer: "LangChain"
-    strength: "Graph-based state machines, conditional edges"
+    strength: "Graph-based state machines, durable execution, human-in-the-loop, memory"
     language: "Python, TypeScript"
     production_ready: true
+    mcp_support: true
 
   crewai:
     maintainer: "CrewAI Inc"
-    strength: "Role-based agent crews, process orchestration"
+    strength: "Role-based agent crews, rapid prototyping"
     language: "Python"
     production_ready: true
+    mcp_support: true
+
+  claude_agent_sdk:
+    maintainer: "Anthropic"
+    strength: "Claude Code capabilities as library, security-first, MCP native"
+    language: "Python, TypeScript"
+    production_ready: true
+    mcp_support: true
 
   openai_agents_sdk:
     maintainer: "OpenAI"
-    strength: "Native handoff protocols, guardrails"
+    strength: "Handoff-based delegation, tracing, guardrails"
     language: "Python"
     production_ready: true
     replaces: "Swarm (experimental)"
+    mcp_support: true
 
   autogen:
     maintainer: "Microsoft"
     strength: "Enterprise multi-agent, Semantic Kernel integration"
     language: "Python, C#"
+    production_ready: true
+    mcp_support: true
+
+  agno:
+    maintainer: "Agno"
+    strength: "Minimal code agents, model-agnostic, fastest setup"
+    language: "Python"
+    production_ready: true
+    mcp_support: true
+
+  dspy:
+    maintainer: "Stanford NLP"
+    strength: "Automated prompt optimization, self-improving"
+    language: "Python"
     production_ready: true
 
   llamaindex:

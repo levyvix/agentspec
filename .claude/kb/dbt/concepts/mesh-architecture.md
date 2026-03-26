@@ -2,11 +2,11 @@
 
 > **Purpose**: dbt Mesh multi-project setup with cross-project refs, access modifiers, Semantic Layer
 > **Confidence**: 0.90
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with production migration patterns
 
 ## Overview
 
-dbt Mesh enables domain teams to own independent dbt projects with **cross-project references**, **access modifiers** (public/protected/private), and **model versioning**. Combined with the **Semantic Layer** (MetricFlow), it implements Data Mesh principles: federated ownership with centralized metric definitions. Each project publishes its public models as a data product.
+dbt Mesh enables domain teams to own independent dbt projects with **cross-project references**, **access modifiers** (public/protected/private), and **model versioning**. Combined with the **Semantic Layer** (MetricFlow), it implements Data Mesh principles: federated ownership with centralized metric definitions. Each project publishes its public models as a data product. Cross-project refs require dbt Cloud Enterprise or Enterprise+ plans. Catalog provides full cross-project lineage.
 
 ## The Concept
 
@@ -53,6 +53,15 @@ models:
 | Contract | `contract: {enforced: true}` |
 | Versioning | `versions:` with `latest_version` |
 | Centralized metrics | Semantic Layer (MetricFlow) |
+
+## Migration Heuristics (Production Mesh Adoption)
+
+| Step | Question | Action |
+|------|----------|--------|
+| 1 | Is there a single downstream team? | Start there as a consumer |
+| 2 | Are people working on separate transformation levels? | Split by staging vs marts |
+| 3 | Different data sources handled separately? | Split by domain boundary |
+| 4 | Existing logical groupings in your project? | Formalize as Mesh interfaces |
 
 ## Common Mistakes
 

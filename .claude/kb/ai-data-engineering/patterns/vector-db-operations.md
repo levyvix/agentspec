@@ -1,6 +1,6 @@
 # Vector DB Operations
 
-> **Purpose**: Vector database operations across pgvector, Qdrant, and hybrid search with index tuning
+> **Purpose**: Vector database operations across pgvector, Qdrant, Milvus, and hybrid search with index tuning
 > **MCP Validated**: 2026-03-26
 
 ## When to Use
@@ -10,6 +10,7 @@
 - Building filtered vector search with complex metadata predicates
 - Combining semantic search with keyword search (hybrid)
 - Tuning recall/latency tradeoffs for production workloads
+- Multi-tenant vector isolation (Qdrant, Milvus)
 
 ## Implementation
 

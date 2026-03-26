@@ -1,4 +1,4 @@
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 # Git Integration
 
@@ -8,6 +8,12 @@
 ## Overview
 
 Fabric Git integration enables workspaces to connect to Azure DevOps or GitHub repositories, providing version control for Fabric items (lakehouses, warehouses, pipelines, notebooks, reports). Changes can be committed from the workspace to Git and synced back from Git to the workspace. This forms the foundation of CI/CD workflows in Fabric, supporting both Git-centric and hybrid deployment strategies.
+
+**Key 2025-2026 updates:**
+- **`fabric-cicd` Python library** (GA Feb 2026) -- official Microsoft tool for programmatic CI/CD deployments, replacing custom scripts
+- **Azure DevOps cross-tenant support** (GA Nov 2025) -- Service Principal authentication across Azure AD tenants
+- **Item-specific CI/CD tips** -- Microsoft's internal team published best practices for Notebooks, Pipelines, Lakehouses, and semantic models (Apr 2025)
+- **Parameterization techniques** -- structured approach for environment-specific configs across Dev/Test/Prod
 
 ## The Pattern
 
@@ -98,6 +104,30 @@ def update_from_git(workspace_id: str, headers: dict):
 | Reports | Yes | PBIR format |
 | Environments | Yes | Configuration files |
 
+## fabric-cicd Python Library (GA Feb 2026)
+
+The official Microsoft CI/CD tool for Fabric, replacing custom deployment scripts:
+
+```python
+# pip install fabric-cicd
+from fabric_cicd import FabricWorkspace, publish_all_items
+
+# Connect to workspace
+ws = FabricWorkspace(
+    workspace_id="your-workspace-id",
+    repository_directory="path/to/git/repo",
+    item_type_in_scope=["Notebook", "DataPipeline", "Lakehouse", "SemanticModel"]
+)
+
+# Deploy all items from Git to workspace
+publish_all_items(ws)
+```
+
+Key benefits:
+- Handles item-specific deployment ordering (dependencies)
+- Supports parameterization for environment-specific values
+- Integrates with Azure DevOps and GitHub Actions pipelines
+
 ## Common Mistakes
 
 ### Wrong
@@ -112,7 +142,7 @@ Connecting production workspace directly to 'main' branch for live editing
 Git-centric approach:
   dev branch  --> dev workspace
   test branch --> test workspace
-  main branch --> prod workspace (deploy via PR merge)
+  main branch --> prod workspace (deploy via PR merge + fabric-cicd)
 ```
 
 ## Related

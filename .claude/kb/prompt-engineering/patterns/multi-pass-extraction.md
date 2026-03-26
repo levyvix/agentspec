@@ -1,7 +1,7 @@
 # Multi-Pass Extraction Pattern
 
 > **Purpose**: Improve extraction accuracy through multiple LLM passes with progressive refinement
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 ## When to Use
 

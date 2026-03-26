@@ -1,12 +1,12 @@
 # Operators
 
-> **Purpose**: PythonOperator, BashOperator, dbt Cloud, SparkSubmit, BigQuery; @task decorators; deferrable operators
+> **Purpose**: PythonOperator, BashOperator, dbt Cloud, SparkSubmit, BigQuery; @task/@asset decorators; deferrable operators
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated for Airflow 3.0 (Task Execution API, @asset decorator)
 
 ## Overview
 
-Operators are the building blocks of Airflow tasks. The TaskFlow API (`@task`) replaces `PythonOperator` for most Python work. Provider packages offer operators for dbt Cloud, Spark, BigQuery, and other systems. **Deferrable operators** free up worker slots by suspending during I/O waits.
+Operators are the building blocks of Airflow tasks. The TaskFlow API (`@task`) replaces `PythonOperator` for most Python work. Provider packages offer operators for dbt Cloud, Spark, BigQuery, and other systems. **Deferrable operators** free up worker slots by suspending during I/O waits. **Airflow 3.0** adds the `@asset` decorator for defining data assets, and the **Task Execution API** enables remote task execution in containerized or edge environments.
 
 ## The Concept
 
@@ -62,15 +62,16 @@ multi_operator_dag()
 
 ## Quick Reference
 
-| Operator | Use Case | Deferrable? |
-|----------|----------|-------------|
-| `@task` / `PythonOperator` | Python logic | No (runs in worker) |
-| `BashOperator` | Shell commands | No |
-| `BigQueryInsertJobOperator` | BQ queries | Yes |
-| `DbtCloudRunJobOperator` | dbt Cloud jobs | Yes |
-| `SparkSubmitOperator` | Spark jobs | No |
-| `S3ToSnowflakeOperator` | S3 → Snowflake COPY | Yes |
-| `HttpOperator` | REST API calls | Yes |
+| Operator | Use Case | Deferrable? | Notes |
+|----------|----------|-------------|-------|
+| `@task` / `PythonOperator` | Python logic | No (runs in worker) | Default choice |
+| `@asset` | Define data assets | N/A | **Airflow 3.0+** — event-driven |
+| `BashOperator` | Shell commands | No | |
+| `BigQueryInsertJobOperator` | BQ queries | Yes | |
+| `DbtCloudRunJobOperator` | dbt Cloud jobs | Yes | |
+| `SparkSubmitOperator` | Spark jobs | No | |
+| `S3ToSnowflakeOperator` | S3 → Snowflake COPY | Yes | |
+| `HttpOperator` | REST API calls | Yes | |
 
 ## Common Mistakes
 

@@ -1,19 +1,17 @@
 # Feature Stores
 
-> **Purpose**: Online/offline store architecture, Feast, Tecton, point-in-time joins, feature serving
+> **Purpose**: Online/offline store architecture, Feast, Tecton, Hopsworks, point-in-time joins, feature serving
 > **Confidence**: 0.90
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Feature stores solve the training-serving skew problem by providing a single system for defining, storing, and serving ML features. They maintain two stores: an **offline store** (data lake/warehouse) for historical training data with point-in-time correctness, and an **online store** (Redis, DynamoDB) for low-latency inference serving. Feast is the dominant open-source option; Tecton and Databricks Feature Store cover the enterprise space.
+Feature stores solve the training-serving skew problem by providing a single system for defining, storing, and serving ML features. They maintain two stores: an **offline store** (data lake/warehouse) for historical training data with point-in-time correctness, and an **online store** (Redis, DynamoDB) for low-latency inference serving. In 2026, the landscape includes Feast (dominant OSS), Tecton (enterprise), Hopsworks (feature platform with native vector support), and cloud-native options (Databricks Feature Store, SageMaker Feature Store). Key 2026 trends: vector feature support, streaming feature computation, and declarative feature definitions.
 
 ## The Concept
 
 ```python
 # Feast Feature Store Architecture
-# feast_repo/feature_definitions.py
-
 from datetime import timedelta
 from feast import Entity, FeatureView, Field, FileSource
 from feast.types import Float32, Int64, String
@@ -50,7 +48,7 @@ customer_stats_fv = FeatureView(
 ```
 
 ```text
-Feast Architecture
+Feature Store Architecture
 
 TRAINING (Offline Path)                    SERVING (Online Path)
 ========================                   ========================
@@ -71,27 +69,26 @@ TRAINING (Offline Path)                    SERVING (Online Path)
 
 | Concept | Description | Critical For |
 |---------|-------------|-------------|
-| Point-in-time join | Join features as-of entity timestamp | Preventing data leakage in training |
+| Point-in-time join | Join features as-of entity timestamp | Preventing data leakage |
 | Materialization | Copy features from offline to online store | Serving freshness |
 | TTL (time-to-live) | Max age before feature is stale | Feature freshness SLA |
-| Feature freshness | Time since last materialization | Monitoring, alerting |
-| Entity | Join key that links features to predictions | Feature lookup |
 | Feature service | Group of feature views for a model | Serving contract |
+| On-demand features | Computed at request time (transforms) | Real-time derived features |
+| Push source | Streaming feature ingestion | Low-latency feature updates |
 
-| Store | Technology | Latency | Use Case |
-|-------|-----------|---------|----------|
-| Offline | Parquet, BigQuery, Redshift | Seconds-minutes | Training, batch scoring |
-| Online (Redis) | Redis Cluster | < 5ms p99 | Real-time inference |
-| Online (DynamoDB) | AWS DynamoDB | < 10ms p99 | Serverless inference |
-| Online (SQLite) | Local SQLite | < 1ms | Development, testing |
+| Platform | Online Store | Offline Store | Streaming | Vector | Best For |
+|----------|-------------|---------------|-----------|--------|----------|
+| Feast | Redis, DynamoDB | Parquet, BQ | Basic (push) | No | OSS, flexible |
+| Tecton | Managed (<5ms) | Managed | Full | No | Enterprise |
+| Hopsworks | RonDB (<5ms) | Hudi/Delta | Full | Native | Feature platform |
+| Databricks FS | Databricks | Delta Lake | Full | Yes | Databricks shops |
+| SageMaker FS | DynamoDB | S3/Parquet | Full | No | AWS shops |
 
 ## Common Mistakes
 
 ### Wrong
-
 ```python
 # Training without point-in-time join -- data leakage!
-# This joins latest feature values, not values at prediction time
 features = db.query("""
     SELECT t.*, f.*
     FROM training_events t
@@ -101,13 +98,11 @@ features = db.query("""
 ```
 
 ### Correct
-
 ```python
 # Point-in-time correct training dataset via Feast
 from feast import FeatureStore
 
 store = FeatureStore(repo_path="feast_repo/")
-
 training_df = store.get_historical_features(
     entity_df=entity_df,  # must have customer_id + event_timestamp
     features=[
@@ -117,7 +112,7 @@ training_df = store.get_historical_features(
     ],
 ).to_df()
 # Feast joins features as-of each entity's event_timestamp
-# No future data leakage -- features are from before prediction time
+# No future data leakage
 ```
 
 ## Related

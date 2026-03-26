@@ -2,15 +2,18 @@
 
 > Fast lookup tables. For code examples, see linked files.
 > **MCP Validated**: 2026-02-17
+> **Last Updated**: 2026-03-26
 
 ## Core Services
 
 | Service | Python Package | Primary Use |
 |---------|---------------|-------------|
-| Cloud Run | `google-cloud-run` | Container hosting, HTTP/event handlers |
+| Cloud Run | `google-cloud-run` | Container hosting, HTTP/event handlers, GPU workloads |
 | Pub/Sub | `google-cloud-pubsub` | Async messaging, event routing |
 | GCS | `google-cloud-storage` | Object storage, pipeline triggers |
-| BigQuery | `google-cloud-bigquery` | Data warehouse, SQL analytics |
+| BigQuery | `google-cloud-bigquery` | Data warehouse, SQL analytics, Iceberg lakehouse |
+| Dataflow | `apache-beam[gcp]` | Batch/streaming pipelines, ML inference |
+| Vertex AI | `google-cloud-aiplatform` | Gemini 3, model garden, agent builder |
 | IAM | `google-cloud-iam` | Access control, service accounts |
 | Secret Manager | `google-cloud-secret-manager` | Credentials, API key storage |
 
@@ -36,6 +39,11 @@
 | Scheduled batch job | Cloud Scheduler -> Pub/Sub -> Cloud Run |
 | Stream analytics | Pub/Sub -> Dataflow -> BigQuery |
 | Store pipeline results | BigQuery (structured) or GCS (files) |
+| GPU inference / LLM serving | Cloud Run with GPU (NVIDIA, scale-to-zero) |
+| Open lakehouse (Iceberg) | BigLake Iceberg tables + BigLake Metastore |
+| ML pipeline / batch inference | Dataflow with GPU (H100) or TPU |
+| AI agent development | Vertex AI Agent Builder + ADK |
+| Natural language pipelines | BigQuery Data Engineering Agent (Preview) |
 
 ## Environment Variables (Cloud Run)
 
@@ -47,6 +55,16 @@
 | `K_CONFIGURATION` | Configuration name (auto-set) |
 | `GOOGLE_CLOUD_PROJECT` | Set manually for project ID |
 
+## BigLake Iceberg Quick Reference
+
+| Operation | Method |
+|-----------|--------|
+| Create Iceberg table | `CREATE TABLE ... WITH CONNECTION ... OPTIONS(file_format='PARQUET', table_format='ICEBERG')` |
+| Metastore | BigLake Metastore (GA) - fully managed, serverless |
+| Catalog API | Iceberg REST Catalog API (Preview) for cross-engine access |
+| Storage | Customer-owned GCS buckets with auto-optimization |
+| Features | Schema evolution, time travel, partitioning (Preview), multi-statement txns (Preview) |
+
 ## Common Pitfalls
 
 | Don't | Do |
@@ -57,6 +75,8 @@
 | Use synchronous pulls for high throughput | Use StreamingPull or push subscriptions |
 | Ignore message deduplication | Implement idempotent handlers |
 | Use `SELECT *` in BigQuery | Query only needed columns |
+| Modify BigLake Iceberg bucket files directly | Always write through BigQuery (prevents data loss) |
+| Use Cloud Run CPU for ML inference | Use Cloud Run GPU (pay-per-second, scale-to-zero) |
 
 ## Related Documentation
 

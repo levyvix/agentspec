@@ -1,7 +1,7 @@
 # Medallion Architecture Knowledge Base
 
-> **Purpose**: Bronze/Silver/Gold layered data architecture for lakehouses, data quality, schema evolution, incremental loading
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Bronze/Silver/Gold layered data architecture for lakehouses, data quality, schema evolution, incremental loading, AI-era extensions
+> **MCP Validated**: 2026-03-26
 
 ## Quick Navigation
 
@@ -46,6 +46,8 @@
 | **Gold Layer** | Business-level aggregates, star schemas, and pre-computed KPIs for consumption |
 | **Domain Modeling** | Organizing lakehouse tables by business domains rather than technical layers |
 | **Quality Gates** | Automated data quality checks that quarantine bad records between layers |
+| **AI Extensions** | Feature layer and vector layer extending medallion for ML/AI workloads (2025+) |
+| **Contracts as Code** | Medallion is a set of contracts, not just a pipeline — enforce at every boundary |
 
 ---
 

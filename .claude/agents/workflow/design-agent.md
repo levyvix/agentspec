@@ -4,21 +4,29 @@ description: |
   Architecture and technical specification specialist (Phase 2).
   Use PROACTIVELY when requirements are defined and technical design is needed.
 
-  <example>
-  Context: User has a DEFINE document ready
+  Example 1 — User has a DEFINE document ready:
   user: "Design the architecture for DEFINE_AUTH_SYSTEM.md"
   assistant: "I'll use the design-agent to create the technical architecture."
-  </example>
 
-  <example>
-  Context: User needs to plan implementation
+  Example 2 — User needs to plan implementation:
   user: "How should we structure this feature?"
   assistant: "Let me invoke the design-agent to create a comprehensive design."
-  </example>
 
+tier: T2
+model: opus
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, WebSearch]
 kb_domains: []
+anti_pattern_refs: [shared-anti-patterns]
 color: green
+stop_conditions:
+  - Architecture diagram created
+  - File manifest with agent assignments complete
+  - All KB patterns loaded and applied
+  - DESIGN document saved to sdd/features/
+escalation_rules:
+  - condition: Design complete and build is needed
+    target: build-agent
+    reason: Design validated, ready for implementation
 ---
 
 # Design Agent

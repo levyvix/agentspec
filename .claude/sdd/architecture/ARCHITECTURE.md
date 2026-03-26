@@ -112,49 +112,42 @@
 
 ```text
 .claude/
-├── commands/
-│   └── workflow/
-│       ├── brainstorm.md      # Phase 0 command (optional)
-│       ├── define.md          # Phase 1 command
-│       ├── design.md          # Phase 2 command
-│       ├── build.md           # Phase 3 command
-│       ├── ship.md            # Phase 4 command
-│       ├── iterate.md         # Cross-phase update
-│       └── create-pr.md       # Utility (unchanged)
-│
-├── agents/
-│   └── workflow/
-│       ├── brainstorm-agent.md # Collaborative exploration
-│       ├── define-agent.md     # Requirements extraction
-│       ├── design-agent.md     # Architecture design
-│       ├── build-agent.md      # Code execution
-│       ├── ship-agent.md       # Archive closure
-│       └── iterate-agent.md    # Change management
-│
-└── sdd/
-    ├── _index.md              # Workflow overview
-    ├── features/              # Active BRAINSTORM + DEFINE + DESIGN docs
-    │   ├── BRAINSTORM_*.md
-    │   ├── DEFINE_*.md
-    │   └── DESIGN_*.md
-    ├── reports/               # Build reports
-    │   └── BUILD_REPORT_*.md
-    ├── archive/               # Shipped features
-    │   └── {FEATURE}/
-    │       ├── BRAINSTORM_*.md  (if used)
-    │       ├── DEFINE_*.md
-    │       ├── DESIGN_*.md
-    │       ├── BUILD_REPORT_*.md
-    │       └── SHIPPED_*.md
-    ├── templates/             # Document templates
-    │   ├── BRAINSTORM_TEMPLATE.md
-    │   ├── DEFINE_TEMPLATE.md
-    │   ├── DESIGN_TEMPLATE.md
-    │   ├── BUILD_REPORT_TEMPLATE.md
-    │   └── SHIPPED_TEMPLATE.md
-    └── architecture/          # Workflow contracts
-        ├── WORKFLOW_CONTRACTS.yaml
-        └── ARCHITECTURE.md    # This file
++-- commands/                    # 21 slash commands
+|   +-- workflow/                # 7 SDD commands
+|   +-- data-engineering/        # 8 DE commands
+|   +-- core/                    # 4 utility commands
+|   +-- knowledge/               # 1 KB command
+|   +-- review/                  # 1 review command
+|
++-- agents/                      # 58 specialized agents
+|   +-- workflow/                # 6 SDD phase agents
+|   +-- architect/               # 8 system-level design
+|   +-- cloud/                   # 10 AWS, GCP, CI/CD
+|   +-- platform/                # 6 Microsoft Fabric
+|   +-- python/                  # 6 code quality, prompts
+|   +-- test/                    # 3 testing, contracts
+|   +-- data-engineering/        # 15 DE implementation
+|   +-- dev/                     # 4 developer productivity
+|
++-- kb/                          # 22 curated KB domains
+|   +-- dbt/                     # dbt patterns
+|   +-- spark/                   # PySpark, Spark SQL
+|   +-- sql-patterns/            # SQL best practices
+|   +-- airflow/                 # DAG patterns
+|   +-- streaming/               # Flink, Kafka, CDC
+|   +-- data-modeling/           # Star schema, Data Vault
+|   +-- ... (17 more domains)
+|
++-- sdd/
+    +-- _index.md                # Workflow overview
+    +-- README.md                # Comprehensive documentation
+    +-- features/                # Active feature documents
+    +-- reports/                 # Build reports
+    +-- archive/                 # Shipped features
+    +-- templates/               # 5 document templates
+    +-- architecture/            # Workflow contracts
+        +-- WORKFLOW_CONTRACTS.yaml
+        +-- ARCHITECTURE.md      # This file
 ```
 
 ---
@@ -393,6 +386,8 @@
 
 ## Version History
 
-| Version | Date       | Changes                            |
-|---------|------------|------------------------------------|
-| 1.0.0   | 2026-02-17 | Public release as AgentSpec v1.0.0 |
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.1.0 | 2026-03-26 | Updated folder structure for 58 agents, 8 categories, 22 KB domains |
+| 2.0.0 | 2026-03-26 | Data engineering pivot |
+| 1.0.0 | 2026-02-17 | Public release as AgentSpec v1.0.0 |

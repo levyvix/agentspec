@@ -1,12 +1,12 @@
 # Data Vault
 
-> **Purpose**: Data Vault 2.0 — Hubs, Links, Satellites, hash keys, loading patterns
-> **Confidence**: 0.90
+> **Purpose**: Data Vault 2.0 — Hubs, Links, Satellites, hash keys, loading patterns, AutomateDV, lakehouse integration
+> **Confidence**: 0.92
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Data Vault 2.0 separates business keys (Hubs), relationships (Links), and descriptive attributes (Satellites). It excels at integrating data from many sources with full history tracking. Hash keys enable parallel loading and deterministic joins.
+Data Vault 2.0 separates business keys (Hubs), relationships (Links), and descriptive attributes (Satellites). It excels at integrating data from many sources with full history tracking. Hash keys enable parallel loading and deterministic joins. In 2025+, automation tools like AutomateDV (dbt package) and Coalesce have made Data Vault practical at enterprise scale by generating Hub/Link/Sat loading SQL from metadata definitions.
 
 ## The Pattern
 
@@ -126,6 +126,47 @@ WHERE NOT EXISTS (
       AND sat.hash_diff = MD5(CONCAT(s.name, s.email))
 );
 ```
+
+## AutomateDV: Metadata-Driven Loading (2025+ Best Practice)
+
+```yaml
+# dbt AutomateDV: metadata-driven hub definition
+# models/raw_vault/hubs/hub_customer.yml
+hub_customer:
+  src_pk: CUSTOMER_HK
+  src_nk: CUSTOMER_ID
+  src_ldts: LOAD_DATETIME
+  src_source: RECORD_SOURCE
+  source_model: stg_crm_customers
+```
+
+```sql
+-- AutomateDV dbt model: hub_customer.sql
+{{ automate_dv.hub(
+    src_pk='CUSTOMER_HK',
+    src_nk='CUSTOMER_ID',
+    src_ldts='LOAD_DATETIME',
+    src_source='RECORD_SOURCE',
+    source_model='stg_crm_customers'
+) }}
+```
+
+### Data Vault in the Lakehouse
+
+| Platform | Data Vault Support | Tooling |
+|----------|-------------------|---------|
+| Databricks | Delta Lake tables for Hubs/Links/Sats | AutomateDV + dbt |
+| Snowflake | Native tables, HASH function support | AutomateDV + dbt / Coalesce |
+| BigQuery | Partitioned tables, SHA256 hashing | AutomateDV + dbt |
+| Iceberg + Spark | Iceberg tables with merge support | AutomateDV + dbt-spark |
+
+### Raw Vault vs Business Vault
+
+| Layer | Purpose | Transformation |
+|-------|---------|---------------|
+| Raw Vault | Source-faithful, no business rules | Hash keys, load metadata only |
+| Business Vault | Derived relationships, computed satellites | Business logic applied |
+| Information Mart | Consumption-ready star schemas | Dimensional model from vault |
 
 ## Related
 

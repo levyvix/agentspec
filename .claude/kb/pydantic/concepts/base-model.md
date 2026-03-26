@@ -2,7 +2,7 @@
 
 > **Purpose**: Core building block for defining validated data schemas in Pydantic v2
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
@@ -84,6 +84,79 @@ class MyModel(BaseModel):
 | `from_attributes` | `False` | Allow ORM-style attribute access |
 | `populate_by_name` | `False` | Allow population by field name or alias |
 | `extra` | `"ignore"` | Handle extra fields: ignore, allow, forbid |
+
+## Computed Fields
+
+```python
+from pydantic import BaseModel, computed_field
+
+
+class Order(BaseModel):
+    items: list[dict]
+    tax_rate: float = 0.1
+
+    @computed_field
+    @property
+    def subtotal(self) -> float:
+        return sum(item['price'] * item['quantity'] for item in self.items)
+
+    @computed_field
+    @property
+    def total(self) -> float:
+        return self.subtotal * (1 + self.tax_rate)
+
+
+order = Order(items=[{"price": 10, "quantity": 2}])
+print(order.model_dump())
+# {'items': [...], 'tax_rate': 0.1, 'subtotal': 20.0, 'total': 22.0}
+# Computed fields appear in model_dump() and JSON schema (marked readOnly)
+```
+
+## TypeAdapter (Non-BaseModel Types)
+
+```python
+from pydantic import TypeAdapter
+
+# Validate arbitrary types without defining a BaseModel
+adapter = TypeAdapter(list[int])
+result = adapter.validate_python(["1", "2", "3"])  # [1, 2, 3]
+schema = adapter.json_schema()  # {'items': {'type': 'integer'}, 'type': 'array'}
+
+# Useful for validating function arguments, API params, etc.
+from typing import Annotated
+from pydantic import Field
+PositiveInt = Annotated[int, Field(gt=0)]
+adapter = TypeAdapter(list[PositiveInt])
+```
+
+## Discriminated Unions
+
+```python
+from typing import Literal, Union
+from pydantic import BaseModel, Field
+
+
+class S3Source(BaseModel):
+    source_type: Literal["s3"]
+    bucket: str
+    key: str
+
+
+class GCSSource(BaseModel):
+    source_type: Literal["gcs"]
+    bucket: str
+    blob: str
+
+
+class Pipeline(BaseModel):
+    name: str
+    source: Union[S3Source, GCSSource] = Field(discriminator="source_type")
+
+
+# Pydantic uses source_type to pick the right model -- no trial-and-error
+p = Pipeline(name="ingest", source={"source_type": "s3", "bucket": "b", "key": "k"})
+print(type(p.source).__name__)  # S3Source
+```
 
 ## Serialization for LLM Prompts
 

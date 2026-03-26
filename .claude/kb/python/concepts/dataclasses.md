@@ -2,7 +2,7 @@
 
 > **Purpose**: @dataclass decorator patterns with slots, frozen, kw_only for Python 3.11+
 > **Confidence**: 0.95
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 ## Overview
 
@@ -140,6 +140,31 @@ class FilePath:
 | Data with runtime validation | Pydantic `BaseModel` |
 | Dict-like typed structure | `TypedDict` |
 | Named constant group | `enum.Enum` |
+| Advanced attrs features (converters, on_setattr) | `attrs` with `@define` |
+
+## Dataclass vs attrs vs Pydantic (2025)
+
+| Feature | dataclass | attrs | Pydantic |
+|---------|-----------|-------|----------|
+| Stdlib (no install) | Yes | No | No |
+| Slots | `slots=True` | `@define` (default) | No (uses `__dict__`) |
+| Runtime validation | No | Opt-in validators | Yes (automatic) |
+| Type coercion | No | Opt-in converters | Yes (automatic) |
+| JSON serialization | No | `cattrs` needed | Built-in |
+| Performance (creation) | Fastest | Fast | Slower (validation cost) |
+| JSON Schema | No | No | Built-in |
+| Best for | Internal data, DTOs | Complex internal data | API boundaries, LLM output |
+
+```python
+# attrs comparison -- @define uses slots by default
+import attrs
+
+@attrs.define
+class Metric:
+    name: str
+    value: float = attrs.field(validator=attrs.validators.gt(0))
+    tags: tuple[str, ...] = ()
+```
 
 ## Related
 

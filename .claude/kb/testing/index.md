@@ -1,7 +1,7 @@
 # Python Testing Knowledge Base
 
-> **Purpose**: Comprehensive pytest-based testing patterns for Python data engineering projects
-> **MCP Validated**: 2026-02-17
+> **Purpose**: pytest 8+, fixtures, mocking, async testing, property-based testing, CI patterns
+> **MCP Validated**: 2026-03-26
 
 ## Quick Navigation
 
@@ -41,10 +41,13 @@
 
 | Concept | Description |
 |---------|-------------|
-| **pytest** | Python testing framework with autodiscovery, fixtures, and rich assertions |
+| **pytest 8+** | Python testing framework with autodiscovery, fixtures, rich assertions, HIDDEN_PARAM |
 | **Fixtures** | Dependency injection for test setup/teardown with configurable scope |
 | **Mocking** | Replace real dependencies with controlled doubles for isolation |
 | **Parametrize** | Run the same test logic against multiple input/output combinations |
+| **pytest-asyncio** | Native async test support with `@pytest.mark.asyncio` and async fixtures |
+| **Hypothesis** | Property-based testing with auto-generated inputs via `@given` |
+| **pytest-xdist** | Parallel test execution with `-n auto` for faster CI |
 
 ---
 
@@ -64,3 +67,4 @@
 |-------|---------------|----------|
 | test-generator | patterns/unit-test-patterns.md, concepts/fixtures.md | Generate pytest tests for Python modules |
 | test-generator | patterns/spark-testing.md | Generate PySpark DataFrame test suites |
+| test-generator | patterns/integration-tests.md | Generate async and integration tests |

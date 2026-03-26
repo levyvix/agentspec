@@ -1,7 +1,7 @@
 # Incremental Model
 
 > **Purpose**: Production-ready incremental model with merge strategy and late-arriving fact handling
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with --sample flag (v1.10+) and microbatch references
 
 ## When to Use
 
@@ -112,7 +112,21 @@ dbt run --select fct_orders --full-refresh
 
 # Run with upstream dependencies
 dbt run --select +fct_orders
+
+# Sample mode (v1.10+) — validate with subset of data, saves time and cost
+dbt run --select fct_orders --sample="3 days"
+
+# Sample with static time range
+dbt run --select fct_orders --sample="{'start': '2026-01-01', 'end': '2026-01-07'}"
 ```
+
+> **Tip (v1.10+)**: The `--sample` flag requires `event_time` to be set on the model for
+> time-based sampling. It generates filtered refs and sources so you can validate
+> outputs without building the entire model. Not supported for Python models.
+
+> **Tip (v1.9+)**: For large time-series data, consider the `microbatch` incremental
+> strategy instead of merge. It processes data in time batches (hour/day/month)
+> without requiring `is_incremental()` logic. See [incremental-strategies](../concepts/incremental-strategies.md).
 
 ## See Also
 

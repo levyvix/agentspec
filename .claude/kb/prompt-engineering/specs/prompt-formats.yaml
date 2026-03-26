@@ -1,8 +1,8 @@
 schema_version: "1.0"
 domain: prompt-engineering
 file_type: prompt-format-specification
-last_validated: "2026-02-17"
-source: "MCP validated: WebSearch, Lakera, OpenAI Docs, PromptingGuide.ai"
+last_validated: "2026-03-26"
+source: "MCP validated: Exa WebSearch, Anthropic Docs, OpenAI Docs"
 
 # Prompt Format Specification
 # Defines the canonical structure for prompts in this knowledge base
@@ -112,17 +112,22 @@ temperature_guide:
 # Model Recommendations
 model_recommendations:
   extraction:
-    primary: "gpt-4o"
-    alternatives: ["claude-sonnet-4-20250514", "gemini-2.0-flash"]
-    notes: "Use strongest model for complex documents"
+    primary: "claude-sonnet-4-6"
+    alternatives: ["gpt-4o", "gemini-2.5-pro"]
+    notes: "Use tool-use-as-schema (Claude) or JSON Schema mode (OpenAI)"
   classification:
     primary: "gpt-4o-mini"
-    alternatives: ["claude-haiku-4-20250514", "gemini-2.0-flash"]
+    alternatives: ["claude-haiku-3-5", "gemini-2.0-flash"]
     notes: "Cheaper models sufficient for classification"
   summarization:
-    primary: "gpt-4o"
-    alternatives: ["claude-sonnet-4-20250514", "gemini-2.0-flash"]
+    primary: "claude-sonnet-4-6"
+    alternatives: ["gpt-4o", "gemini-2.5-pro"]
     notes: "Balance quality and cost"
+  structured_output:
+    primary: "gpt-4o"
+    alternatives: ["claude-sonnet-4-6"]
+    notes: "OpenAI JSON Schema mode (strict) or Instructor library"
+    library: "instructor"
 
 # Validation Checklist
 validation_checklist:

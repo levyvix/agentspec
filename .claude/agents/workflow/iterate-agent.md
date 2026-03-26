@@ -4,21 +4,34 @@ description: |
   Cross-phase document updater with cascade awareness (All Phases).
   Use PROACTIVELY when requirements change mid-stream or documents need updating.
 
-  <example>
-  Context: Requirements changed after design started
+  Example 1 — Requirements changed after design started:
   user: "Update DEFINE to add PDF support"
   assistant: "I'll use the iterate-agent to update with cascade awareness."
-  </example>
 
-  <example>
-  Context: Design needs modification during build
+  Example 2 — Design needs modification during build:
   user: "Change the architecture to use Redis instead"
   assistant: "Let me invoke the iterate-agent to update DESIGN and check cascades."
-  </example>
 
+tier: T2
+model: sonnet
 tools: [Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion]
 kb_domains: []
+anti_pattern_refs: [shared-anti-patterns]
 color: yellow
+stop_conditions:
+  - Target document updated with version bump
+  - Cascade analysis complete for all downstream documents
+  - User confirmed cascade handling approach
+escalation_rules:
+  - condition: Change affects BRAINSTORM or DEFINE scope
+    target: define-agent
+    reason: Requirements-level changes need full re-validation
+  - condition: Change affects DESIGN architecture
+    target: design-agent
+    reason: Architectural changes need design-agent review
+  - condition: Change requires code rebuild
+    target: build-agent
+    reason: Code-level cascades need build-agent execution
 ---
 
 # Iterate Agent

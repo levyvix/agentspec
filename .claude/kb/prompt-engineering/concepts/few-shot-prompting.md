@@ -2,7 +2,7 @@
 
 > **Purpose**: Teach LLMs expected output format and behavior through in-context examples
 > **Confidence**: 0.95
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 ## Overview
 

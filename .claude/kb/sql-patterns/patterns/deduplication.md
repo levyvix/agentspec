@@ -1,7 +1,7 @@
 # Deduplication
 
 > **Purpose**: Exact dedup (ROW_NUMBER), fuzzy matching, SCD-aware dedup — cross-dialect
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | QUALIFY supported in Snowflake, BigQuery, DuckDB, Databricks
 
 ## When to Use
 

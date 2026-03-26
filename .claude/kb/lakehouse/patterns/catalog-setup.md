@@ -85,15 +85,42 @@ MERGE BRANCH feature_new_model INTO main IN nessie;
 DROP BRANCH feature_new_model IN nessie;
 ```
 
+## Polaris Setup (Apache TLP, REST catalog standard)
+
+```yaml
+# Polaris: Apache Iceberg REST catalog (docker-compose)
+services:
+  polaris:
+    image: apache/polaris:1.3.0
+    ports:
+      - "8181:8181"
+    environment:
+      POLARIS_AUTH_TYPE: opa                    # OPA integration (v1.3)
+      POLARIS_OPA_URL: http://opa:8181/v1/data
+    volumes:
+      - polaris-data:/data
+```
+
+```sql
+-- Polaris: register catalog in Spark
+spark.sql.catalog.polaris = org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.polaris.type = rest
+spark.sql.catalog.polaris.uri = http://polaris:8181/api/catalog
+spark.sql.catalog.polaris.warehouse = my_warehouse
+
+-- Polaris 1.3: generic tables (non-Iceberg formats)
+-- Register Delta/Hudi tables alongside Iceberg in single catalog
+```
+
 ## Quick Reference
 
-| Catalog | Setup Complexity | Multi-Engine | Branching | RBAC |
-|---------|-----------------|-------------|-----------|------|
-| Gravitino | Medium (YAML + SDK) | Excellent | No | Basic |
-| Unity Catalog | Low (Databricks) | Limited | No | Excellent |
-| Nessie | Medium (REST server) | Good | Yes (git-like) | Basic |
-| Polaris | Low (REST) | Good | No | Good |
-| AWS Glue | Low (managed) | Good (AWS) | No | IAM-based |
+| Catalog | Setup Complexity | Multi-Engine | Branching | Governance | AI/ML |
+|---------|-----------------|-------------|-----------|------------|-------|
+| Gravitino 1.1 | Medium (YAML + SDK) | Excellent | No | Unified RBAC + OpenLineage | Model Catalog + Lance REST |
+| Unity Catalog 0.3.1 | Low (Databricks) | Good (expanding) | No | ABAC + tags + quality | Model registry, feature store |
+| Nessie | Medium (REST server) | Good | Yes (git-like) | Basic | No |
+| Polaris 1.3 (TLP) | Low (REST) | Excellent | No | RBAC + OPA | Iceberg metrics |
+| AWS Glue | Low (managed) | Good (AWS) | No | IAM-based | Glue ML |
 
 ## Related
 

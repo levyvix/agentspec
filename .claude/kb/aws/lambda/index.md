@@ -2,6 +2,7 @@
 
 > **Purpose**: AWS Lambda serverless functions with Python handlers, SAM deployment, S3 triggers, and data processing
 > **MCP Validated**: 2026-02-17
+> **Last Updated**: 2026-03-26 (Python 3.14, Powertools v2.43+, managed instances)
 
 ## Quick Navigation
 

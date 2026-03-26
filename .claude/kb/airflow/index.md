@@ -1,7 +1,7 @@
 # Airflow Knowledge Base
 
-> **Purpose**: Orchestration patterns — Airflow 2.x TaskFlow, Dagster, Prefect comparison, DAG design
-> **MCP Validated**: 2026-03-26
+> **Purpose**: Orchestration patterns — Airflow 3.x asset-aware scheduling, DAG versioning, remote execution, TaskFlow API
+> **MCP Validated**: 2026-03-26 | Updated with Airflow 3.0 GA (April 2025) features
 
 ## Quick Navigation
 
@@ -37,8 +37,12 @@
 |---------|-------------|
 | **DAG Design** | Idempotent, atomic tasks with retry and SLA configuration |
 | **TaskFlow API** | Modern @task decorators replacing classic operators |
+| **Asset-Aware Scheduling** | **Airflow 3.0**: `@asset` decorator and `Asset()` for event-driven DAG triggering |
+| **DAG Versioning** | **Airflow 3.0**: Tracks and saves DAG code at execution time |
+| **Remote Execution** | **Airflow 3.0**: Task Execution API decouples tasks from scheduler |
 | **Dynamic Mapping** | expand()/map() for runtime-determined task parallelism |
-| **Orchestrator Choice** | Airflow (battle-tested) vs Dagster (asset-centric) vs Prefect (DX-first) |
+| **New UI** | **Airflow 3.0**: React-based UI with asset and task navigation |
+| **Orchestrator Choice** | Airflow 3.x vs Dagster vs Prefect 3.x |
 
 ---
 

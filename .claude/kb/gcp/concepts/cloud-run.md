@@ -92,10 +92,67 @@ CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", \
 |---------|---------|-------------|
 | `--memory` | 512Mi | 512Mi-2Gi for data pipelines |
 | `--cpu` | 1 | 1-2 for CPU-bound work |
+| `--gpu` | 0 | 1 for ML inference (NVIDIA L4) |
 | `--concurrency` | 80 | 1 for heavy processing |
 | `--timeout` | 300s | Up to 3600s for long jobs |
 | `--min-instances` | 0 | 1+ for low-latency services |
 | `--max-instances` | 100 | Set based on downstream limits |
+
+## Cloud Run GPU Support (GA June 2025)
+
+NVIDIA GPU support enables ML inference, LLM serving, and AI workloads on Cloud Run.
+
+```bash
+# Deploy Cloud Run service with GPU
+gcloud run deploy my-llm-service \
+  --image gcr.io/my-project/llm-server:latest \
+  --gpu 1 \
+  --gpu-type nvidia-l4 \
+  --cpu 8 \
+  --memory 32Gi \
+  --region us-central1 \
+  --no-cpu-throttling
+```
+
+### GPU Key Features
+
+| Feature | Details |
+|---------|---------|
+| **Pay-per-second billing** | Charged only when GPU is active |
+| **Scale to zero** | Eliminates idle GPU costs |
+| **Cold start** | Instance with GPU + drivers in <5 seconds |
+| **Streaming** | HTTP and WebSocket streaming for LLM responses |
+| **GPU types** | NVIDIA L4 (GA) |
+
+### Best Practices for GPU on Cloud Run
+
+- Download ML models from GCS (not container image) for large models (>10GB)
+- Pre-transform models at build time to avoid GPU-ready conversion at startup
+- Use `--no-cpu-throttling` to keep CPU active during GPU operations
+- Set `--concurrency 1` for dedicated GPU per request
+
+## Cloud Run Updates (2025-2026)
+
+| Feature | Status | Date |
+|---------|--------|------|
+| GPU support (NVIDIA L4) | GA | Jun 2025 |
+| Identity-Aware Proxy (IAP) direct | GA | Mar 2026 |
+| Multi-region HA with automated failover | Preview | Feb 2026 |
+| Remote MCP server for AI agents | Preview | Feb 2026 |
+| Direct VPC egress (no connector needed) | GA | 2025 |
+| Worker pools with Direct VPC ingress | GA | 2026 |
+
+## Dockerfile Pattern (Updated for Python 3.12)
+
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", \
+     "--threads", "8", "--timeout", "0", "main:app"]
+```
 
 ## Related
 

@@ -1,6 +1,6 @@
 # Data Contract Authoring
 
-> **Purpose**: Full ODCS YAML template with schema, SLA, ownership, CI/CD enforcement
+> **Purpose**: Full ODCS v3.1 YAML template with schema, relationships, SLA, ownership, CI/CD enforcement
 > **MCP Validated**: 2026-03-26
 
 ## When to Use
@@ -14,8 +14,8 @@
 
 ```yaml
 # contracts/commerce/orders.contract.yaml
-# Open Data Contract Standard (ODCS) v3
-apiVersion: v3.0.0
+# Open Data Contract Standard (ODCS) v3.1
+apiVersion: v3.1.0
 kind: DataContract
 metadata:
   name: orders
@@ -64,6 +64,15 @@ schema:
       type: timestamp_tz
       required: true
 
+# NEW in ODCS v3.1: Relationships
+references:
+  - name: customer_fk
+    column: customer_id
+    referencedDataset: dim_customers
+    referencedColumn: customer_id
+    type: foreignKey
+    description: "Links orders to customer dimension"
+
 quality:
   freshness:
     column: updated_at
@@ -104,16 +113,22 @@ consumers:
     usage: "Feature extraction for churn prediction"
 ```
 
-## Configuration
+## Configuration (ODCS v3.1 Sections)
 
 | Section | Required | Purpose |
 |---------|----------|---------|
 | `metadata` | Yes | Ownership, versioning, classification |
 | `schema` | Yes | Column definitions, types, constraints |
+| `references` | Recommended | FK relationships to other datasets (NEW in v3.1) |
 | `quality` | Recommended | Freshness, completeness, volume thresholds |
 | `sla` | Recommended | Availability, latency, escalation |
 | `evolution` | Recommended | Compatibility rules, deprecation policy |
 | `consumers` | Optional | Registered downstream dependents |
+| `vendors` | Optional | Vendor-specific extensions |
+| `team` | Optional | Team members and contact info |
+| `roles` | Optional | Access control roles |
+| `pricing` | Optional | Data product pricing (data mesh) |
+| `infrastructures` | Optional | Server and infrastructure details |
 
 ## Example Usage
 

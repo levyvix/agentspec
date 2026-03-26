@@ -1,7 +1,7 @@
 # Cross-Dialect Patterns
 
 > **Purpose**: DuckDB, Snowflake, BigQuery, Spark SQL syntax differences and translation patterns
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with DuckDB 1.3+, ASOF JOIN, time_bucket patterns
 
 ## When to Use
 
@@ -99,10 +99,64 @@ SELECT * FROM (
 | LATERAL JOIN | Yes | Correlated subquery | Yes | No |
 | Regex | REGEXP_LIKE | REGEXP_CONTAINS | REGEXP_MATCHES | RLIKE |
 
+## ASOF JOIN (Temporal Lookups)
+
+```sql
+-- DuckDB: ASOF JOIN for time-series lookups
+-- "What was the exchange rate as of each order timestamp?"
+SELECT o.order_id, o.amount, o.order_ts, r.rate
+FROM orders o
+ASOF JOIN exchange_rates r
+    ON o.currency = r.currency
+   AND o.order_ts >= r.effective_ts;
+
+-- Snowflake (preview): ASOF JOIN with MATCH_CONDITION
+SELECT o.order_id, o.amount, r.rate
+FROM orders o
+ASOF JOIN exchange_rates r
+    MATCH_CONDITION(o.order_ts >= r.effective_ts)
+    ON o.currency = r.currency;
+
+-- Manual ASOF (any dialect): LATERAL + LIMIT 1
+SELECT o.order_id, o.amount, r.rate
+FROM orders o
+CROSS JOIN LATERAL (
+    SELECT rate FROM exchange_rates r
+    WHERE r.currency = o.currency AND r.effective_ts <= o.order_ts
+    ORDER BY r.effective_ts DESC LIMIT 1
+) r;
+```
+
+## Time Bucketing
+
+```sql
+-- DuckDB: time_bucket for time-series aggregation
+SELECT
+    time_bucket(INTERVAL '15 minutes', reading_ts) AS bucket,
+    AVG(value) AS avg_value
+FROM sensor_readings
+GROUP BY bucket
+ORDER BY bucket;
+
+-- Snowflake: TIME_SLICE equivalent
+SELECT
+    TIME_SLICE(reading_ts, 15, 'MINUTE') AS bucket,
+    AVG(value) AS avg_value
+FROM sensor_readings
+GROUP BY bucket;
+
+-- BigQuery: TIMESTAMP_BUCKET
+SELECT
+    TIMESTAMP_BUCKET(reading_ts, INTERVAL 15 MINUTE) AS bucket,
+    AVG(value) AS avg_value
+FROM sensor_readings
+GROUP BY bucket;
+```
+
 ## Example Usage
 
 ```sql
--- DuckDB-specific power features
+-- DuckDB-specific power features (1.3+)
 -- List comprehension
 SELECT [x * 2 FOR x IN [1, 2, 3, 4] IF x > 1];  -- [4, 6, 8]
 
@@ -111,6 +165,10 @@ SELECT * FROM 's3://bucket/data/*.parquet' WHERE year = 2026;
 
 -- COLUMNS expression (dynamic column selection)
 SELECT COLUMNS('revenue_.*') FROM quarterly_report;
+
+-- Lambda syntax (1.3+): single arrow deprecated, use parenthesized form
+-- Old: list_transform([1,2,3], x -> x + 1)
+-- New: list_transform([1,2,3], (x) -> x + 1)
 ```
 
 ## See Also

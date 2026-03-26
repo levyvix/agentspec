@@ -1,6 +1,6 @@
 # Great Expectations
 
-> **Purpose**: Suite definition, checkpoint config, data docs, custom expectations
+> **Purpose**: Suite definition, checkpoint config, data docs, custom expectations, ExpectAI
 > **MCP Validated**: 2026-03-26
 
 ## When to Use
@@ -9,6 +9,14 @@
 - Want a Python-native testing framework (vs SQL-only like dbt tests)
 - Building reusable expectation suites across multiple datasets
 - Require custom business logic validation beyond built-in checks
+
+**Key 2025 updates (GX Core 1.3+):**
+- **ExpectAI** (Feb 2025) -- auto-generate data quality rules by analyzing dataset patterns in GX Cloud; reduces trial-and-error expectation authoring
+- **Inline SQL prompts** -- streamlined SQL-based Expectation writing with Generate SQL integrated inline (Aug 2025)
+- **Row-condition filtering** -- apply Expectations to specific subsets of rows with precision
+- **Atlan partnership** -- GX is a Launch Partner for the Atlan App Framework (Aug 2025)
+- **GX Core 0.18 retired** (Oct 2025) -- must upgrade to 1.x for cleaner APIs + typed params
+- **GX Core 1.3.10** -- latest stable release (Mar 2025)
 
 ## Implementation
 

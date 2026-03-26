@@ -390,6 +390,6 @@ Comparing: HEAD vs develop
 
 ## Related
 
-- Agent: `.claude/agents/code-quality/code-reviewer.md`
+- Agent: `.claude/agents/python/code-reviewer.md`
 - Config: `.coderabbit.yaml` (optional, create if needed)
 - Create PR: `.claude/commands/workflow/create-pr.md`

@@ -1,25 +1,25 @@
 # Task Dependencies
 
-> **Purpose**: Trigger rules, XCom, dynamic task mapping, dataset-driven scheduling
+> **Purpose**: Trigger rules, XCom, dynamic task mapping, asset-aware scheduling
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated for Airflow 3.0 (Asset replaces Dataset)
 
 ## Overview
 
-Airflow tasks form a DAG through explicit dependencies (`>>` operator or TaskFlow return values). Beyond simple sequencing, Airflow supports trigger rules (run even if upstream fails), XCom for inter-task data passing, dynamic task mapping for runtime-determined parallelism, and dataset-driven scheduling where DAGs trigger on data updates rather than time.
+Airflow tasks form a DAG through explicit dependencies (`>>` operator or TaskFlow return values). Beyond simple sequencing, Airflow supports trigger rules (run even if upstream fails), XCom for inter-task data passing, dynamic task mapping for runtime-determined parallelism, and **asset-aware scheduling** where DAGs trigger on data asset updates rather than time. In **Airflow 3.0**, `Dataset` has been renamed to `Asset` with logical operators (`&` for AND, `|` for OR) for complex trigger conditions.
 
 ## The Concept
 
 ```python
-from airflow.decorators import dag, task
-from airflow import Dataset
+# Airflow 3.0+ — use Asset (Dataset is deprecated)
+from airflow.sdk import DAG, task, Asset
 from airflow.utils.trigger_rule import TriggerRule
 from datetime import datetime
 
-# Dataset-driven scheduling: this DAG runs when orders dataset updates
-orders_dataset = Dataset("s3://lake/silver/orders")
+# Asset-aware scheduling: this DAG runs when orders asset updates
+orders_asset = Asset("s3://lake/silver/orders")
 
-@dag(schedule=[orders_dataset], start_date=datetime(2026, 1, 1))
+@dag(schedule=[orders_asset], start_date=datetime(2026, 1, 1))
 def downstream_analytics():
 
     @task()
@@ -58,7 +58,10 @@ downstream_analytics()
 |---------|-----------|-------|
 | XCom | Return value from `@task` | < 48KB (use S3/GCS for large data) |
 | XCom Backend | Custom backend (S3, GCS) | Unlimited |
-| Dataset scheduling | `schedule=[Dataset(...)]` | Multiple datasets = AND logic |
+| Asset scheduling (3.0+) | `schedule=[Asset(...)]` | Multiple assets = AND logic |
+| Asset AND logic | `schedule=(asset1 & asset2)` | Both must update |
+| Asset OR logic | `schedule=(asset1 \| asset2)` | Either can trigger |
+| Complex conditions | `schedule=(a1 \| (a2 & a3))` | Compose AND/OR freely |
 
 ## Common Mistakes
 

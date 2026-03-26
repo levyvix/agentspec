@@ -79,6 +79,33 @@ RESTORE TABLE catalog.silver.orders TO VERSION AS OF 5;  -- rollback
 DESCRIBE HISTORY catalog.silver.orders;
 ```
 
+## Delta 4.x New Operations
+
+```sql
+-- Variant type: flexible semi-structured data
+INSERT INTO catalog.silver.events
+SELECT event_id, PARSE_JSON(raw_payload) AS event_data FROM staging;
+
+-- Query Variant with path extraction
+SELECT event_data:user.name::STRING, event_data:metrics.page_views::INT
+FROM catalog.silver.events;
+
+-- Type widening: widen column types without data rewrite
+ALTER TABLE catalog.silver.orders SET TBLPROPERTIES ('delta.enableTypeWidening' = 'true');
+ALTER TABLE catalog.silver.orders ALTER COLUMN quantity TYPE BIGINT;
+
+-- Conflict-free feature enablement (4.1): enable features without blocking writes
+ALTER TABLE catalog.silver.orders SET TBLPROPERTIES ('delta.enableDeletionVectors' = 'true');
+-- No longer blocks concurrent write operations (4.1+)
+
+-- Identity columns: auto-incrementing surrogate keys
+CREATE TABLE catalog.gold.dim_product (
+    product_sk BIGINT GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+    product_id STRING NOT NULL,
+    product_name STRING NOT NULL
+) USING delta;
+```
+
 ## Quick Reference
 
 | Operation | Command | When to Use |
@@ -88,6 +115,9 @@ DESCRIBE HISTORY catalog.silver.orders;
 | CDF query | `table_changes(table, start, end)` | Incremental downstream loads |
 | Time travel | `VERSION AS OF N` | Debug, audit, rollback |
 | RESTORE | `RESTORE TABLE TO VERSION AS OF N` | Emergency rollback |
+| Type widen | `ALTER COLUMN col TYPE wider_type` | Schema evolution (4.0+) |
+| Variant query | `col:path::TYPE` | Semi-structured data (4.0+) |
+| Identity column | `GENERATED ALWAYS AS IDENTITY` | Surrogate keys (4.0+) |
 
 ## Related
 

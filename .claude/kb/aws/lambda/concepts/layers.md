@@ -14,28 +14,38 @@ size of function code plus all layers cannot exceed 250 MB.
 ## The Pattern
 
 ```yaml
-# SAM template using managed layers
+# SAM template using managed layers (Python 3.14)
 Resources:
   ProcessorFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       MemorySize: 512  # Minimum for pandas/pyarrow
       Layers:
         # AWS SDK for pandas (includes pandas, pyarrow, numpy, boto3)
-        - !Sub arn:aws:lambda:${AWS::Region}:336392948345:layer:AWSSDKPandas-Python312:15
-        # Powertools for AWS Lambda
-        - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-x86_64:7
+        - !Sub arn:aws:lambda:${AWS::Region}:336392948345:layer:AWSSDKPandas-Python314:1
+        # Powertools for AWS Lambda v3
+        - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-python314-x86_64:1
 ```
 
 ## AWS-Managed Layer ARNs
 
+### Python 3.14 (Latest)
+
+| Layer | Python 3.14 ARN | Size |
+|-------|------------------|------|
+| AWS SDK for pandas | `336392948345:layer:AWSSDKPandas-Python314:*` | ~160 MB |
+| Powertools v3 (x86) | `017000801446:layer:AWSLambdaPowertoolsPythonV3-python314-x86_64:*` | ~15 MB |
+| Powertools v3 (arm64) | `017000801446:layer:AWSLambdaPowertoolsPythonV3-python314-arm64:*` | ~15 MB |
+
+### Python 3.12 (Stable)
+
 | Layer | Python 3.12 ARN | Size |
 |-------|------------------|------|
 | AWS SDK for pandas | `336392948345:layer:AWSSDKPandas-Python312:15` | ~160 MB |
-| Powertools (x86) | `017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-x86_64:7` | ~15 MB |
-| Powertools (arm64) | `017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-arm64:7` | ~15 MB |
+| Powertools v3 (x86) | `017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-x86_64:7` | ~15 MB |
+| Powertools v3 (arm64) | `017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-arm64:7` | ~15 MB |
 
 Note: Layer version numbers increment. Check current versions at:
 - [AWS SDK for pandas releases](https://github.com/aws/aws-sdk-pandas/releases)

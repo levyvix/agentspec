@@ -121,6 +121,27 @@ config = Config(
 s3_client = boto3.client("s3", config=config)
 ```
 
+## Python 3.14 Features in Handlers
+
+Python 3.14 (GA on Lambda Nov 2025) brings:
+
+- **Template strings** (`t-strings`): `t"Hello {name}"` returns a `Template` object for custom processing
+- **Deferred type annotations** (PEP 649): Annotations evaluated lazily, reducing import overhead
+- **Powertools v2.43+**: Full Python 3.14 support for Logger, Tracer, Metrics, and BatchProcessor
+
+```python
+# Python 3.14 handler with Powertools typing
+from aws_lambda_powertools.utilities.typing import LambdaContext
+from aws_lambda_powertools.utilities.data_classes import S3Event
+
+def lambda_handler(event: dict, context: LambdaContext) -> dict[str, str]:
+    s3_event = S3Event(event)
+    for record in s3_event.records:
+        bucket: str = record.s3.get_bucket.name  # deferred annotation
+        key: str = record.s3.get_object.key
+    return {"statusCode": "200"}
+```
+
 ## Related
 
 - [SAM Templates](../concepts/sam-templates.md)

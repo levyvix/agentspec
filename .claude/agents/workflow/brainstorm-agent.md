@@ -4,21 +4,28 @@ description: |
   Collaborative exploration specialist for clarifying intent and approach (Phase 0).
   Use PROACTIVELY when users have raw ideas, vague requirements, or need to explore approaches.
 
-  <example>
-  Context: User has a raw idea without clear requirements
+  Example 1 — User has a raw idea without clear requirements:
   user: "I want to build an automated data processing pipeline"
   assistant: "I'll use the brainstorm-agent to explore this idea and clarify requirements."
-  </example>
 
-  <example>
-  Context: User needs to compare approaches
+  Example 2 — User needs to compare approaches:
   user: "Should I use Lambda or Cloud Run for this?"
   assistant: "Let me invoke the brainstorm-agent to explore both approaches with trade-offs."
-  </example>
 
+tier: T2
+model: sonnet
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
 kb_domains: []
+anti_pattern_refs: [shared-anti-patterns]
 color: purple
+stop_conditions:
+  - Approach selected and confirmed by user
+  - Minimum 3 discovery questions answered
+  - Draft requirements ready for /define
+escalation_rules:
+  - condition: Requirements are clear and validated
+    target: define-agent
+    reason: Brainstorm complete, ready for requirements extraction
 ---
 
 # Brainstorm Agent

@@ -1,4 +1,4 @@
-> **MCP Validated:** 2026-02-17
+> **MCP Validated:** 2026-03-26
 
 # Microsoft Fabric Quick Reference
 
@@ -9,11 +9,13 @@
 | Use Case | Workload | Why |
 |----------|----------|-----|
 | Raw ingestion + Spark | Lakehouse | Delta tables, PySpark, notebooks |
-| Structured analytics + T-SQL | Warehouse | Full DML, RLS, data masking |
-| Real-time streaming | Eventhouse | KQL, time-series, sub-second |
-| ETL/ELT orchestration | Data Factory | Copy Activity, Dataflows Gen2 |
-| Dashboards + reports | Power BI | DirectLake, semantic models |
-| ML + AI workflows | Data Science | MLflow, Copilot, AI Skills |
+| Structured analytics + T-SQL | Warehouse | Full DML, RLS, AI Functions, COPY INTO from OneLake |
+| Real-time streaming | Eventhouse | KQL, time-series, sub-second, endpoints for Lakehouse & Warehouse |
+| ETL/ELT orchestration | Data Factory | Copy Activity, Dataflows Gen2, pipelines |
+| Dashboards + reports | Power BI | DirectLake, semantic models, Copilot |
+| ML + AI workflows | Data Science | MLflow, Copilot, AI Skills, SynapseML |
+| Operational database | SQL Database | OLTP + mirroring into OneLake (GA Nov 2025) |
+| Document analytics | Cosmos DB | Mirroring for analytical queries (GA Nov 2025) |
 
 ## Capacity SKUs
 
@@ -47,6 +49,22 @@
 | Row-level access control | Warehouse RLS + security policies |
 | Automated deployments | Deployment Pipelines + Git integration |
 
+## What's New (2025-2026)
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Copilot on F2+ | GA (Apr 2025) | AI/Copilot no longer requires F64; available on all paid SKUs |
+| `fabric-cicd` Python lib | GA (Feb 2026) | Official CI/CD tool for programmatic deployments |
+| AI Functions in Warehouse | Preview | T-SQL functions for sentiment, classification, extraction |
+| Eventhouse for Warehouse | GA (Nov 2025) | Real-time analytics endpoint on Warehouse data |
+| OneLake SharePoint/OneDrive shortcuts | GA (Dec 2025) | Reference M365 files directly in analytics |
+| Azure Blob Storage shortcut | GA (May 2025) | New shortcut type for Blob containers |
+| SQL Database | GA (Nov 2025) | OLTP database with auto-mirroring to OneLake |
+| Cosmos DB mirroring | GA (Nov 2025) | Mirror Cosmos DB data for analytical queries |
+| Azure DevOps cross-tenant | GA (Nov 2025) | Git integration across Azure AD tenants |
+| COPY INTO from OneLake | Preview (Jul 2025) | Direct ingestion from OneLake files in Warehouse |
+| JSONL in OPENROWSET | Preview (Aug 2025) | JSON Lines support for Warehouse and Lakehouse SQL |
+
 ## Common Pitfalls
 
 | Don't | Do |
@@ -57,6 +75,8 @@
 | Run heavy Spark on F2 | Scale to F16+ for production Spark |
 | Ignore capacity throttling | Monitor CU usage via Capacity Metrics app |
 | Mix bronze/silver/gold in one lakehouse | Separate lakehouses per medallion layer |
+| Require F64 for Copilot | Copilot works on F2+ since April 2025 |
+| Build custom CI/CD scripts | Use official `fabric-cicd` Python library |
 
 ## Related Documentation
 

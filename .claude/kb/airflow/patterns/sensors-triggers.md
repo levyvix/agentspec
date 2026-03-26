@@ -1,14 +1,14 @@
 # Sensors & Triggers
 
-> **Purpose**: Deferrable operators, ExternalTaskSensor, TriggerDagRunOperator, dataset-driven scheduling
-> **MCP Validated**: 2026-03-26
+> **Purpose**: Deferrable operators, ExternalTaskSensor, TriggerDagRunOperator, asset-aware scheduling
+> **MCP Validated**: 2026-03-26 | Updated for Airflow 3.0 (Asset replaces Dataset)
 
 ## When to Use
 
 - Waiting for upstream DAGs or external systems
 - File/partition arrival detection before processing
 - Cross-DAG orchestration without tight coupling
-- Dataset-driven scheduling (Airflow 2.4+)
+- Asset-aware scheduling (Airflow 3.0+; Dataset in 2.4-2.x)
 
 ## Implementation
 
@@ -106,12 +106,14 @@ file_watcher()
 
 ## Configuration
 
-| Sensor Pattern | Worker Usage | Best For |
-|---------------|-------------|----------|
-| `mode="poke"` | Holds worker slot | Short waits (<5 min) |
-| `mode="reschedule"` | Releases between pokes | Medium waits (5-60 min) |
-| `deferrable=True` | Async trigger (no worker) | Long waits (1h+) |
-| `Dataset` schedule | Event-driven (no sensor) | Cross-DAG dependencies |
+| Sensor Pattern | Worker Usage | Best For | Version |
+|---------------|-------------|----------|---------|
+| `mode="poke"` | Holds worker slot | Short waits (<5 min) | All |
+| `mode="reschedule"` | Releases between pokes | Medium waits (5-60 min) | All |
+| `deferrable=True` | Async trigger (no worker) | Long waits (1h+) | 2.2+ |
+| `Asset()` schedule | Event-driven (no sensor) | Cross-DAG dependencies | **3.0+** |
+| `Asset() & Asset()` | AND logic on assets | Multiple upstream deps | **3.0+** |
+| `Asset() \| Asset()` | OR logic on assets | Any-of triggering | **3.0+** |
 
 ## See Also
 

@@ -1,8 +1,8 @@
 # pytest Basics
 
-> **Purpose**: Core pytest conventions, test discovery, markers, and CLI usage
+> **Purpose**: Core pytest 8+ conventions, test discovery, markers, async, and CLI usage
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
@@ -118,6 +118,76 @@ def test_value():
     assert 1 + 1 == 2
 ```
 
+## Async Testing (pytest-asyncio)
+
+```python
+import pytest
+import httpx
+
+
+# Mark individual test as async
+@pytest.mark.asyncio
+async def test_fetch_data():
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://api.example.com/data")
+    assert response.status_code == 200
+
+
+# Async fixture with teardown
+@pytest.fixture
+async def async_db():
+    conn = await create_connection("test://localhost/db")
+    yield conn
+    await conn.close()
+
+
+@pytest.mark.asyncio
+async def test_query(async_db):
+    result = await async_db.fetch("SELECT 1")
+    assert result == [(1,)]
+```
+
+### pyproject.toml for auto mode
+
+```toml
+[tool.pytest.ini_options]
+asyncio_mode = "auto"  # all async tests auto-detected, no marker needed
+```
+
+## Property-Based Testing (Hypothesis)
+
+```python
+from hypothesis import given, strategies as st, assume
+
+
+@given(st.lists(st.integers()))
+def test_sort_is_idempotent(xs):
+    """Sorting twice gives the same result as sorting once."""
+    assert sorted(sorted(xs)) == sorted(xs)
+
+
+@given(st.text(min_size=1), st.text(min_size=1))
+def test_concat_length(a, b):
+    """Concatenation length equals sum of parts."""
+    assert len(a + b) == len(a) + len(b)
+
+
+@given(st.integers(min_value=1, max_value=1000))
+def test_positive_division(n):
+    """Division by self always yields 1."""
+    assume(n != 0)
+    assert n / n == 1.0
+```
+
+## pytest 8+ New Features
+
+| Feature | Description |
+|---------|-------------|
+| `pytest.HIDDEN_PARAM` (8.4+) | Hide parameter from test name in parametrize |
+| Improved `--tb` output | Better traceback formatting and diffs |
+| `--override-ini` | Override pyproject.toml settings from CLI |
+| Native `pathlib` support | Fixtures return `Path` objects by default |
+
 ## CLI Quick Reference
 
 | Flag | Purpose |
@@ -130,6 +200,8 @@ def test_value():
 | `-k "expr"` | Filter tests by name expression |
 | `-m "marker"` | Run only tests with marker |
 | `--co` | Collect and list tests, do not run |
+| `--sw` | Stepwise: stop on failure, resume next run |
+| `-n auto` | Parallel execution (pytest-xdist) |
 
 ## Related
 

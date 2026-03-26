@@ -1,7 +1,7 @@
 # Data Quality Gates
 
 > **Purpose**: Automated quality checks and quarantine patterns between Medallion layers
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -155,6 +155,46 @@ CREATE TABLE IF NOT EXISTS quality.audit_log (
     gate_passed BOOLEAN,
     checked_at TIMESTAMP
 ) USING DELTA;
+```
+
+## Shift-Left Quality: Bronze Validation (2025+ Best Practice)
+
+Modern medallion implementations validate data earlier than traditional "quality only at Silver" approaches:
+
+```python
+# Bronze-level structural validation (not transformation)
+bronze_structural_rules = [
+    QualityRule("has_primary_key", "order_id", "not_null", threshold=1.0),
+    QualityRule("parseable_json", "raw_payload", "not_empty", threshold=0.999),
+]
+
+# Silver-level business validation
+silver_business_rules = [
+    QualityRule("amount_positive", "amount", "positive", threshold=0.99),
+    QualityRule("valid_email", "email", "regex", threshold=0.95,
+                params={"pattern": r"^[^@]+@[^@]+\.[^@]+$"}),
+]
+
+# Gold-level aggregate validation
+gold_aggregate_rules = [
+    QualityRule("revenue_not_zero", "total_revenue", "positive", threshold=1.0),
+    QualityRule("customer_count_range", "unique_customers", "range", threshold=1.0,
+                params={"min": 1, "max": 10_000_000}),
+]
+```
+
+## Quality Gate with Unity Catalog Data Quality Monitoring
+
+```sql
+-- Unity Catalog (Databricks): built-in data quality monitoring
+ALTER TABLE silver_sales.cleansed_orders
+SET TBLPROPERTIES ('quality.monitor.enabled' = 'true');
+
+-- Define expectations (Databricks-native)
+CREATE OR REPLACE EXPECTATION silver_orders_quality
+ON TABLE silver_sales.cleansed_orders
+EXPECT (order_id IS NOT NULL AND amount > 0)
+WITH (violation_action = 'WARN');  -- or 'DROP', 'FAIL'
 ```
 
 ## See Also

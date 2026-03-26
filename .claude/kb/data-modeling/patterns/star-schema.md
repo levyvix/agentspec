@@ -114,6 +114,42 @@ CREATE TABLE fact_orders (
 );
 ```
 
+## Star Schema in the Modern Stack (2025+)
+
+Star schemas remain the gold standard for enterprise analytics, but modern tooling changes how they are built and consumed:
+
+| Modern Tool | How It Enhances Star Schema |
+|------------|---------------------------|
+| **Semantic layer** (dbt Metrics, Cube, AtScale) | Abstracts join complexity; analysts query metrics, not tables |
+| **Liquid clustering** (Delta 4.x) | Replaces Z-ORDER/manual partitioning on fact tables |
+| **Identity columns** (Delta 4.0+) | Native auto-increment for surrogate keys |
+| **Hidden partitioning** (Iceberg) | Partition facts by date without exposing layout |
+| **Materialized views** (Databricks, Snowflake) | Auto-refresh pre-joined OBT marts from star schema |
+| **Data contracts** | Enforce dim/fact schemas at write time |
+
+```sql
+-- Modern star schema with Delta 4.x features
+CREATE TABLE gold.dim_customer (
+    customer_sk BIGINT GENERATED ALWAYS AS IDENTITY,  -- identity column (4.0+)
+    customer_id STRING NOT NULL,
+    customer_name STRING NOT NULL,
+    segment STRING NOT NULL,
+    region STRING NOT NULL,
+    is_current BOOLEAN NOT NULL DEFAULT TRUE
+) USING delta;
+
+CREATE TABLE gold.fact_orders (
+    order_item_sk BIGINT GENERATED ALWAYS AS IDENTITY,
+    order_id STRING NOT NULL,
+    customer_sk BIGINT NOT NULL,
+    product_sk BIGINT NOT NULL,
+    date_sk INT NOT NULL,
+    quantity INT NOT NULL,
+    net_amount DECIMAL(12,2) NOT NULL
+) USING delta
+CLUSTER BY (date_sk, customer_sk);  -- liquid clustering
+```
+
 ## Related
 
 - [dimensional-modeling](../concepts/dimensional-modeling.md)

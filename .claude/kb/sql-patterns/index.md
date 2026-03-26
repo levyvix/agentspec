@@ -1,7 +1,7 @@
 # SQL Patterns Knowledge Base
 
 > **Purpose**: Cross-dialect SQL — window functions, CTEs, deduplication, DuckDB/Snowflake/BigQuery/Spark
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with DuckDB 1.3+, ASOF JOIN, time_bucket, PIVOT/UNPIVOT enhancements
 
 ## Quick Navigation
 
@@ -27,6 +27,17 @@
 ## Quick Reference
 
 - [quick-reference.md](quick-reference.md) - Fast lookup tables
+
+## Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Window Functions** | ROW_NUMBER, RANK, LAG/LEAD, QUALIFY for filtering window results |
+| **CTEs** | Chained, recursive, and materialized Common Table Expressions |
+| **ASOF JOIN** | Temporal lookup — "most recent value as of this time" (DuckDB, Snowflake) |
+| **time_bucket()** | Time-series bucketing for aggregation (DuckDB, TimescaleDB) |
+| **PIVOT/UNPIVOT** | Row-to-column and column-to-row transformations across dialects |
+| **Cross-Dialect** | Portable SQL patterns: DuckDB, Snowflake, BigQuery, Spark SQL |
 
 ## Agent Usage
 

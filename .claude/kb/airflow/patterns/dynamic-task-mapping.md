@@ -1,7 +1,7 @@
 # Dynamic Task Mapping
 
 > **Purpose**: Runtime task generation with expand(), partial(), TaskGroups; fan-out/fan-in patterns for variable workloads
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Compatible with Airflow 2.3+ and 3.0+
 
 ## When to Use
 

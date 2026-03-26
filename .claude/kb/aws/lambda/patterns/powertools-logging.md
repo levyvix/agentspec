@@ -156,6 +156,47 @@ logger = Logger(sampling_rate=0.1)
 logger.setLevel("DEBUG")  # Override for this invocation only
 ```
 
+## Powertools v2.43+ New Features
+
+Powertools for AWS Lambda Python v2.43+ (supporting Python 3.14) includes:
+
+| Feature | Description |
+|---------|-------------|
+| **BatchProcessor** | Process SQS, Kinesis, DynamoDB Streams with partial failure handling |
+| **Event Handler** | APIGatewayRestResolver, APIGatewayHttpResolver, ALBResolver |
+| **Idempotency** | DynamoDB-backed idempotency for exactly-once processing |
+| **Feature Flags** | AppConfig-backed feature toggles |
+| **Parameters** | SSM, Secrets Manager, AppConfig, DynamoDB parameter fetching |
+| **Streaming** | S3 object streaming for large file processing |
+
+```python
+# BatchProcessor for SQS with Powertools v2.43+
+from aws_lambda_powertools import Logger, Tracer
+from aws_lambda_powertools.utilities.batch import (
+    BatchProcessor, EventType, process_partial_response
+)
+from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
+from aws_lambda_powertools.utilities.typing import LambdaContext
+
+processor = BatchProcessor(event_type=EventType.SQS)
+logger = Logger()
+tracer = Tracer()
+
+@tracer.capture_method
+def record_handler(record: SQSRecord):
+    payload = record.json_body
+    logger.info("Processing record", extra={"payload": payload})
+    # ... business logic
+
+@logger.inject_lambda_context
+@tracer.capture_lambda_handler
+def lambda_handler(event: dict, context: LambdaContext):
+    return process_partial_response(
+        event=event, record_handler=record_handler,
+        processor=processor, context=context
+    )
+```
+
 ## See Also
 
 - [Lambda Handler](../concepts/lambda-handler.md)

@@ -2,7 +2,7 @@
 
 > **Purpose**: Domain-driven design applied to lakehouse organization for data mesh and bounded contexts
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 

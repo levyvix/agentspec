@@ -2,6 +2,7 @@
 
 > **Purpose**: Data quality, contracts, and observability — Soda, GE, dbt tests, ODCS, Monte Carlo
 > **MCP Validated**: 2026-03-26
+> **Latest**: Soda 4.0 (Jan 2026) with Data Contracts as default, GX Core 1.3+ with ExpectAI and Atlan integration, ODCS v3.1.0 with relationships and stricter validation
 
 ## Quick Navigation
 
@@ -12,7 +13,7 @@
 | [concepts/data-contracts.md](concepts/data-contracts.md) | ODCS, Soda, dbt contracts, ownership |
 | [concepts/quality-dimensions.md](concepts/quality-dimensions.md) | Completeness, accuracy, consistency, timeliness, uniqueness, validity |
 | [concepts/observability.md](concepts/observability.md) | Freshness, volume, distribution drift |
-| [concepts/soda-core.md](concepts/soda-core.md) | SodaCL syntax, anomaly detection, backtesting |
+| [concepts/soda-core.md](concepts/soda-core.md) | Soda 4.0 Data Contracts, SodaCL syntax, anomaly detection |
 
 ### Patterns (< 200 lines each)
 

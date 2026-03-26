@@ -1,12 +1,12 @@
 # Embedding Pipelines
 
-> **Purpose**: Model selection, batch vs streaming embedding, Matryoshka embeddings, versioning and drift
+> **Purpose**: Model selection, batch vs streaming embedding, Matryoshka, multimodal, versioning and drift
 > **Confidence**: 0.90
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Embedding pipelines convert unstructured data (text, images, code) into dense vector representations for downstream retrieval and ML tasks. Key decisions include model selection (OpenAI vs Cohere vs open-source), execution mode (batch for bulk ingestion vs streaming for real-time), dimensionality (Matryoshka embeddings allow variable dimensions from a single model), and lifecycle management (versioning, drift detection, re-embedding strategies).
+Embedding pipelines convert unstructured data (text, images, code) into dense vector representations for downstream retrieval and ML tasks. In March 2026, the landscape has shifted: Google's Gemini Embedding models top the MTEB leaderboard, Cohere embed-v4 and Voyage 3 compete for second, and multimodal embeddings (text + image + PDF in one model) are emerging via Gemini Embedding 2 Preview. Key decisions include model selection, execution mode (batch vs streaming), dimensionality (Matryoshka for variable dimensions), and lifecycle management (versioning, drift detection).
 
 ## The Concept
 
@@ -18,7 +18,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 client = OpenAI()
 EMBEDDING_MODEL = "text-embedding-3-large"
-EMBEDDING_VERSION = "v3-large-2024"
+EMBEDDING_VERSION = "v3-large-2026"
 DIMENSIONS = 1024  # Matryoshka: 256, 512, 1024, or 3072
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
@@ -59,20 +59,21 @@ Matryoshka Embeddings (Variable Dimensions)
   [||||||||]                          512d -- 92% quality, 2KB/vector
   [||||]                              256d -- 88% quality, 1KB/vector
 
+  Supported by: OpenAI text-embedding-3-*, Nomic embed-text-v1.5, Gemini Embedding
   Same model, truncate output to desired dimension.
-  Trade storage/speed for marginal quality loss.
 ```
 
-## Quick Reference
+## Quick Reference (March 2026 MTEB Rankings)
 
-| Model | Provider | Dimensions | Context | Matryoshka | Cost (per 1M tokens) |
-|-------|----------|-----------|---------|------------|---------------------|
-| text-embedding-3-large | OpenAI | 3072 (truncatable) | 8191 | Yes | $0.13 |
-| text-embedding-3-small | OpenAI | 1536 (truncatable) | 8191 | Yes | $0.02 |
-| embed-v3 | Cohere | 1024 | 512 | No | $0.10 |
-| BGE-large-en-v1.5 | BAAI (OSS) | 1024 | 512 | No | Free (self-host) |
-| Nomic embed-text-v1.5 | Nomic (OSS) | 768 | 8192 | Yes | Free (self-host) |
-| GTE-large-en-v1.5 | Alibaba (OSS) | 1024 | 8192 | No | Free (self-host) |
+| Model | Provider | Dims | Context | Matryoshka | MTEB | Cost/1M tokens |
+|-------|----------|------|---------|------------|------|---------------|
+| Gemini Embedding 001 | Google | 3072 | 8K | Yes | 68.3 | ~$0.004/1K chars |
+| Voyage 3 Large | Voyage AI | 1024 | 32K | No | 67.2 | $0.18 |
+| Cohere embed-v4 | Cohere | 1024 | 512 | No | 65.2 | $0.10 |
+| text-embedding-3-large | OpenAI | 3072 | 8191 | Yes | 64.6 | $0.13 |
+| BGE-M3 | BAAI (OSS) | 1024 | 8192 | No | 63.0 | Free |
+| text-embedding-3-small | OpenAI | 1536 | 8191 | Yes | 62.3 | $0.02 |
+| Nomic embed-text-v1.5 | Nomic (OSS) | 768 | 8192 | Yes | 60.1 | Free |
 
 | Mode | Latency | Throughput | Use Case |
 |------|---------|-----------|----------|
@@ -81,22 +82,33 @@ Matryoshka Embeddings (Variable Dimensions)
 | Streaming | Real-time | 1 doc/request | New document ingestion, chat |
 | Cached | < 1ms | N/A | Repeated queries, hot content |
 
+## Multimodal Embeddings (2026)
+
+```python
+# Gemini Embedding 2 Preview -- 5 modalities in one model
+# Text, image, video, audio, PDF natively
+# Available March 2026, supports MRL (Matryoshka)
+
+import google.generativeai as genai
+
+result = genai.embed_content(
+    model="models/gemini-embedding-exp-03",
+    content=["Text to embed", image_bytes, pdf_bytes],
+    output_dimensionality=1024,  # Matryoshka truncation
+)
+```
+
 ## Common Mistakes
 
 ### Wrong
-
 ```python
 # Embedding with no version tracking -- impossible to detect drift
 vectors = embed(texts)
 db.upsert(ids=ids, embeddings=vectors)
 # 6 months later: which model version created these vectors?
-
-# Mixing embedding models in the same collection
-# OpenAI (1536d) and Cohere (1024d) vectors are incompatible!
 ```
 
 ### Correct
-
 ```python
 # Track embedding model + version + dimensions per vector
 db.upsert(
@@ -104,7 +116,7 @@ db.upsert(
     embeddings=vectors,
     metadatas=[{
         "embedding_model": "text-embedding-3-large",
-        "embedding_version": "v3-large-2024",
+        "embedding_version": "v3-large-2026",
         "dimensions": 1024,
         "embedded_at": "2026-03-26T00:00:00Z",
     } for _ in ids]

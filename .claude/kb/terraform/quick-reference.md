@@ -2,6 +2,7 @@
 
 > Fast lookup tables. For code examples, see linked files.
 > **MCP Validated:** 2026-02-17
+> **Last Updated:** 2026-03-26
 
 ## Essential Commands
 
@@ -15,6 +16,7 @@
 | `terraform validate` | Syntax validation | Does not check provider APIs |
 | `terraform import` | Import existing resources | `terraform import RESOURCE ID` |
 | `terraform state list` | List state resources | Useful for debugging |
+| `terraform test` | Run integration tests | TF 1.11+ with improved assertions |
 
 ## GCP Resource Types
 
@@ -40,6 +42,15 @@
 | `map(string)` | `{key = "val"}` | Key-value pairs |
 | `object({...})` | Complex structs | Module inputs |
 
+## Ephemeral Resources and Write-Only Arguments (1.10+/1.11+)
+
+| Feature | Version | Purpose |
+|---------|---------|---------|
+| `ephemeral` block | 1.10+ | Temporary resources not stored in state/plan |
+| Ephemeral variables | 1.10+ | `ephemeral = true` on input variables |
+| Write-only arguments | 1.11+ | `_wo` suffix args on managed resources |
+| `for_each` on ephemeral | 1.10+ | Multiple ephemeral resources from collections |
+
 ## Decision Matrix
 
 | Use Case | Choose |
@@ -49,6 +60,9 @@
 | Reusable infra | Modules with variables |
 | Team collaboration | Remote state with locking |
 | Secret management | `google_secret_manager_secret` |
+| Secrets out of state | Ephemeral resources (1.10+) + write-only args (1.11+) |
+| Multi-env deployment | HCP Terraform Stacks |
+| Open-source IaC | OpenTofu (MPL 2.0, drop-in replacement) |
 
 ## Common Pitfalls
 
@@ -59,6 +73,8 @@
 | Skip `terraform plan` | Always plan before apply |
 | Use `count` for complex logic | Use `for_each` with maps |
 | Commit `.terraform/` | Add to `.gitignore` |
+| Store secrets in state with `sensitive` | Use ephemeral resources + write-only args (1.11+) |
+| Use BSL Terraform if licensing concerns | Evaluate OpenTofu (MPL 2.0, drop-in compatible) |
 
 ## Related Documentation
 

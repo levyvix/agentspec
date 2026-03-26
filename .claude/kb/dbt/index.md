@@ -1,7 +1,7 @@
 # dbt Knowledge Base
 
 > **Purpose**: dbt development patterns — Fusion Engine, Mesh, Semantic Layer, models, macros, tests
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with dbt Core v1.9/v1.10, Fusion Engine GA status, microbatch strategy
 
 ## Quick Navigation
 
@@ -38,10 +38,12 @@
 | Concept | Description |
 |---------|-------------|
 | **Model Types** | stg_, int_, fct_, dim_ naming with ref()/source() chains |
-| **Incremental** | Avoid full refresh on large tables — merge, append, or delete+insert |
-| **Fusion Engine** | Rust-based dbt compiler — sub-second parse for 10K+ models |
-| **Mesh** | Multi-project architecture with cross-project refs and contracts |
-| **Semantic Layer** | Centralized metrics via MetricFlow, consumed by BI tools |
+| **Incremental** | Avoid full refresh on large tables — merge, append, delete+insert, or **microbatch** (v1.9+) |
+| **Fusion Engine** | Rust-based dbt compiler — sub-second parse for 10K+ models, multi-dialect SQL, ADBC drivers |
+| **Mesh** | Multi-project architecture with cross-project refs, contracts, and access modifiers |
+| **Semantic Layer** | Centralized metrics via MetricFlow, consumed by BI tools and AI agents |
+| **Unit Testing** | Validate SQL logic on static inputs before materialization (v1.8+) |
+| **Sample Mode** | `--sample` flag for time-based data sampling during dev builds (v1.10+) |
 
 ---
 

@@ -5,7 +5,18 @@
 
 ## Overview
 
-SQLMesh is a data transformation framework that improves on dbt with virtual environments (no data duplication for dev/staging), automatic change classification, built-in scheduling, and column-level lineage. It can also run dbt projects via its compatibility layer.
+SQLMesh is a data transformation framework that improves on dbt with virtual environments (no data duplication for dev/staging), automatic change classification, built-in scheduling, and column-level lineage. It can also run dbt projects via its compatibility layer, now including a dedicated `dbt` CLI wrapper.
+
+**Key 2025 developments (v0.210 - v0.231):**
+- **Microsoft Fabric Warehouse support** (Aug 2025) -- proper MERGE statements and alter table workarounds for Fabric
+- **dbt CLI compatibility** -- `--project-dir`, `--profiles-dir`, `--log-level`, `--profile`, `--target` flags
+- **Built-in linter rules** -- `NoMissingUnitTest` and others for code quality enforcement
+- **VSCode multi-project support** -- work with multiple SQLMesh projects simultaneously
+- **Table Diff view in VSCode** -- visual comparison of data changes
+- **Dev-only VDE mode** -- virtual dev environments optimized for development workflows
+- **`on_additive_change` support** -- handle additive model changes without full backfill
+- **`ignore_destructive` support** -- safety guardrails for destructive schema changes
+- **BigQuery materialized views** -- column types and comments support for Databricks MV
 
 ## Key Concepts
 
@@ -66,18 +77,22 @@ sqlmesh run
 sqlmesh plan --enable-airflow
 ```
 
-## SQLMesh vs dbt Comparison
+## SQLMesh vs dbt Comparison (2025)
 
 | Feature | SQLMesh | dbt Core |
 |---------|---------|----------|
 | Environments | Virtual (no data copy) | Full schema clone |
-| Change detection | Automatic (breaking/non-breaking) | Manual (full refresh or incremental) |
-| Backfill | Automatic, minimal | Manual via --full-refresh |
-| Lineage | Column-level | Model-level |
+| Change detection | Automatic (breaking/non-breaking) via SQLGlot | Manual (full refresh or incremental) |
+| Backfill | Automatic, minimal (affected models only) | Manual via --full-refresh |
+| Lineage | Column-level (native) | Model-level (Fusion for column-level) |
 | Scheduler | Built-in | Requires Airflow/Dagster |
-| Testing | Built-in audits + tests | schema.yml tests |
-| dbt compatibility | Yes (sqlmesh init -t dbt) | Native |
-| IDE | Built-in web UI | dbt Cloud or third-party |
+| Testing | Built-in audits + tests + linter rules | schema.yml tests + sqlfluff |
+| SQL validation | Compile-time (SQLGlot parse) | Run-time (Jinja template) |
+| dbt compatibility | Yes (CLI wrapper + adapter) | Native |
+| IDE | VSCode extension (OSS) + web UI | dbt Cloud IDE or dbt Power User |
+| Execution speed | ~9x faster (benchmarked) | Baseline (Fusion: 30x parse speed) |
+| State management | Built-in, stateful | Stateless (relies on manifest) |
+| Fabric Warehouse | Yes (Aug 2025) | Yes |
 
 ## When to Use
 
@@ -88,10 +103,14 @@ sqlmesh plan --enable-airflow
 
 | Pros | Cons |
 |------|------|
-| Virtual environments save storage/compute | Smaller community than dbt |
+| Virtual environments save storage/compute | Smaller community than dbt (3K GitHub stars vs 10K+) |
 | Automatic change detection reduces errors | Fewer third-party packages |
 | Column-level lineage for impact analysis | Learning curve for dbt users |
 | Built-in scheduler simplifies stack | Less mature cloud offering |
+| ~9x faster execution than dbt Core | Rapid release cadence may require frequent updates |
+| Compile-time SQL validation catches errors earlier | SQLGlot parser may not support all SQL dialects perfectly |
+| OSS VSCode extension with multi-project support | Ecosystem packages (dbt_utils equivalent) still limited |
+| Built-in linter rules (NoMissingUnitTest) | State DB adds operational overhead |
 
 ## See Also
 

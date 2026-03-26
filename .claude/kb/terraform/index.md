@@ -2,6 +2,7 @@
 
 > **Purpose**: Infrastructure as Code for GCP serverless architecture with module patterns
 > **MCP Validated**: 2026-02-17
+> **Last Updated**: 2026-03-26 (Terraform 1.14, ephemeral resources, write-only args, Stacks, OpenTofu)
 
 ## Quick Navigation
 
@@ -63,6 +64,26 @@
 | **Advanced** | concepts/workspaces.md, patterns/iam-module.md, specs/terraform-config.yaml |
 
 ---
+
+## Terraform Version History (2024-2026)
+
+| Version | Release | Key Features |
+|---------|---------|-------------|
+| **1.14** | Dec 2025 | Stacks improvements, bug fixes |
+| **1.11** | Mar 2025 | Write-only arguments for secrets in managed resources |
+| **1.10** | Nov 2024 | Ephemeral resources and values (secrets out of state) |
+| **1.9** | Mid 2024 | Variable validation with references, improved moved blocks |
+
+## Terraform vs OpenTofu (2026)
+
+| Aspect | Terraform | OpenTofu |
+|--------|-----------|----------|
+| License | BSL 1.1 (IBM/HashiCorp) | MPL 2.0 (Linux Foundation) |
+| Latest | 1.14.7 | 1.11.5 |
+| State encryption | No native | Built-in |
+| Provider-defined functions | Yes (1.10+) | Yes (1.8+, first) |
+| Migration | N/A | Drop-in, 0 code changes from TF 1.5.x |
+| Ecosystem | 4800+ providers, HCP Terraform | Growing, community-governed |
 
 ## Agent Usage
 

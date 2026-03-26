@@ -1,12 +1,12 @@
 # DuckLake
 
-> **Purpose**: DuckDB-based lakehouse with SQL catalog — sub-TB, single-node, local-first use cases
-> **Confidence**: 0.85
+> **Purpose**: DuckDB-based lakehouse with SQL catalog — sub-TB, single-node, local-first, Iceberg interop
+> **Confidence**: 0.90
 > **MCP Validated**: 2026-03-26
 
 ## Overview
 
-DuckLake is a lightweight lakehouse format where DuckDB acts as both the catalog and query engine. It stores metadata in a DuckDB database and data in Parquet on object storage. Best for sub-TB datasets, development environments, and local-first analytics where Iceberg/Delta's distributed complexity is overkill.
+DuckLake is an open lakehouse format (launched May 2025) where a standard SQL database stores all metadata instead of complex file hierarchies, while data lives in open formats like Parquet on object storage. DuckLake 0.3 (Sep 2025) added Iceberg interoperability (shallow copy between DuckLake and Iceberg), geometry/spatial type support, and improved robustness. The format provides true multi-table ACID transactions, built-in encryption, data inlining for small values, and dramatically simpler operations compared to Iceberg/Delta for sub-TB workloads.
 
 ## The Concept
 
@@ -44,16 +44,45 @@ SELECT * FROM lakehouse.analytics.events AT (TIMESTAMP '2026-03-25');
 
 ## Quick Reference
 
-| Feature | DuckLake | Iceberg | Delta |
+| Feature | DuckLake 0.3 | Iceberg v3 | Delta 4.1 |
 |---------|---------|---------|-------|
 | Best scale | < 500 GB | TB-PB | TB-PB |
-| Catalog | DuckDB file | REST/HMS/Glue | Unity/_delta_log |
-| Engine | DuckDB only | Multi-engine | Spark-native, some multi |
-| Transactions | ACID | ACID | ACID |
-| Time travel | Yes | Yes | Yes |
-| Partition evolution | N/A (columnar scan) | Yes | No (liquid clustering instead) |
+| Catalog | SQL database (DuckDB/Postgres/MySQL) | REST/HMS/Glue | Unity/_delta_log |
+| Engine | DuckDB (+ Iceberg bridge) | Multi-engine | Spark-native, some multi |
+| Transactions | ACID (multi-table) | ACID (per-table) | ACID (per-table) |
+| Time travel | Yes (snapshot-based) | Yes | Yes |
+| Partition evolution | N/A (columnar scan) | Yes | No (liquid clustering) |
+| Encryption | Built-in (zero-trust) | External (cloud KMS) | External (cloud KMS) |
+| Data inlining | Yes (small values stored in metadata) | No | No |
+| Iceberg interop | Shallow copy (v0.3) | Native | Via UniForm |
+| Geometry/spatial | Yes (v0.3) | Yes (v3) | No |
 | Cost | Zero (open source) | Zero + infra | Zero + infra |
-| Use case | Dev, CI/CD, local analytics | Production lakehouse | Production lakehouse |
+| Use case | Dev, CI/CD, local analytics, edge | Production lakehouse | Production lakehouse |
+
+### DuckLake Version History
+
+| Version | Date | Key Features |
+|---------|------|-------------|
+| 0.1 | May 2025 | Initial release, SQL-based metadata, Parquet data |
+| 0.2 | Jul 2025 | Relative schema/table paths, structured file layout |
+| 0.3 | Sep 2025 | Iceberg interoperability, geometry support, conflict resolution |
+
+## DuckLake 0.3: Iceberg Interop
+
+```sql
+-- Shallow copy from Iceberg to DuckLake (no data rewrite)
+INSTALL iceberg;
+LOAD iceberg;
+
+-- Copy Iceberg table into DuckLake (metadata-only, references same Parquet files)
+COPY FROM DATABASE iceberg_catalog TO ducklake_catalog;
+
+-- Shallow copy from DuckLake to Iceberg
+COPY FROM DATABASE ducklake_catalog TO iceberg_catalog;
+
+-- DuckLake with Postgres as metadata backend (multi-user)
+ATTACH 'ducklake:postgres:dbname=catalog_db' AS lakehouse;
+```
 
 ## Common Mistakes
 
@@ -72,6 +101,8 @@ Use DuckLake for:
 - Local-first analytics (< 500 GB)
 - MotherDuck for cloud sharing of small-medium datasets
 - Prototyping before Iceberg/Delta migration
+- Edge computing with built-in encryption
+- Iceberg bridge: develop in DuckLake, promote to Iceberg for production
 ```
 
 ## Related

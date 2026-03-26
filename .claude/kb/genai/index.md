@@ -1,7 +1,7 @@
 # GenAI Architecture Knowledge Base
 
-> **Purpose**: Architecture patterns for GenAI systems -- multi-agent orchestration, agentic workflows, RAG, chatbots, LLM pipelines
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Architecture patterns for GenAI systems -- multi-agent orchestration, agentic workflows, RAG, chatbots, LLM pipelines, MCP, Agent SDKs
+> **MCP Validated**: 2026-03-26
 
 ## Quick Navigation
 
@@ -9,20 +9,20 @@
 
 | File | Purpose |
 |------|---------|
-| [concepts/multi-agent-systems.md](concepts/multi-agent-systems.md) | Agent orchestration patterns: hub-spoke, mesh, sequential, concurrent |
-| [concepts/rag-architecture.md](concepts/rag-architecture.md) | RAG pipeline design: chunking, embedding, retrieval, generation |
-| [concepts/state-machines.md](concepts/state-machines.md) | Finite state machines for conversational flow control |
-| [concepts/tool-calling.md](concepts/tool-calling.md) | LLM function/tool calling protocols and execution |
-| [concepts/guardrails.md](concepts/guardrails.md) | Safety guardrails: input/output filtering, topic control |
+| [concepts/multi-agent-systems.md](concepts/multi-agent-systems.md) | Agent orchestration: LangGraph, CrewAI, Claude Agent SDK, OpenAI Agents SDK |
+| [concepts/rag-architecture.md](concepts/rag-architecture.md) | RAG variants: naive, agentic, GraphRAG, corrective, modular |
+| [concepts/state-machines.md](concepts/state-machines.md) | Finite state machines with LangGraph graph-based orchestration |
+| [concepts/tool-calling.md](concepts/tool-calling.md) | Tool calling protocols, MCP (Model Context Protocol), Agent SDKs |
+| [concepts/guardrails.md](concepts/guardrails.md) | Defense-in-depth: NeMo, Llama Guard 4, prompt injection defense |
 
 ### Patterns (< 200 lines each)
 
 | File | Purpose |
 |------|---------|
-| [patterns/agentic-workflow.md](patterns/agentic-workflow.md) | Multi-step agent workflow with plan-and-execute |
-| [patterns/chatbot-architecture.md](patterns/chatbot-architecture.md) | Production chatbot with state management and routing |
-| [patterns/rag-pipeline.md](patterns/rag-pipeline.md) | End-to-end RAG with hybrid search and reranking |
-| [patterns/evaluation-framework.md](patterns/evaluation-framework.md) | LLM evaluation with LLM-as-judge and RAGAS metrics |
+| [patterns/agentic-workflow.md](patterns/agentic-workflow.md) | Multi-step agent workflow with plan-and-execute and model tiering |
+| [patterns/chatbot-architecture.md](patterns/chatbot-architecture.md) | Production chatbot with state management, routing, and MCP tools |
+| [patterns/rag-pipeline.md](patterns/rag-pipeline.md) | End-to-end RAG with hybrid search, reranking, and context engineering |
+| [patterns/evaluation-framework.md](patterns/evaluation-framework.md) | LLM evaluation with LLM-as-judge, RAGAS, DeepEval, Braintrust |
 
 ### Specs (Machine-Readable)
 
@@ -42,11 +42,11 @@
 
 | Concept | Description |
 |---------|-------------|
-| **Multi-Agent Systems** | Orchestration of specialized LLM agents with handoff protocols |
-| **RAG Architecture** | Retrieval-augmented generation for grounded responses |
-| **State Machines** | Deterministic conversation flow with LLM-powered transitions |
-| **Tool Calling** | Structured function invocation from LLM reasoning |
-| **Guardrails** | Safety layers for input validation and output filtering |
+| **Multi-Agent Systems** | Orchestration via LangGraph, CrewAI, Claude Agent SDK, OpenAI Agents SDK |
+| **RAG Architecture** | Agentic RAG, GraphRAG, hybrid search, context engineering |
+| **State Machines** | Graph-based orchestration with LangGraph StateGraph and Functional API |
+| **Tool Calling** | MCP protocol, structured function invocation, Agent SDKs |
+| **Guardrails** | Defense-in-depth with Llama Guard 4, NeMo, OWASP LLM Top 10 compliance |
 
 ---
 

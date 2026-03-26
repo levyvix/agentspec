@@ -1,7 +1,7 @@
 # Schema Evolution
 
-> **Purpose**: Handling schema changes across Medallion layers with Delta Lake evolution features
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Handling schema changes across Medallion layers with Delta Lake / Iceberg evolution features
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -102,9 +102,26 @@ silver_schema_migration("silver_sales.cleansed_orders", migrations)
 |-----------|--------|--------|------|
 | Auto-add columns | `mergeSchema=true` | Explicit migration | Schema follows Silver |
 | Rename columns | Not needed | `ALTER COLUMN RENAME` | Rebuild from Silver |
-| Drop columns | Never | With `columnMapping=name` | Rebuild from Silver |
-| Type widening | Not needed | `ALTER COLUMN TYPE` | Rebuild from Silver |
+| Drop columns | Never | With `columnMapping=name` (Delta) or native (Iceberg) | Rebuild from Silver |
+| Type widening | Not needed | `ALTER COLUMN TYPE` or type widening (Delta 4.0+) | Rebuild from Silver |
 | Full schema replace | Never | Rare, explicit | `overwriteSchema=true` |
+| Variant type (semi-structured) | Store as Variant (Delta 4.0+ / Iceberg v3) | Extract typed columns from Variant | N/A (use typed columns) |
+
+### Iceberg Schema Evolution at Each Layer
+
+```sql
+-- Bronze (Iceberg): auto-evolve schema on write
+-- Iceberg handles schema evolution natively via metadata
+ALTER TABLE catalog.bronze.raw_events ADD COLUMN new_field STRING;
+
+-- Silver (Iceberg): explicit evolution with full support
+ALTER TABLE catalog.silver.orders RENAME COLUMN amt TO amount;
+ALTER TABLE catalog.silver.orders ALTER COLUMN quantity TYPE BIGINT;
+ALTER TABLE catalog.silver.orders DROP COLUMN deprecated_flag;
+
+-- Gold (Iceberg): rebuild from Silver
+CREATE OR REPLACE TABLE catalog.gold.agg_revenue AS SELECT ...;
+```
 
 ## SQL Schema Migration Pattern
 

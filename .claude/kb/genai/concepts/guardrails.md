@@ -1,12 +1,12 @@
 # Guardrails
 
-> **Purpose**: Safety guardrails for LLM applications -- input/output filtering, topic control, content safety
+> **Purpose**: Defense-in-depth safety layers for LLM applications -- prompt injection defense, content safety, OWASP LLM Top 10
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Guardrails are programmable safety layers that intercept inputs and outputs of LLM systems to enforce policies. They prevent jailbreaks, block harmful content, restrict off-topic conversations, and validate output structure. In production, guardrails operate at multiple pipeline stages: pre-LLM (input rails), mid-pipeline (retrieval rails), and post-LLM (output rails).
+Guardrails are programmable safety layers that intercept inputs and outputs of LLM systems to enforce policies. In 2026, guardrails are no longer optional -- OWASP LLM Top 10 lists prompt injection, sensitive information disclosure, and excessive agency as top threats. Production systems require defense-in-depth: multiple layers of input validation, output filtering, tool-use restrictions, and continuous monitoring. Prompt injection appears in 73% of production AI deployments assessed during security audits, yet only 35% of organizations have dedicated defenses.
 
 ## The Pattern
 
@@ -34,24 +34,28 @@ class GuardRail(ABC):
     def check(self, content: str, context: dict) -> RailResult:
         pass
 
-class TopicRail(GuardRail):
-    """Restrict conversation to allowed topics."""
-    def __init__(self, allowed_topics: list[str], llm_classifier=None):
-        self.allowed_topics = allowed_topics
-        self.llm_classifier = llm_classifier
+class PromptInjectionRail(GuardRail):
+    """Detect and block prompt injection attacks (OWASP LLM01)."""
+    def __init__(self, classifier_model: str = "meta-llama/Llama-Guard-4"):
+        self.classifier = classifier_model
 
     def check(self, content: str, context: dict) -> RailResult:
-        topic = self.llm_classifier.classify(content, self.allowed_topics)
-        if topic in self.allowed_topics:
-            return RailResult(action=RailAction.ALLOW)
-        return RailResult(
-            action=RailAction.BLOCK,
-            message="I can only help with: " + ", ".join(self.allowed_topics),
-            violated_policy="topic_restriction",
-        )
+        # Multi-layer detection: pattern matching + classifier
+        if self._pattern_check(content):
+            return RailResult(action=RailAction.BLOCK,
+                violated_policy="prompt_injection_pattern")
+        if self._classifier_check(content):
+            return RailResult(action=RailAction.BLOCK,
+                violated_policy="prompt_injection_classifier")
+        return RailResult(action=RailAction.ALLOW)
+
+    def _pattern_check(self, content: str) -> bool:
+        patterns = ["ignore previous", "system:", "you are now",
+                     "disregard", "forget your instructions"]
+        return any(p.lower() in content.lower() for p in patterns)
 
 class OutputFactualityRail(GuardRail):
-    """Check output is grounded in provided context."""
+    """Check output is grounded in provided context (anti-hallucination)."""
     def check(self, content: str, context: dict) -> RailResult:
         retrieved = context.get("retrieved_chunks", "")
         if not retrieved:
@@ -64,59 +68,61 @@ class OutputFactualityRail(GuardRail):
             violated_policy="factuality")
 ```
 
-## Guardrail Pipeline
+## Defense-in-Depth Pipeline
 
 ```text
 User Input
     |
-[Input Rails]  -- jailbreak detection, PII redaction, topic check
+[Input Rails]      -- prompt injection (Llama Guard 4), PII redaction, topic check
     |
-[Retrieval Rails]  -- relevance filtering, content safety
+[Tool Rails]       -- validate tool arguments, block destructive operations
+    |
+[Retrieval Rails]  -- relevance filtering, content safety on retrieved docs
     |
 [LLM Generation]
     |
-[Output Rails]  -- factuality check, toxicity filter, format validation
+[Output Rails]     -- factuality check, toxicity filter, PII scan, format validation
     |
 Safe Response
 ```
+
+## Guardrail Tools (2026)
+
+| Tool | Type | Strength | Latency |
+|------|------|----------|---------|
+| Llama Guard 4 | OSS classifier | Multi-category safety, 14 risk categories | 50-200ms |
+| NeMo Guardrails | NVIDIA OSS framework | Configurable rails, Colang DSL | 100-300ms |
+| Guardrails AI | OSS Python library | Pydantic-based validators, 50+ pre-built | 10-100ms |
+| LMQL | Query language | Constrained decoding, output control | 5-20ms |
+| Galileo Protect | Commercial | Real-time hallucination detection | 50-150ms |
+| Prompt Armor | Commercial | Injection detection API | 30-100ms |
+
+## OWASP LLM Top 10 (2025-2026)
+
+| Risk | Guardrail Strategy |
+|------|-------------------|
+| LLM01: Prompt Injection | Llama Guard + pattern detection + input/output separation |
+| LLM02: Sensitive Information Disclosure | PII redaction + output scanning + data masking |
+| LLM03: Supply Chain | Model provenance + package scanning |
+| LLM06: Excessive Agency | Tool confirmation gates + action allowlists |
+| LLM09: Overreliance | Confidence scores + factuality checking |
 
 ## Quick Reference
 
 | Rail | Stage | Latency | Technique |
 |------|-------|---------|-----------|
-| Jailbreak detection | Input | 50-200ms | Classifier (Llama Guard) |
-| PII redaction | Input | 10-50ms | Regex + NER |
-| Topic control | Input | 100-300ms | LLM classifier |
+| Prompt injection | Input | 50-200ms | Llama Guard 4 + pattern matching |
+| PII redaction | Input | 10-50ms | Regex + NER + Microsoft Presidio |
+| Topic control | Input | 100-300ms | LLM classifier or NeMo Guardrails |
+| Tool validation | Pre-execution | 5-20ms | Pydantic + allowlist |
 | Relevance filter | Retrieval | 10-50ms | Similarity threshold |
 | Factuality check | Output | 200-500ms | LLM-as-judge |
-| Toxicity filter | Output | 50-200ms | Classifier |
+| Toxicity filter | Output | 50-200ms | Llama Guard 4 classifier |
 | Format validation | Output | 5-20ms | JSON Schema / Pydantic |
-
-## NeMo Guardrails Configuration
-
-```yaml
-models:
-  - type: main
-    engine: openai
-    model: gpt-4o
-rails:
-  input:
-    flows:
-      - self check input
-  output:
-    flows:
-      - self check output
-instructions:
-  - type: general
-    content: |
-      You are a helpful customer support assistant.
-      Only answer questions about our products and services.
-```
 
 ## Common Mistakes
 
 ### Wrong
-
 ```python
 # Guardrails only on output -- misses prompt injection
 response = llm.generate(user_input)  # user_input could be a jailbreak
@@ -124,12 +130,12 @@ filtered = toxicity_filter(response)  # too late
 ```
 
 ### Correct
-
 ```python
 pipeline = GuardrailPipeline(rails=[
-    JailbreakDetector(),      # pre-LLM
+    PromptInjectionRail(model="llama-guard-4"),  # pre-LLM
     PIIRedactor(),
     TopicRail(["billing", "support"]),
+    ToolValidationRail(allowed_tools=["search", "lookup"]),
     FactualityChecker(),      # post-LLM
     ToxicityFilter(),
     FormatValidator(schema),

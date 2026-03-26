@@ -2,11 +2,11 @@
 
 > **Purpose**: Orchestration patterns for coordinating multiple specialized LLM agents
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
-Multi-agent systems coordinate multiple specialized LLM agents to solve complex tasks that exceed the capabilities of a single agent. Each agent has a defined role, tools, and instructions. An orchestrator manages handoffs, state sharing, and task routing. In 2025-2026, 72% of enterprise AI projects involve multi-agent architectures.
+Multi-agent systems coordinate multiple specialized LLM agents to solve complex tasks. Each agent has a defined role, tools, and instructions. An orchestrator manages handoffs, state sharing, and task routing. In 2026, the ecosystem has consolidated around production-grade frameworks: LangGraph (graph-based state machines), CrewAI (role-based crews), Claude Agent SDK (tool-calling agent loop), and OpenAI Agents SDK (handoff-based delegation). MCP (Model Context Protocol) has emerged as the universal tool connectivity standard.
 
 ## Core Topologies
 
@@ -17,54 +17,74 @@ A -> B -> C        A --|                    B                A <-> B
                    C --|            A --  Hub  -- D           C <-> D
                                         \   |   /
                                             C
+
+SUPERVISOR (LangGraph)           SWARM (OpenAI Agents SDK)
+     Supervisor                  A --handoff--> B
+    /    |    \                  B --handoff--> C
+   A     B     C                 C --handoff--> A
+   (router decides next)         (agents delegate dynamically)
 ```
 
-## The Pattern
+## Framework Comparison (2026)
+
+| Framework | Architecture | Best For | MCP Support |
+|-----------|-------------|----------|-------------|
+| LangGraph | StateGraph + conditional edges | Production control, durable execution | Yes |
+| CrewAI | Role-based crews with tasks | Rapid prototyping, role assignment | Yes |
+| Claude Agent SDK | Agent loop with tool calling | Claude-native apps, security-first | Native |
+| OpenAI Agents SDK | Handoff-based delegation | OpenAI ecosystem, tracing built-in | Yes |
+| AutoGen (AG2) | Conversation patterns | Enterprise, Semantic Kernel integration | Yes |
+| Agno | Minimal-code agents | Fastest setup, model-agnostic | Yes |
+
+## The Pattern: LangGraph Multi-Agent
 
 ```python
-from dataclasses import dataclass, field
-from typing import Callable
-from enum import Enum
+from langgraph.graph import StateGraph, START, END, MessagesState
+from langchain.chat_models import init_chat_model
 
-class AgentRole(Enum):
-    PLANNER = "planner"
-    RESEARCHER = "researcher"
-    WRITER = "writer"
-    REVIEWER = "reviewer"
+# Specialized agents as graph nodes
+researcher_model = init_chat_model("claude-sonnet-4-6", temperature=0)
+writer_model = init_chat_model("claude-sonnet-4-6", temperature=0.3)
 
-@dataclass
-class Agent:
-    name: str
-    role: AgentRole
-    model: str  # e.g., "gpt-4o", "claude-sonnet"
-    system_prompt: str
-    tools: list[Callable] = field(default_factory=list)
-    max_iterations: int = 5
+def researcher(state: MessagesState):
+    """Research agent with search tools."""
+    return {"messages": [researcher_model.invoke(state["messages"])]}
 
-@dataclass
-class Handoff:
-    from_agent: str
-    to_agent: str
-    condition: str  # natural language or code condition
-    pass_context: bool = True
+def writer(state: MessagesState):
+    """Writing agent -- synthesizes research into content."""
+    return {"messages": [writer_model.invoke(state["messages"])]}
 
-@dataclass
-class Orchestrator:
-    agents: dict[str, Agent]
-    handoffs: list[Handoff]
-    entry_agent: str
+def router(state: MessagesState) -> str:
+    """Supervisor decides next agent based on last message."""
+    last = state["messages"][-1]
+    if "RESEARCH_COMPLETE" in last.content:
+        return "writer"
+    return "researcher"
 
-    def route(self, state: dict) -> str:
-        """Determine next agent based on state."""
-        current = state.get("current_agent", self.entry_agent)
-        for handoff in self.handoffs:
-            if handoff.from_agent == current:
-                if self._evaluate_condition(handoff.condition, state):
-                    return handoff.to_agent
-        return current
+# Build the multi-agent graph
+graph = StateGraph(MessagesState)
+graph.add_node("researcher", researcher)
+graph.add_node("writer", writer)
+graph.add_edge(START, "researcher")
+graph.add_conditional_edges("researcher", router, ["writer", "researcher"])
+graph.add_edge("writer", END)
+agent = graph.compile()
+```
 
-    def _evaluate_condition(self, condition: str, state: dict) -> bool:
-        return state.get("step_complete", False)
+## The Pattern: Claude Agent SDK
+
+```python
+# Claude Agent SDK -- packages Claude Code capabilities as a library
+from claude_agent_sdk import Agent, Tool
+
+agent = Agent(
+    model="claude-sonnet-4-6",
+    tools=[Tool.computer_use(), Tool.bash(), Tool.file_editor()],
+    system_prompt="You are a code review specialist.",
+    max_turns=10,
+)
+# Agent loop handles tool calling, retries, and context management
+result = await agent.run("Review the PR at https://github.com/org/repo/pull/42")
 ```
 
 ## Quick Reference
@@ -75,70 +95,40 @@ class Orchestrator:
 | Concurrent | Low | High | Medium | Parallel analysis |
 | Hub-and-Spoke | Medium | Medium | Medium | Centralized control |
 | Mesh | Medium | High | High | Resilient systems |
-| Hierarchical | Variable | Low | Medium | Plan-and-execute |
+| Supervisor | Variable | Medium | Medium | Multi-agent routing |
+| Plan-and-Execute | Variable | Low | Medium | Cost-optimized pipelines |
+
+## Cost Optimization: Plan-and-Execute
+
+```python
+# Frontier model plans, cheaper models execute
+# Claude Opus 4.6 plans -> Sonnet 4.6 or Haiku executes
+# Result: ~70-90% cost reduction vs. frontier-for-everything
+plan_agent = Agent(model="claude-opus-4-6", role="planner")
+exec_agents = {
+    "search": Agent(model="claude-sonnet-4-6", role="researcher", tools=[web_search]),
+    "write": Agent(model="claude-sonnet-4-6", role="writer"),
+}
+```
 
 ## Common Mistakes
 
 ### Wrong
-
 ```python
 # Single monolithic agent doing everything
 agent = Agent(
-    name="do_everything",
     system_prompt="You are an expert at research, writing, coding, review...",
     tools=[search, write, code, review, deploy, monitor],  # too many tools
 )
 ```
 
 ### Correct
-
 ```python
-# Specialized agents with clear responsibilities
-researcher = Agent(
-    name="researcher",
-    role=AgentRole.RESEARCHER,
-    model="gpt-4o-mini",  # cheaper model for retrieval
-    system_prompt="You research topics and return structured findings.",
-    tools=[web_search, doc_search],
-)
-writer = Agent(
-    name="writer",
-    role=AgentRole.WRITER,
-    model="claude-sonnet-4-20250514",  # stronger model for generation
-    system_prompt="You write clear, accurate content from research.",
-    tools=[],
-)
-orchestrator = Orchestrator(
-    agents={"researcher": researcher, "writer": writer},
-    handoffs=[Handoff("researcher", "writer", "research_complete")],
-    entry_agent="researcher",
-)
+# Specialized agents with clear responsibilities and model tiering
+researcher = Agent(model="claude-sonnet-4-6", tools=[web_search, doc_search])
+writer = Agent(model="claude-sonnet-4-6", tools=[])
+reviewer = Agent(model="claude-opus-4-6", tools=[])  # frontier for quality
 ```
-
-## Cost Optimization: Plan-and-Execute
-
-```python
-# Frontier model plans, cheaper models execute
-plan_agent = Agent(name="planner", model="gpt-4o", role=AgentRole.PLANNER,
-                   system_prompt="Break task into steps. Assign each to a worker.")
-exec_agents = {
-    "search": Agent(name="search", model="gpt-4o-mini", role=AgentRole.RESEARCHER,
-                    system_prompt="Execute search step.", tools=[web_search]),
-    "write": Agent(name="write", model="gpt-4o-mini", role=AgentRole.WRITER,
-                   system_prompt="Execute writing step."),
-}
-# Result: ~90% cost reduction vs. frontier-for-everything
-```
-
-## Key Frameworks (2025-2026)
-
-| Framework | Maintainer | Strength |
-|-----------|-----------|----------|
-| LangGraph | LangChain | Graph-based state machines |
-| CrewAI | CrewAI Inc | Role-based agent crews |
-| OpenAI Agents SDK | OpenAI | Native handoff protocols |
-| AutoGen/Semantic Kernel | Microsoft | Enterprise multi-agent |
-| Swarm (deprecated) | OpenAI | Replaced by Agents SDK |
 
 ## Related
 

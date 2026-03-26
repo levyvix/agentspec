@@ -1,7 +1,7 @@
 # Integration Test Patterns
 
-> **Purpose**: Test patterns for verifying interactions across service boundaries, APIs, and databases
-> **MCP Validated**: 2026-02-17
+> **Purpose**: Test patterns for verifying interactions across service boundaries, APIs, databases, and async services
+> **MCP Validated**: 2026-03-26
 
 ## When to Use
 
@@ -177,6 +177,63 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if "integration" in item.keywords:
                 item.add_marker(skip)
+```
+
+## Async Integration Tests
+
+```python
+import pytest
+import httpx
+
+
+@pytest.fixture
+async def async_api_client():
+    """Async test client for FastAPI apps."""
+    from httpx import ASGITransport
+    from myapp.main import app
+
+    transport = ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_async_create_invoice(async_api_client):
+    payload = {"invoice_number": "INV-200", "vendor": "Async Corp", "amount": 750.00}
+    response = await async_api_client.post("/invoices", json=payload)
+    assert response.status_code == 201
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_async_health_check(async_api_client):
+    response = await async_api_client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+```
+
+## Property-Based Integration Tests (Hypothesis)
+
+```python
+from hypothesis import given, strategies as st, settings
+import pytest
+
+
+@pytest.mark.integration
+@settings(max_examples=50)
+@given(
+    vendor=st.text(min_size=1, max_size=100),
+    amount=st.floats(min_value=0.01, max_value=1_000_000, allow_nan=False),
+)
+def test_invoice_roundtrip(api_client, vendor, amount):
+    """Any valid vendor/amount should survive a create-then-fetch cycle."""
+    payload = {"invoice_number": "INV-HYP", "vendor": vendor, "amount": round(amount, 2)}
+    create = api_client.post("/invoices", json=payload)
+    if create.status_code == 201:
+        fetched = api_client.get(f"/invoices/{create.json()['id']}")
+        assert fetched.status_code == 200
+        assert fetched.json()["vendor"] == vendor
 ```
 
 ## See Also

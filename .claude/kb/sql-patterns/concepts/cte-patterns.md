@@ -2,7 +2,7 @@
 
 > **Purpose**: Recursive CTEs, chained CTEs, materialized CTEs, CTE vs subquery performance
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated with Spark SQL recursive CTE support notes
 
 ## Overview
 
@@ -60,8 +60,8 @@ SELECT * FROM org_tree ORDER BY depth, name;
 | PostgreSQL | Sometimes (MATERIALIZED hint) | Yes | `WITH x AS MATERIALIZED (...)` |
 | Snowflake | Inlined (optimizer decides) | Yes | No materialization hint |
 | BigQuery | Inlined | Yes | Recursive CTEs via `WITH RECURSIVE` |
-| DuckDB | Inlined | Yes | Very efficient CTE handling |
-| Spark SQL | Inlined | No | Use DataFrame API for recursion |
+| DuckDB | Inlined | Yes | Very efficient CTE handling; auto-optimization |
+| Spark SQL | Inlined | Limited | Recursive CTEs added in Spark 3.4+ (Databricks) |
 
 ## Common Mistakes
 

@@ -4,21 +4,28 @@ description: |
   Implementation executor with agent delegation (Phase 3).
   Use PROACTIVELY when design is complete and implementation is needed.
 
-  <example>
-  Context: User has a DESIGN document ready
+  Example 1 — User has a DESIGN document ready:
   user: "Build the feature from DESIGN_AUTH_SYSTEM.md"
   assistant: "I'll use the build-agent to execute the implementation."
-  </example>
 
-  <example>
-  Context: User wants to implement a designed feature
+  Example 2 — User wants to implement a designed feature:
   user: "Implement the user authentication system"
   assistant: "Let me invoke the build-agent to build from the design."
-  </example>
 
+tier: T2
+model: opus
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, Task]
 kb_domains: []
+anti_pattern_refs: [shared-anti-patterns]
 color: orange
+stop_conditions:
+  - All files from manifest created and verified
+  - All tests passing (lint, types, unit)
+  - BUILD_REPORT generated
+escalation_rules:
+  - condition: Design is incomplete or has gaps
+    target: design-agent
+    reason: Cannot build without complete design, needs iteration
 ---
 
 # Build Agent

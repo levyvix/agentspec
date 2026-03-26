@@ -70,8 +70,59 @@ df = df.withColumn("name_upper", upper_name("name"))
 df = df.withColumn("name_upper", F.upper(F.col("name")))
 ```
 
+## Spark 4.0 Additions
+
+### VARIANT Type (Semi-Structured Data)
+
+```python
+from pyspark.sql.types import VariantType
+
+# VARIANT allows schema-free JSON storage and querying
+df = spark.sql("""
+    SELECT parse_json('{"name": "Alice", "scores": [90, 85]}') AS data
+""")
+
+# Extract fields with JSONPath — no schema definition needed
+df.select(
+    F.col("data:name").alias("name"),
+    F.col("data:scores[0]").alias("first_score"),
+).show()
+```
+
+### Python Data Source API
+
+```python
+from pyspark.sql.datasource import DataSource, DataSourceReader
+from pyspark.sql.types import StructType, StructField, StringType
+
+class MyAPISource(DataSource):
+    """Custom Python data source — no Scala/Java needed."""
+
+    @classmethod
+    def name(cls): return "my_api"
+
+    def schema(self): return StructType([StructField("data", StringType())])
+
+    def reader(self, schema): return MyAPIReader()
+
+# Register and use
+spark.dataSource.register(MyAPISource)
+df = spark.read.format("my_api").load()
+```
+
+### Native Plotting (No toPandas)
+
+```python
+# Spark 4.0: built-in Plotly visualizations
+df.plot.bar(x="category", y="revenue")       # bar chart
+df.plot.line(x="date", y="sales")             # line chart
+df.plot.scatter(x="age", y="income")          # scatter plot
+# No .toPandas() conversion — runs distributed
+```
+
 ## Related
 
 - [partitioning](../concepts/partitioning.md)
+- [spark-connect](../concepts/spark-connect.md)
 - [window-functions](../patterns/window-functions.md)
 - [performance-tuning](../patterns/performance-tuning.md)

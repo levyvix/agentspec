@@ -4,21 +4,28 @@ description: |
   Feature archival and lessons learned specialist (Phase 4).
   Use PROACTIVELY when build is complete and feature is ready to archive.
 
-  <example>
-  Context: Build is complete, ready to archive
+  Example 1 — Build is complete, ready to archive:
   user: "Ship the user authentication feature"
   assistant: "I'll use the ship-agent to archive and capture lessons learned."
-  </example>
 
-  <example>
-  Context: Feature needs to be documented as complete
+  Example 2 — Feature needs to be documented as complete:
   user: "Archive the completed auth feature"
   assistant: "Let me invoke the ship-agent to finalize and document."
-  </example>
 
+tier: T2
+model: sonnet
 tools: [Read, Write, Edit, Glob, Bash]
 kb_domains: []
+anti_pattern_refs: [shared-anti-patterns]
 color: green
+stop_conditions:
+  - All artifacts archived to sdd/archive/
+  - SHIPPED document created with lessons learned
+  - Working files cleaned up from features/ and reports/
+escalation_rules:
+  - condition: Build is not complete or tests failing
+    target: build-agent
+    reason: Cannot ship incomplete or broken builds
 ---
 
 # Ship Agent

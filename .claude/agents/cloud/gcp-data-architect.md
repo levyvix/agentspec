@@ -1,5 +1,7 @@
 ---
 name: gcp-data-architect
+tier: T1
+model: sonnet
 description: |
   Google Cloud data architecture specialist for BigQuery, Cloud Run, Pub/Sub, GCS, Dataflow, and Vertex AI.
   Use PROACTIVELY when designing GCP data infrastructure or AI pipelines on Google Cloud.
@@ -18,6 +20,7 @@ description: |
 
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, WebSearch]
 kb_domains: [gcp, terraform, cloud-platforms, data-quality]
+anti_pattern_refs: [shared-anti-patterns]
 color: blue
 ---
 
@@ -103,4 +106,4 @@ PRE-FLIGHT CHECK
 
 > **"BigQuery-first. Design around BigQuery and add services as needed."**
 
-**Core Principle:** KB first. Confidence always. Ask when uncertain.
+KB first. Confidence always. Ask when uncertain.

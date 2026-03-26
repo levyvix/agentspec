@@ -1,20 +1,20 @@
 # Orchestrator Comparison
 
-> **Purpose**: Airflow 2.x vs Dagster vs Prefect 3.x — decision matrix with trade-offs
+> **Purpose**: Airflow 3.x vs Dagster vs Prefect 3.x — decision matrix with trade-offs
 > **Confidence**: 0.90
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated for Airflow 3.0 GA (April 2025)
 
 ## Overview
 
-The three leading Python orchestrators each have a distinct philosophy: **Airflow** is task-centric (schedule tasks on a timeline), **Dagster** is asset-centric (define data assets and their dependencies), and **Prefect** is workflow-centric (decorate Python functions with retry/scheduling). Choosing the right one depends on team size, existing infrastructure, and whether you think in tasks or data assets.
+The three leading Python orchestrators each have a distinct philosophy: **Airflow 3.x** is now a **task + asset hybrid** (schedule tasks on a timeline OR trigger on asset updates), **Dagster** is asset-centric (define data assets and their dependencies), and **Prefect** is workflow-centric (decorate Python functions with retry/scheduling). Airflow 3.0's addition of asset-aware scheduling and remote execution significantly narrows the gap with Dagster on data lineage and with Prefect on ease of deployment.
 
 ## The Concept
 
 ```python
 # Same pipeline in three orchestrators
 
-# --- AIRFLOW 2.x ---
-from airflow.decorators import dag, task
+# --- AIRFLOW 3.x ---
+from airflow.sdk import DAG, task
 @dag(schedule="@daily")
 def orders_pipeline():
     @task()
@@ -50,18 +50,20 @@ def orders_pipeline():
 
 ## Quick Reference
 
-| Dimension | Airflow 2.x | Dagster | Prefect 3.x |
+| Dimension | Airflow 3.x | Dagster | Prefect 3.x |
 |-----------|------------|---------|-------------|
-| **Mental model** | Tasks on a schedule | Data assets + lineage | Decorated Python functions |
-| **Scheduling** | Cron, datasets, sensors | Cron, sensors, freshness policies | Cron, event-driven |
+| **Mental model** | Tasks + Assets hybrid | Data assets + lineage | Decorated Python functions |
+| **Scheduling** | Cron, **assets (AND/OR)**, sensors | Cron, sensors, freshness policies | Cron, event-driven |
 | **Dynamic tasks** | `expand()` / `map()` | `@multi_asset`, `DynamicPartitionsDefinition` | `.map()` on tasks |
-| **Testing** | Difficult (needs Airflow context) | First-class (`materialize()` in pytest) | Easy (call functions directly) |
-| **UI** | Mature, complex | Modern, asset-focused | Clean, flow-focused |
+| **Testing** | Improved (still needs context) | First-class (`materialize()` in pytest) | Easy (call functions directly) |
+| **UI** | **Modern React UI** (dark mode) | Modern, asset-focused | Clean, flow-focused |
+| **DAG versioning** | **Built-in (3.0+)** | Built-in | Via Git |
+| **Remote execution** | **Task Execution API** | Built-in | Cloud-native |
 | **Deployment** | Self-hosted, MWAA, Astronomer | Self-hosted, Dagster Cloud | Self-hosted, Prefect Cloud |
 | **dbt integration** | Provider package | `dagster-dbt` (asset-level) | `prefect-dbt` |
-| **Learning curve** | Medium-high | Medium | Low |
-| **Community size** | Largest | Growing fast | Medium |
-| **Best for** | Complex scheduling, legacy migration | Data-asset-centric teams, testing-heavy | Small teams, Python-first |
+| **Learning curve** | Medium | Medium | Low |
+| **Community size** | Largest (30M+ monthly downloads) | Growing fast | Medium |
+| **Best for** | Enterprise-scale, hybrid cloud, MLOps | Data-asset-centric teams, testing-heavy | Small teams, Python-first |
 
 ## Common Mistakes
 
@@ -78,10 +80,12 @@ Choosing Airflow because "everyone uses it" without considering:
 
 ```text
 Decision framework:
-1. Team > 10 DE + existing Airflow? → Stay with Airflow, modernize with TaskFlow
+1. Team > 10 DE + existing Airflow? → Upgrade to Airflow 3.0 (assets + versioning)
 2. Asset-centric + strong testing culture? → Dagster
 3. Small team + Python-first + fast iteration? → Prefect
-4. Regulated industry + audit trail? → Airflow (most mature logging)
+4. Regulated industry + audit trail? → Airflow 3.x (DAG versioning + mature logging)
+5. Multi-cloud/hybrid execution? → Airflow 3.x (Task Execution API)
+6. MLOps + GenAI workflows? → Airflow 3.x (30% of users, growing fast)
 ```
 
 ## Related

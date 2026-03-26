@@ -1,8 +1,8 @@
 # Fixtures
 
-> **Purpose**: pytest fixture patterns, scope control, and dependency injection for test setup
+> **Purpose**: pytest fixture patterns, scope control, async fixtures, and dependency injection
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-02-17
+> **MCP Validated**: 2026-03-26
 
 ## Overview
 
@@ -129,6 +129,47 @@ def test_a(fresh_list):
 
 def test_b(fresh_list):
     assert len(fresh_list) == 0  # Always passes
+```
+
+## Async Fixtures (pytest-asyncio)
+
+```python
+import pytest
+
+
+@pytest.fixture
+async def async_client():
+    """Async fixture with setup and teardown."""
+    import httpx
+    async with httpx.AsyncClient(base_url="http://test") as client:
+        yield client
+
+
+@pytest.fixture(scope="session")
+async def async_db_pool():
+    """Session-scoped async fixture."""
+    import asyncpg
+    pool = await asyncpg.create_pool("postgresql://localhost/test")
+    yield pool
+    await pool.close()
+
+
+@pytest.mark.asyncio
+async def test_fetch(async_client):
+    response = await async_client.get("/api/health")
+    assert response.status_code == 200
+```
+
+## tmp_path Fixture (Built-in)
+
+```python
+def test_write_file(tmp_path):
+    """tmp_path provides a unique temporary directory as pathlib.Path."""
+    file = tmp_path / "data.json"
+    file.write_text('{"key": "value"}')
+
+    assert file.exists()
+    assert "key" in file.read_text()
 ```
 
 ## Related

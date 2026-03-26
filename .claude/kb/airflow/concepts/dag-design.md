@@ -2,11 +2,11 @@
 
 > **Purpose**: Idempotency, atomicity, retries, SLAs, schedule strategies, naming conventions
 > **Confidence**: 0.95
-> **MCP Validated**: 2026-03-26
+> **MCP Validated**: 2026-03-26 | Updated for Airflow 3.0 GA
 
 ## Overview
 
-A well-designed DAG is idempotent (re-runs produce the same result), atomic (each task does one thing), and observable (SLAs, alerting). The `@dag` decorator (Airflow 2.x TaskFlow API) is the modern way to define DAGs, replacing the classic `DAG()` context manager.
+A well-designed DAG is idempotent (re-runs produce the same result), atomic (each task does one thing), and observable (SLAs, alerting). The `@dag` decorator (TaskFlow API) is the modern way to define DAGs. **Airflow 3.0** adds DAG versioning (code tracked per execution), asset-aware scheduling via `@asset` decorator, and a new React-based UI. Import from `airflow.sdk` in Airflow 3.0+.
 
 ## The Concept
 
@@ -97,6 +97,35 @@ def good_dag():
         import pandas as pd  # import inside task
         df = pd.read_csv("big_file.csv")
     process()
+```
+
+## Airflow 3.0: Asset-Driven DAG Example
+
+```python
+from airflow.sdk import DAG, task, asset
+from datetime import datetime
+
+@asset
+def orders_data():
+    """Define a data asset that other DAGs can depend on."""
+    print("Producing orders data...")
+    return "orders_ready"
+
+@dag(
+    dag_id="asset_consumer_pipeline",
+    schedule=[Asset("s3://lake/silver/orders")],  # triggers on asset update
+    start_date=datetime(2026, 1, 1),
+    catchup=False,
+)
+def asset_consumer():
+    @task()
+    def process_orders():
+        """Runs only when the orders asset is updated."""
+        pass
+
+    process_orders()
+
+asset_consumer()
 ```
 
 ## Related
